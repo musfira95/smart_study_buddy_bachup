@@ -21,21 +21,21 @@ public class SplashActivity extends AppCompatActivity {
 
                 Intent intent;
                 if (session.isLoggedIn()) {
-                    String role = session.getUserRole(); // get role from session
-                    if (role.equals("admin")) {
+                    String role = session.getUserRole();
+
+                    // ✅ Null-safe check for role
+                    if ("admin".equals(role)) {
                         intent = new Intent(SplashActivity.this, AdminDashboardActivity.class);
                     } else {
                         intent = new Intent(SplashActivity.this, DashboardActivity.class);
                     }
-                    // ✅ Send logged-in email
                     intent.putExtra("email", session.getUserEmail());
                 } else {
                     intent = new Intent(SplashActivity.this, LoginActivity.class);
                 }
 
-
                 startActivity(intent);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_out); // animation
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 finish();
             }
         }, SPLASH_DELAY);

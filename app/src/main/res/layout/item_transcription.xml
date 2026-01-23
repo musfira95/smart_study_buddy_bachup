@@ -12,7 +12,8 @@
         android:layout_height="wrap_content"
         android:text="Transcription Title"
         android:textStyle="bold"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        android:textColor="#4F6F64" />   <!-- PURPLE COLOR -->
 
     <TextView
         android:id="@+id/tvTranscriptionDate"

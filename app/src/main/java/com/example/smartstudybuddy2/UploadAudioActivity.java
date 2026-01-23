@@ -1,97 +1,195 @@
 package com.example.smartstudybuddy2;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
+
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
-import android.view.View;
-import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.database.Cursor;
+import android.content.res.AssetFileDescriptor;
+
+import java.io.IOException;
 
 public class UploadAudioActivity extends AppCompatActivity {
 
     private static final int PICK_AUDIO_REQUEST = 1;
-    Button uploadButton, processButton;
-    TextView fileNameText;
-    Uri audioUri;
+    private static final int RECORD_AUDIO_REQUEST = 200;
+
+    // Upload Audio UI
+    private CardView uploadButton, recordButton;
+    private LinearLayout processButton;
+    private TextView fileNameText;
+
+    // Bottom Navigation
+    private ImageView navHome, navAnalytics, navSettings, navProfile;
+
+    private Uri audioUri;
+    private String fileName;
+    private long fileSize;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_upload_audio);
 
-        uploadButton = findViewById(R.id.uploadButton);
-        processButton = findViewById(R.id.processButton);
-        fileNameText = findViewById(R.id.fileNameText);
+        // ===== Upload Audio Views =====
+        uploadButton = findViewById(R.id.btnSelectAudio);
+        recordButton = findViewById(R.id.btnRecordAudio);
+        processButton = findViewById(R.id.btnProcessAudio);
+        fileNameText = findViewById(R.id.tvFileStatus);
 
-        // Initially disable the process button
         processButton.setEnabled(false);
 
-        uploadButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openAudioPicker();
+        // ===== Bottom Nav Views =====
+        navHome = findViewById(R.id.navHome);
+        navAnalytics = findViewById(R.id.navAnalytics);
+        navSettings = findViewById(R.id.navSettings);
+        navProfile = findViewById(R.id.navProfile);
+
+        // ================= Upload MP3 =================
+        uploadButton.setOnClickListener(v -> openAudioPicker());
+
+        // ================= Process Audio =================
+        processButton.setOnClickListener(v -> {
+            if (audioUri != null) {
+                Intent intent = new Intent(UploadAudioActivity.this, ProcessAudioActivity.class);
+                intent.putExtra("fileName", fileName);
+                intent.putExtra("fileSize", fileSize);
+                intent.putExtra("audioUri", audioUri.toString());
+                startActivity(intent);
+            } else {
+                Toast.makeText(this, "Please select an MP3 first", Toast.LENGTH_SHORT).show();
             }
         });
 
-
-
-        processButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(audioUri != null){
-                    Toast.makeText(UploadAudioActivity.this, "Audio ready for processing!", Toast.LENGTH_SHORT).show();
-                    // TODO: Add audio processing logic here
-                } else {
-                    Toast.makeText(UploadAudioActivity.this, "Please select an audio file first", Toast.LENGTH_SHORT).show();
-                }
-            }
+        // ================= Record Audio =================
+        recordButton.setOnClickListener(v -> {
+            Intent intent = new Intent(UploadAudioActivity.this, RecordMicActivity.class);
+            startActivityForResult(intent, RECORD_AUDIO_REQUEST);
         });
+
+        // ================= Bottom Navigation (SAME AS DASHBOARD) =================
+
+        // Home → Dashboard
+        navHome.setOnClickListener(v -> {
+            Intent intent = new Intent(UploadAudioActivity.this, DashboardActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            startActivity(intent);
+            finish();
+        });
+
+        // Analytics
+        navAnalytics.setOnClickListener(v ->
+                startActivity(new Intent(UploadAudioActivity.this, AnalyticsActivity.class))
+        );
+
+        // Settings
+        navSettings.setOnClickListener(v ->
+                startActivity(new Intent(UploadAudioActivity.this, ThemeSettingsActivity.class))
+        );
+
+        // Profile
+        navProfile.setOnClickListener(v ->
+                startActivity(new Intent(UploadAudioActivity.this, ProfileActivity.class))
+        );
     }
 
-    private void openAudioPicker(){
+    // ================= Audio Picker =================
+    private void openAudioPicker() {
         Intent intent = new Intent();
         intent.setType("audio/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent,"Select MP3"), PICK_AUDIO_REQUEST);
+        startActivityForResult(Intent.createChooser(intent, "Select MP3"), PICK_AUDIO_REQUEST);
     }
 
+    // ================= Handle Results =================
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data){
-        super.onActivityResult(requestCode,resultCode,data);
-        if(requestCode == PICK_AUDIO_REQUEST && resultCode == RESULT_OK && data != null){
-            audioUri = data.getData();
-            if(audioUri != null){
-                String name = getFileName(audioUri);
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
-                // Only allow .mp3 files
-                if(name.endsWith(".mp3")){
-                    fileNameText.setText(name);
-                    processButton.setEnabled(true); // enable process button
-                } else {
-                    Toast.makeText(this, "Please select an MP3 file", Toast.LENGTH_SHORT).show();
+        // Recording Result
+        if (requestCode == RECORD_AUDIO_REQUEST && resultCode == RESULT_OK && data != null) {
+            Toast.makeText(this, "Recording received", Toast.LENGTH_SHORT).show();
+        }
+
+        // MP3 Picker Result
+        if (requestCode == PICK_AUDIO_REQUEST && resultCode == RESULT_OK && data != null) {
+            audioUri = data.getData();
+            if (audioUri != null) {
+                fileName = getFileName(audioUri);
+
+                if (!fileName.toLowerCase().endsWith(".mp3")) {
+                    Toast.makeText(this, "Please select an MP3 audio file only", Toast.LENGTH_SHORT).show();
                     audioUri = null;
-                    processButton.setEnabled(false);
+                    fileName = null;
+                    fileSize = 0;
                     fileNameText.setText("No file selected");
+                    processButton.setEnabled(false);
+                    return;
                 }
+
+                fileSize = getFileSize(audioUri);
+                fileNameText.setText("Selected: " + fileName + " (" + fileSize + " KB)");
+                processButton.setEnabled(true);
             }
         }
     }
 
-    private String getFileName(Uri uri){
-        String result = "";
-        if(uri.getScheme().equals("content")){
-            try (android.database.Cursor cursor = getContentResolver().query(uri, null, null, null, null)){
-                if(cursor != null && cursor.moveToFirst()){
-                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+    // ================= Helpers =================
+    private String getFileName(Uri uri) {
+        if (uri == null) return "";
+        String result = null;
+
+        if ("content".equals(uri.getScheme())) {
+            Cursor cursor = null;
+            try {
+                cursor = getContentResolver().query(uri, null, null, null, null);
+                if (cursor != null && cursor.moveToFirst()) {
+                    int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                    if (nameIndex != -1) result = cursor.getString(nameIndex);
+                }
+            } finally {
+                if (cursor != null) cursor.close();
+            }
+        }
+
+        return result != null ? result : uri.getLastPathSegment();
+    }
+
+    private long getFileSize(Uri uri) {
+        if (uri == null) return 0;
+        long size = 0;
+
+        Cursor cursor = null;
+        try {
+            cursor = getContentResolver().query(uri, null, null, null, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
+                if (sizeIndex != -1) size = cursor.getLong(sizeIndex);
+            }
+        } finally {
+            if (cursor != null) cursor.close();
+        }
+
+        if (size <= 0) {
+            AssetFileDescriptor afd = null;
+            try {
+                afd = getContentResolver().openAssetFileDescriptor(uri, "r");
+                if (afd != null && afd.getLength() > 0) size = afd.getLength();
+            } catch (Exception ignored) {
+            } finally {
+                if (afd != null) {
+                    try { afd.close(); } catch (IOException ignored) {}
                 }
             }
         }
-        if(result.isEmpty()){
-            result = uri.getLastPathSegment();
-        }
-        return result;
+
+        return size > 0 ? size / 1024 : 0;
     }
 }

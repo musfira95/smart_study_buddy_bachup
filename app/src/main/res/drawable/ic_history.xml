@@ -1,4 +1,16 @@
-<?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-  
-</selector>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Circular arrow for history -->
+    <path
+        android:fillColor="#A64AC9"
+        android:pathData="M12,4a8,8 0 1,1 -7.5,5.2l1.9,0.7A6,6 0 1,0 12,6v2l-3,-2 3,-2v2z"/>
+
+    <!-- History list lines -->
+    <path
+        android:fillColor="#A64AC9"
+        android:pathData="M8,12h8v1.5H8zM8,15h6v1.5H8z"/>
+</vector>

@@ -2,15 +2,17 @@ package com.example.smartstudybuddy2;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import java.util.ArrayList;
 
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder> {
@@ -40,65 +42,46 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         holder.emailText.setText("Email: " + user.getEmail());
         holder.roleText.setText("Role: " + user.getRole());
 
-        // --- Edit Button ---
-        holder.editBtn.setOnClickListener(v -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(context);
-            View view = LayoutInflater.from(context).inflate(R.layout.dialog_update_user, null);
-            builder.setView(view);
+        holder.blockBtn.setText(user.getIsBlocked() == 1 ? "Unblock" : "Block");
 
-            EditText updateUsername = view.findViewById(R.id.updateUsername);
-            EditText updateEmail = view.findViewById(R.id.updateEmail);
-            EditText updatePassword = view.findViewById(R.id.updatePassword);
-            Button updateButton = view.findViewById(R.id.updateButton);
+        holder.blockBtn.setOnClickListener(v -> {
+            int newStatus = user.getIsBlocked() == 1 ? 0 : 1;
 
-            updateUsername.setText(user.getUsername());
-            updateEmail.setText(user.getEmail());
-            updatePassword.setText(user.getPassword());
+            if (dbHelper.updateBlockStatus(user.getEmail(), newStatus)) {
+                user.setIsBlocked(newStatus);
+                notifyItemChanged(position);
 
-            AlertDialog dialog = builder.create();
-            dialog.show();
-
-            updateButton.setOnClickListener(btn -> {
-                String newUsername = updateUsername.getText().toString().trim();
-                String newEmail = updateEmail.getText().toString().trim();
-                String newPassword = updatePassword.getText().toString().trim();
-
-                if (newUsername.isEmpty() || newEmail.isEmpty() || newPassword.isEmpty()) {
-                    Toast.makeText(context, "Please fill all fields", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                boolean updated = dbHelper.updateUser(user.getEmail(), newEmail, newUsername, newPassword, user.getRole());
-                if (updated) {
-                    Toast.makeText(context, "User updated successfully", Toast.LENGTH_SHORT).show();
-                    user.setUsername(newUsername);
-                    user.setEmail(newEmail);
-                    user.setPassword(newPassword);
-                    notifyItemChanged(position);
-                } else {
-                    Toast.makeText(context, "Update failed", Toast.LENGTH_SHORT).show();
-                }
-                dialog.dismiss();
-            });
+                Toast.makeText(context,
+                        newStatus == 1 ? "User Blocked" : "User Unblocked",
+                        Toast.LENGTH_SHORT).show();
+            }
         });
 
-        // --- Delete Button ---
         holder.deleteBtn.setOnClickListener(v -> {
             new AlertDialog.Builder(context)
                     .setTitle("Delete User")
-                    .setMessage("Are you sure you want to delete " + user.getUsername() + "?")
-                    .setPositiveButton("Yes", (dialog, which) -> {
-                        boolean deleted = dbHelper.deleteUser(user.getEmail());
-                        if (deleted) {
+                    .setMessage("Delete " + user.getUsername() + "?")
+                    .setPositiveButton("Yes", (d, w) -> {
+
+                        if (user.getRole().equals("admin") && dbHelper.isLastAdmin(user.getEmail())) {
+                            Toast.makeText(context, "Cannot delete last admin", Toast.LENGTH_LONG).show();
+                            return;
+                        }
+
+                        if (dbHelper.deleteUser(user.getEmail())) {
                             usersList.remove(position);
                             notifyItemRemoved(position);
-                            Toast.makeText(context, "User deleted successfully", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(context, "Failed to delete user", Toast.LENGTH_SHORT).show();
                         }
                     })
                     .setNegativeButton("No", null)
                     .show();
+        });
+
+        holder.manageRoleBtn.setOnClickListener(v -> {
+            Intent intent = new Intent(context, RoleManagementActivity.class);
+            intent.putExtra("email", user.getEmail());
+            intent.putExtra("role", user.getRole());
+            context.startActivity(intent);
         });
     }
 
@@ -109,15 +92,16 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
     static class UserViewHolder extends RecyclerView.ViewHolder {
         TextView usernameText, emailText, roleText;
-        Button editBtn, deleteBtn;
+        Button deleteBtn, manageRoleBtn, blockBtn;
 
         public UserViewHolder(@NonNull View itemView) {
             super(itemView);
             usernameText = itemView.findViewById(R.id.usernameText);
             emailText = itemView.findViewById(R.id.emailText);
             roleText = itemView.findViewById(R.id.roleText);
-            editBtn = itemView.findViewById(R.id.editBtn);
             deleteBtn = itemView.findViewById(R.id.deleteBtn);
+            manageRoleBtn = itemView.findViewById(R.id.manageRoleBtn);
+            blockBtn = itemView.findViewById(R.id.blockBtn);
         }
     }
 }

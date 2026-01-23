@@ -1,6 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="180dp"
+    android:background="@drawable/login_bg"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="16dp">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- ADMIN PROFILE IMAGE -->
+    <ImageView
+        android:id="@+id/imgAdminProfile"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:src="@drawable/ic_user"
+        android:background="@drawable/circle_white"
+        android:padding="14dp" />
+
+    <!-- ADMIN NAME -->
+    <TextView
+        android:id="@+id/tvAdminName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Admin"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="#4F6F64"
+        android:layout_marginTop="10dp" />
+
+    <!-- ADMIN EMAIL -->
+    <TextView
+        android:id="@+id/tvAdminEmail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="admin@smartstudybuddy.com"
+        android:textSize="13sp"
+        android:textColor="#777777"
+        android:layout_marginTop="4dp" />
+
+</LinearLayout>

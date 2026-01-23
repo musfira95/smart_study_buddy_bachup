@@ -1,19 +1,23 @@
 package com.example.smartstudybuddy2;
+import android.widget.ImageView;
 
-import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
+import android.view.MotionEvent;
 import android.widget.EditText;
-import android.widget.Toast;
 import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+import android.view.View;
 
+import androidx.appcompat.app.AppCompatActivity;
 
 public class SignupActivity extends AppCompatActivity {
 
-    EditText emailEditText, usernameEditText, passwordEditText;
-    Button signupButton;
+    EditText etName, etEmail, etPassword, etConfirmPassword;
+    LinearLayout signupButton;
+    ImageView googleSignUpBtn, facebookSignUpBtn;
+    TextView tvLoginLink;
     DatabaseHelper dbHelper;
 
     @Override
@@ -23,55 +27,82 @@ public class SignupActivity extends AppCompatActivity {
 
         dbHelper = new DatabaseHelper(this);
 
-        emailEditText = findViewById(R.id.emailEditText);
-        usernameEditText = findViewById(R.id.usernameEditText);
-        passwordEditText = findViewById(R.id.passwordEditText);
+        etName = findViewById(R.id.etName);
+        etEmail = findViewById(R.id.etEmail);
+        etPassword = findViewById(R.id.etPassword);
+        etConfirmPassword = findViewById(R.id.etConfirmPassword);
         signupButton = findViewById(R.id.signupButton);
+        googleSignUpBtn = findViewById(R.id.googleSignUpBtn);
+        facebookSignUpBtn = findViewById(R.id.facebookSignUpBtn);
+        tvLoginLink = findViewById(R.id.tvLoginLink);
 
-        signupButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String email = emailEditText.getText().toString().trim();
-                String username = usernameEditText.getText().toString().trim();
-                String password = passwordEditText.getText().toString().trim();
+        etPassword.setOnTouchListener(getPasswordTouchListener(etPassword));
+        etConfirmPassword.setOnTouchListener(getPasswordTouchListener(etConfirmPassword));
 
-                if(email.isEmpty() || username.isEmpty() || password.isEmpty()){
-                    Toast.makeText(SignupActivity.this, "Please fill all fields", Toast.LENGTH_SHORT).show();
-                }
-                else if(!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()){
-                    Toast.makeText(SignupActivity.this, "Enter a valid email", Toast.LENGTH_SHORT).show();
-                }
-                else if(password.length() < 6){
-                    Toast.makeText(SignupActivity.this, "Password must be 6+ characters", Toast.LENGTH_SHORT).show();
-                }
-                else {
-                    // ✅ Updated insertUser with role "user"
-                    boolean inserted = dbHelper.insertUser(email, username, password, "user");
-                    if(inserted){
-                        Toast.makeText(SignupActivity.this, "Signup Successful", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
-                        startActivity(intent);
-                        finish();
-                    } else {
-                        Toast.makeText(SignupActivity.this, "User already exists", Toast.LENGTH_SHORT).show();
-                    }
-                }
+        signupButton.setOnClickListener(v -> {
+            String name = etName.getText().toString().trim();
+            String email = etEmail.getText().toString().trim();
+            String password = etPassword.getText().toString().trim();
+            String confirmPassword = etConfirmPassword.getText().toString().trim();
+
+            if(name.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+                Toast.makeText(SignupActivity.this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if(!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                Toast.makeText(SignupActivity.this, "Enter a correct email format", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if(!password.equals(confirmPassword)) {
+                Toast.makeText(SignupActivity.this, "Passwords do not match", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            boolean inserted = dbHelper.insertUser(email, name, password, "user");
+            if(inserted) {
+                Toast.makeText(SignupActivity.this, "Account created successfully!", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(SignupActivity.this, LoginActivity.class));
+            } else {
+                Toast.makeText(SignupActivity.this, "Email already exists", Toast.LENGTH_SHORT).show();
             }
         });
 
-        LinearLayout googleSignUpBtn, facebookSignUpBtn;
+        tvLoginLink.setOnClickListener(v ->
+                startActivity(new Intent(SignupActivity.this, LoginActivity.class))
+        );
+    }
 
-        googleSignUpBtn = findViewById(R.id.googleSignUpBtn);
-        facebookSignUpBtn = findViewById(R.id.facebookSignUpBtn);
+    private View.OnTouchListener getPasswordTouchListener(EditText passwordEditText) {
+        return (v, event) -> {
+            final int DRAWABLE_END = 2;
+            if(event.getAction() == MotionEvent.ACTION_UP) {
+                if(event.getRawX() >= (passwordEditText.getRight()
+                        - passwordEditText.getCompoundDrawables()[DRAWABLE_END].getBounds().width())) {
 
-        googleSignUpBtn.setOnClickListener(v -> {
-            Toast.makeText(SignupActivity.this, "Google SignUp Coming Soon!", Toast.LENGTH_SHORT).show();
-        });
+                    if(passwordEditText.getInputType() == (android.text.InputType.TYPE_CLASS_TEXT
+                            | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD)) {
 
-        facebookSignUpBtn.setOnClickListener(v -> {
-            Toast.makeText(SignupActivity.this, "Facebook SignUp Coming Soon!", Toast.LENGTH_SHORT).show();
-        });
+                        passwordEditText.setInputType(android.text.InputType.TYPE_CLASS_TEXT
+                                | android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
 
+                        passwordEditText.setCompoundDrawablesWithIntrinsicBounds(
+                                null, null, getResources().getDrawable(R.drawable.ic_visibility), null);
 
+                    } else {
+                        passwordEditText.setInputType(android.text.InputType.TYPE_CLASS_TEXT
+                                | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
+
+                        passwordEditText.setCompoundDrawablesWithIntrinsicBounds(
+                                null, null, getResources().getDrawable(R.drawable.ic_visibility_off), null);
+                    }
+
+                    passwordEditText.setSelection(passwordEditText.getText().length());
+                    return true;
+                }
+            }
+            return false;
+        };
     }
 }

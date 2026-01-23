@@ -2,6 +2,18 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- 🎙 Microphone permission -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- 💾 Storage permissions -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
+    <!-- For Android 13+ (TIRAMISU) -->
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO"
+        tools:ignore="ScopedStorage" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -11,12 +23,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Smartstudybuddy2"
-        tools:targetApi="31">
+        android:networkSecurityConfig="@xml/network_security_config"
+        tools:targetApi="33">
+        <activity android:name=".EditProfileActivity" />
+        <activity android:name=".LastTranscriptionActivity" />
 
-        <activity android:name=".ForgotPasswordActivity" />
-        <activity android:name=".ResetPasswordActivity" />
 
-        <!-- Launcher activity ab SplashActivity hai -->
+        <!-- Launcher activity -->
         <activity
             android:name=".SplashActivity"
             android:exported="true">
@@ -32,18 +45,62 @@
         <activity android:name=".DashboardActivity" />
         <activity android:name=".UploadAudioActivity" />
         <activity android:name=".MainActivity" />
-
-        <!-- ✅ Admin dashboard activity -->
+        <activity android:name=".NotesActivity" />
+        <activity android:name=".RecordMicActivity" />
+        <activity android:name=".ProcessAudioActivity" />
+        <activity android:name=".RecordingListActivity" />
         <activity android:name=".AdminDashboardActivity" />
+        <activity android:name=".NoteDetailActivity" />
+        <activity android:name=".TranscriptionActivity" />
+        <activity android:name=".SummaryActivity" />
+        <activity android:name=".QuizActivity" />
+        <activity android:name=".QuizResultActivity" />
+        <activity android:name=".ViewUploadedDetailsActivity" />
+        <activity android:name=".SummaryQuizActivity" />
+        <activity android:name=".ProfileActivity" />
+        <activity android:name=".ExportActivity" />
+        <activity android:name=".TimetableActivity" />
+        <activity android:name=".SearchActivity" />
+        <activity android:name=".AboutActivity" />
+        <activity android:name=".HelpActivity" />
+        <activity android:name=".AllTranscriptionsActivity" />
+        <activity android:name=".AnalyticsActivity" />
+        <activity android:name=".HistoryActivity"
+            android:label="History Tracking"
+            android:exported="true"/>
+        <activity android:name=".RoleManagementActivity" />
+        <activity android:name=".SearchUsersActivity" />
+        <activity android:name=".AnalyticsDashboardActivity" />
+        <activity android:name=".ThemeSettingsActivity" />
+        <activity android:name=".AdminHomeActivity" />
+        <activity android:name=".UsersListActivity" />
+        <activity android:name=".Reminders" />
+        <activity android:name=".NotificationActivity"/>
+        <!-- ADMIN PROFILE -->
+        <activity android:name=".AdminProfileActivity" />
+        <activity android:name=".EditAdminProfileActivity" />
 
-        <!-- ✅ Add user screen with keyboard adjustment -->
+
+
+
+
+
+
+
+
+
+
+
+        <!-- User management activities -->
         <activity
             android:name=".AddUserActivity"
             android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".ForgotPasswordActivity" />
+        <activity android:name=".ResetPasswordActivity" />
+        <activity android:name=".RecordingDetailActivity" />
 
 
 
     </application>
-
 
 </manifest>

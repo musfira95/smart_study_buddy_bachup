@@ -5,15 +5,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class ForgotPasswordActivity extends AppCompatActivity {
 
     EditText emailEditText;
-    Button submitBtn;
+    LinearLayout submitBtn; // LinearLayout button
     TextView backToLogin;
     DatabaseHelper dbHelper;
 
@@ -25,9 +25,10 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         dbHelper = new DatabaseHelper(this);
 
         emailEditText = findViewById(R.id.forgotEmailEditText);
-        submitBtn = findViewById(R.id.forgotContinueButton);
+        submitBtn = findViewById(R.id.forgotContinueButton); // Updated for LinearLayout
         backToLogin = findViewById(R.id.forgotBackToLogin);
 
+        // Submit button click
         submitBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -44,7 +45,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
 
                 boolean exists = dbHelper.checkEmailExists(email);
                 if (exists) {
-                    // go to reset screen and pass email
+                    // Go to reset screen and pass email
                     Intent intent = new Intent(ForgotPasswordActivity.this, ResetPasswordActivity.class);
                     intent.putExtra("email", email);
                     startActivity(intent);
@@ -55,6 +56,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
             }
         });
 
+        // Back to login click
         backToLogin.setOnClickListener(v -> {
             startActivity(new Intent(ForgotPasswordActivity.this, LoginActivity.class));
             finish();

@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-  
+
+    <!-- Selected item color -->
+    <item android:color="#6FAF9F" android:state_checked="true"/>
+
+    <!-- Default text color -->
+    <item android:color="#000000"/>   <!-- BLACK TEXT (visible) -->
+
 </selector>

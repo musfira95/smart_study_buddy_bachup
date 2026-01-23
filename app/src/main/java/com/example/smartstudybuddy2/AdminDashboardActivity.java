@@ -1,93 +1,102 @@
 package com.example.smartstudybuddy2;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import com.example.smartstudybuddy2.UserAdapter;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.drawerlayout.widget.DrawerLayout;
 
-import android.app.AlertDialog;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
-import android.widget.Button;
-import android.widget.Toast;
+import android.view.Gravity;
+import android.widget.ImageView;
+import android.widget.TextView;
 
-import java.util.ArrayList;
+import com.google.android.material.navigation.NavigationView;
 
 public class AdminDashboardActivity extends AppCompatActivity {
 
-    RecyclerView usersRecyclerView;
-    Button addUserButton;
-    DatabaseHelper dbHelper;
-    ArrayList<UserModel> usersList;
-    String loggedInEmail;
+    TextView tvTotalUsers, tvTotalAudios, tvTotalNotes, tvBlockedUsers;
+    DatabaseHelper db;
 
-    Button logoutButton;
-
-    UserAdapter adapter; // ✅ Correct adapter name
+    // 🔹 Drawer items
+    DrawerLayout drawerLayout;
+    NavigationView navigationView;
+    ImageView btnMenu;   // hamburger icon
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_dashboard);
 
-        dbHelper = new DatabaseHelper(this);
-        usersRecyclerView = findViewById(R.id.usersRecyclerView);
-        addUserButton = findViewById(R.id.addUserButton);
+        // INIT DATABASE
+        db = new DatabaseHelper(this);
 
-        loggedInEmail = getIntent().getStringExtra("email");
+        // INIT TEXTVIEWS
+        tvTotalUsers = findViewById(R.id.tvTotalUsers);
+        tvTotalAudios = findViewById(R.id.tvTotalAudios);
+        tvTotalNotes = findViewById(R.id.tvTotalNotes);
+        tvBlockedUsers = findViewById(R.id.tvBlockedUsers);
+        ImageView btnProfile = findViewById(R.id.btnProfile);
 
-        loadUsers();
-
-        addUserButton.setOnClickListener(v -> {
-            startActivity(new Intent(AdminDashboardActivity.this, AddUserActivity.class));
-        });
-        logoutButton = findViewById(R.id.logoutButton);
-
-        logoutButton.setOnClickListener(v -> {
-            Intent intent = new Intent(AdminDashboardActivity.this, LoginActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        btnProfile.setOnClickListener(v -> {
+            Intent intent = new Intent(AdminDashboardActivity.this, AdminProfileActivity.class);
             startActivity(intent);
-            finish(); // admin dashboard close kar dega
         });
 
+
+        // INIT DRAWER
+        drawerLayout = findViewById(R.id.drawerLayout);
+        navigationView = findViewById(R.id.navigationView);
+        btnMenu = findViewById(R.id.btnMenu);
+
+        // LOAD DATA
+        loadDashboardData();
+
+        // 🍔 HAMBURGER CLICK
+        btnMenu.setOnClickListener(v ->
+                drawerLayout.openDrawer(Gravity.START)
+        );
+
+        // 📌 DRAWER MENU CLICK HANDLING
+        navigationView.setNavigationItemSelectedListener(item -> {
+
+            int id = item.getItemId();
+
+             if (id == R.id.nav_user_management) {
+                startActivity(new Intent(this, UsersListActivity.class));
+            }
+
+            else if (id == R.id.nav_settings) {
+                startActivity(new Intent(this, ThemeSettingsActivity.class));
+            }
+             else if (id == R.id.search_users) {
+                 startActivity(new Intent(this, SearchUsersActivity.class));
+             }
+            else if (id == R.id.nav_logout) {
+                new SessionManager(this).logoutUser();
+                startActivity(new Intent(this, LoginActivity.class));
+                finish();
+            }
+
+            drawerLayout.closeDrawer(Gravity.START);
+            return true;
+        });
     }
 
-    private void loadUsers() {
-        usersList = new ArrayList<>();
-        Cursor cursor = dbHelper.getAllUsers();
+    private void loadDashboardData() {
 
-        if (cursor != null && cursor.moveToFirst()) {
-            do {
-                int emailIndex = cursor.getColumnIndex("email");
-                int usernameIndex = cursor.getColumnIndex("username");
-                int roleIndex = cursor.getColumnIndex("role");
-                int passwordIndex = cursor.getColumnIndex("password");
+        // 🔢 TOTAL USERS
+        int totalUsers = db.getTotalUsers();
+        tvTotalUsers.setText(String.valueOf(totalUsers));
 
-                String email = (emailIndex != -1) ? cursor.getString(emailIndex) : "N/A";
-                String username = (usernameIndex != -1) ? cursor.getString(usernameIndex) : "Unknown";
-                String role = (roleIndex != -1) ? cursor.getString(roleIndex) : "user";
-                String password = (passwordIndex != -1) ? cursor.getString(passwordIndex) : "";
+        // 🎧 TOTAL AUDIOS
+        int totalAudios = db.getTotalAudios();
+        tvTotalAudios.setText(String.valueOf(totalAudios));
 
-                usersList.add(new UserModel(username, email, role, password));
-            } while (cursor.moveToNext());
-            cursor.close();
-        } else {
-            Toast.makeText(this, "No users found", Toast.LENGTH_SHORT).show();
-        }
+        // 📝 TOTAL NOTES / TRANSCRIPTIONS
+        int totalNotes = db.getTotalNotes();
+        tvTotalNotes.setText(String.valueOf(totalNotes));
 
-        // ✅ RecyclerView setup
-        UserAdapter adapter = new UserAdapter(this, usersList, dbHelper);
-        usersRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        usersRecyclerView.setAdapter(adapter);
-    }
-
-
-
-    // ✅ Optional (refresh users on screen)
-    @Override
-    protected void onResume() {
-        super.onResume();
-        loadUsers();
+        // 🚫 BLOCKED USERS
+        int blockedUsers = db.getBlockedUsersCount();
+        tvBlockedUsers.setText(String.valueOf(blockedUsers));
     }
 }

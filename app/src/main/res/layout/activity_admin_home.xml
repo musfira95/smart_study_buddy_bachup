@@ -1,6 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent">
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:padding="32dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F3E9FF">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- HEADER AREA (Purple) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:background="#9C27FF"
+        android:gravity="bottom|center_horizontal"
+        android:padding="20dp"
+        android:elevation="6dp">
+
+        <TextView
+            android:id="@+id/welcomeText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Welcome Admin 👋"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"/>
+    </LinearLayout>
+
+    <!-- SUBTEXT -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Manage users, control analytics and run the system smoothly."
+        android:textSize="16sp"
+        android:textColor="#5A4A6D"
+        android:gravity="center"
+        android:layout_marginTop="30dp"
+        android:padding="10dp"/>
+
+    <!-- DASHBOARD BUTTON (Purple Button) -->
+    <LinearLayout
+        android:id="@+id/btnGoDashboard"
+        android:layout_width="250dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="30dp"
+        android:gravity="center"
+        android:padding="10dp"
+        android:elevation="6dp"
+        android:background="#9C27FF"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_marginBottom="10dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Open Dashboard"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:textSize="17sp"/>
+    </LinearLayout>
+
+</LinearLayout>

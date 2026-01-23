@@ -1,6 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent">
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:gravity="center"
+    android:background="@drawable/splash_background"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+<TextView
+android:id="@+id/tvTimetableTitle"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:text="Timetable / Reminders"
+android:textColor="#A64AC9"
+android:textSize="22sp"
+android:textStyle="bold"
+android:fontFamily="@font/poppins_regular"
+android:layout_marginBottom="16dp"/>
+
+<ImageView
+android:id="@+id/ivTimetableIllustration"
+android:layout_width="160dp"
+android:layout_height="160dp"
+android:src="@drawable/time_table"
+android:contentDescription="Timetable Illustration"
+android:adjustViewBounds="true"
+android:scaleType="centerCrop"
+android:layout_marginBottom="24dp" />
+
+<LinearLayout
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:orientation="vertical"
+android:gravity="center_horizontal">
+
+<LinearLayout
+    android:id="@+id/btnAddReminder"
+    android:layout_width="match_parent"
+    android:layout_height="45dp"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@drawable/button_rounded"
+    android:layout_marginStart="40dp"
+    android:layout_marginEnd="40dp"
+    android:layout_marginTop="8dp"
+    android:elevation="4dp"
+    android:clickable="true"
+    android:focusable="true">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add Reminder"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/white"
+        android:gravity="center"/>
+</LinearLayout>
+
+<LinearLayout
+    android:id="@+id/btnViewCalendar"
+    android:layout_width="match_parent"
+    android:layout_height="45dp"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@drawable/button_rounded"
+    android:layout_marginStart="40dp"
+    android:layout_marginEnd="40dp"
+    android:layout_marginTop="20dp"
+    android:elevation="4dp"
+    android:clickable="true"
+    android:focusable="true">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="View Calendar"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/white"
+        android:gravity="center"/>
+</LinearLayout>
+
+</LinearLayout>
+
+    </LinearLayout>

@@ -1,6 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- Title / File Name -->
+    <TextView
+        android:id="@+id/tvTranscriptionTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Title"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="#000"
+        android:layout_marginBottom="8dp"/>
+
+    <!-- Date / Time -->
+    <TextView
+        android:id="@+id/tvTranscriptionDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Date Time"
+        android:textSize="14sp"
+        android:textColor="#555"
+        android:layout_marginBottom="12dp"/>
+
+    <!-- Transcription Text -->
+    <TextView
+        android:id="@+id/tvTranscriptionContent"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="Transcription content will appear here"
+        android:textSize="16sp"
+        android:textColor="#000"
+        android:padding="12dp"
+        android:background="@android:drawable/edit_text"
+        android:scrollbars="vertical"/>
+
+    <!-- Button to view all transcriptions -->
+    <Button
+        android:id="@+id/btnViewAll"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="16dp"
+        android:text="View All Transcriptions"
+        android:textColor="#FFFFFF"
+        android:background="@drawable/button_rounded"/>
+
+
+
+</LinearLayout>

@@ -1,6 +1,43 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:padding="14dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#51096449"
+    android:layout_marginBottom="10dp"
+    android:gravity="center_vertical"
+    android:elevation="4dp">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- TEXT AREA -->
+<LinearLayout
+android:orientation="vertical"
+android:layout_width="0dp"
+android:layout_height="wrap_content"
+android:layout_weight="1">
+
+<TextView
+    android:id="@+id/noteTitle"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:textStyle="bold"
+    android:textSize="16sp"
+    android:textColor="#0C0F0F"
+android:paddingBottom="4dp" />
+
+<TextView
+    android:id="@+id/noteContent"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:textSize="14sp"
+    android:textColor="#333333" />
+</LinearLayout>
+
+    <!-- BOOKMARK ICON -->
+<ImageView
+android:id="@+id/ivBookmark"
+android:layout_width="32dp"
+android:layout_height="32dp"
+android:src="@drawable/ic_star_outline"
+android:tint="#4F6F64"
+android:padding="4dp"/>
+    </LinearLayout>

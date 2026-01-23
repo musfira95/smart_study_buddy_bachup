@@ -1,4 +1,16 @@
 package com.example.smartstudybuddy2;
 
-public class ApiService {
+import okhttp3.MultipartBody;
+import retrofit2.Call;
+import retrofit2.http.Multipart;
+import retrofit2.http.POST;
+import retrofit2.http.Part;
+
+public interface ApiService {
+
+    @Multipart
+    @POST("process")
+    Call<ApiResponse> uploadAudio(
+            @Part MultipartBody.Part audiofile
+    );
 }

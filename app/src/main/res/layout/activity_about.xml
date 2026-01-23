@@ -1,6 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent">
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp"
+    android:background="@drawable/login_bg">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- PAGE TITLE -->
+        <TextView
+            android:id="@+id/tvAboutTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="About App"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#4F6F64"
+            android:letterSpacing="0.02"
+            android:paddingBottom="20dp" />
+
+        <!-- WHITE CARD BOX -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@android:color/white"
+            android:elevation="6dp"
+            android:padding="18dp"
+            android:layout_marginTop="8dp">
+
+            <TextView
+                android:id="@+id/tvAboutDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Smart Study Buddy helps you record audio, generate transcription, save notes, view analytics, and stay organized with your studies. Designed with simplicity and power — all in one app!"
+                android:textSize="16sp"
+                android:textColor="#333333"
+                android:lineSpacingExtra="5dp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#E0E0E0"
+                android:layout_marginVertical="16dp"/>
+
+            <TextView
+                android:id="@+id/tvAppVersion"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="App Version: 1.0.0"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#4F6F64" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>
