@@ -17,7 +17,7 @@ public class QuizActivity extends AppCompatActivity {
     TextView tvQuestion;
     RadioGroup rgOptions;
     RadioButton optionA, optionB, optionC, optionD;
-    LinearLayout btnNext, btnSubmit; // <-- LinearLayout now
+    LinearLayout btnNext, btnSubmit, btnSkip; // <-- Added btnSkip
 
     ArrayList<QuizQuestion> questions = new ArrayList<>();
     int currentIndex = 0;
@@ -37,6 +37,7 @@ public class QuizActivity extends AppCompatActivity {
         optionD = findViewById(R.id.optionD);
         btnNext = findViewById(R.id.btnNext);
         btnSubmit = findViewById(R.id.btnSubmit);
+        btnSkip = findViewById(R.id.btnSkip);
 
         loadDummyQuestions();
         showQuestion();
@@ -66,6 +67,12 @@ public class QuizActivity extends AppCompatActivity {
             intent.putExtra("correctCount", correct);
             intent.putExtra("wrongCount", wrong);
             startActivity(intent);
+            finish();
+        });
+
+        // -------------------- Skip Quiz --------------------
+        btnSkip.setOnClickListener(v -> {
+            Toast.makeText(this, "Quiz Skipped", Toast.LENGTH_SHORT).show();
             finish();
         });
     }

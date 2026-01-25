@@ -142,5 +142,27 @@
         </LinearLayout>
 
 
+        <!-- ⏭ SKIP QUIZ BUTTON -->
+        <LinearLayout
+            android:id="@+id/btnSkip"
+            android:layout_width="220dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="12dp"
+            android:gravity="center"
+            android:background="@drawable/button_rounded"
+            android:clickable="true"
+            android:focusable="true">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Skip Quiz"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"/>
+        </LinearLayout>
+
+
     </LinearLayout>
 </ScrollView>

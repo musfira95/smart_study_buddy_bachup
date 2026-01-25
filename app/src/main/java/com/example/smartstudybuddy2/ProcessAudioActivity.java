@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -46,8 +47,9 @@ public class ProcessAudioActivity extends AppCompatActivity {
 
         audioUri = Uri.parse(audioUriString);
 
+
         // PROCESS AUDIO
-        processAudioBtn.setOnClickListener(v -> uploadToServer());
+        processAudioBtn.setOnClickListener(v -> uploadAudioToServer());
 
         // VIEW DETAILS
         viewDetailsBtn.setOnClickListener(v -> {
@@ -87,54 +89,71 @@ public class ProcessAudioActivity extends AppCompatActivity {
         }
     }
 
-    // Send File to Flask Backend
-    private void uploadToServer() {
-
-        File file = convertUriToFile(audioUri);
-        if (file == null) {
-            Toast.makeText(this, "Audio file error!", Toast.LENGTH_SHORT).show();
+    // -------------------- SERVER UPLOAD --------------------
+    private void uploadAudioToServer() {
+        if (audioUri == null) {
+            Toast.makeText(this, "No audio selected!", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        RequestBody requestBody =
-                RequestBody.create(MediaType.parse("audio/*"), file);
+        transcriptionText.setText("Preparing file for upload...");
+        File file = convertUriToFile(audioUri);
+        if (file == null) return;
 
-        MultipartBody.Part audioPart =
-                MultipartBody.Part.createFormData(
-                        "audiofile",
-                        file.getName(),
-                        requestBody
-                );
+        // Create RequestBody (audio/mpeg for mp3)
+        RequestBody requestFile = RequestBody.create(MediaType.parse("audio/mpeg"), file);
 
-        ApiService api = ApiClient.getClient().create(ApiService.class);
-        Call<ApiResponse> call = api.uploadAudio(audioPart);
+        // MultipartBody.Part is used to send also the actual file name
+        MultipartBody.Part body = MultipartBody.Part.createFormData("audiofile", file.getName(), requestFile);
 
-        transcriptionText.setText("Processing... Please wait...");
+        // Make API Call
+        transcriptionText.setText("Uploading & Processing... Please wait.");
+        Toast.makeText(this, "Connecting to Server...", Toast.LENGTH_SHORT).show();
+        processAudioBtn.setEnabled(false); // Disable button to prevent double clicks
+
+        ApiService service = ApiClient.getClient().create(ApiService.class);
+        Call<ApiResponse> call = service.uploadAudio(body);
 
         call.enqueue(new Callback<ApiResponse>() {
             @Override
             public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
-
+                processAudioBtn.setEnabled(true);
                 if (response.isSuccessful() && response.body() != null) {
+                    ApiResponse apiResponse = response.body();
+                    String trans = apiResponse.transcript;
+                    String sum = apiResponse.summary;
 
-                    ApiResponse data = response.body();
+                    transcriptionText.setText("Processing Complete!\n\nTranscription:\n" + trans);
+                    
+                    // Show Summary Button or Navigate
+                    Toast.makeText(ProcessAudioActivity.this, "Success!", Toast.LENGTH_SHORT).show();
 
-                    String finalResult =
-                            "📌 TRANSCRIPT:\n" + data.transcript +
-                                    "\n\n📌 SUMMARY:\n" + data.summary +
-                                    "\n\n📌 QUIZ:\n" + data.quiz.toString();
-
-                    transcriptionText.setText(finalResult);
+                    // Navigate to Summary Activity
+                    Intent intent = new Intent(ProcessAudioActivity.this, SummaryActivity.class);
+                    intent.putExtra("transcriptionText", trans); // Pass transcript
+                    // You might want to pass summary too if the server returns it
+                    // intent.putExtra("summaryText", sum); 
+                    startActivity(intent);
 
                 } else {
-                    transcriptionText.setText("Server error!");
+                    transcriptionText.setText("Server Error: " + response.message() + " (" + response.code() + ")");
+                    Toast.makeText(ProcessAudioActivity.this, "Failed to process audio", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<ApiResponse> call, Throwable t) {
-                transcriptionText.setText("Failed: " + t.getMessage());
+                processAudioBtn.setEnabled(true);
+                transcriptionText.setText("Connection Failed:\n" + t.getMessage() + "\n\nCheck your IP Address in ApiClient.java or ensure server is running.");
+                Toast.makeText(ProcessAudioActivity.this, "Connection Error", Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    // Placeholder for Offline Processing (Vosk) - KEPT FOR REFERENCE BUT UNUSED
+    private void processAudioLocally() {
+        transcriptionText.setText("Initialization of Offline Model in progress... (Step 1/3)");
+        Toast.makeText(this, "Starting Offline Processing...", Toast.LENGTH_SHORT).show();
+        // TODO: Initialize Vosk Model and Start Transcription
     }
 }

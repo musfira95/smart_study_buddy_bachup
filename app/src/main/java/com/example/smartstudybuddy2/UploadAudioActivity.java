@@ -123,22 +123,34 @@ public class UploadAudioActivity extends AppCompatActivity {
             audioUri = data.getData();
             if (audioUri != null) {
                 fileName = getFileName(audioUri);
+                long sizeInBytes = getFileSizeBytes(audioUri); // Get exact bytes
 
                 if (!fileName.toLowerCase().endsWith(".mp3")) {
                     Toast.makeText(this, "Please select an MP3 audio file only", Toast.LENGTH_SHORT).show();
-                    audioUri = null;
-                    fileName = null;
-                    fileSize = 0;
-                    fileNameText.setText("No file selected");
-                    processButton.setEnabled(false);
+                    resetSelection();
                     return;
                 }
 
-                fileSize = getFileSize(audioUri);
+                // 5MB Limit = 5 * 1024 * 1024 = 5242880 Bytes
+                if (sizeInBytes > 5 * 1024 * 1024) {
+                    Toast.makeText(this, "File is too large! Limit is 5MB.", Toast.LENGTH_LONG).show();
+                    resetSelection();
+                    return;
+                }
+
+                fileSize = sizeInBytes / 1024; // Store in KB for display if needed
                 fileNameText.setText("Selected: " + fileName + " (" + fileSize + " KB)");
                 processButton.setEnabled(true);
             }
         }
+    }
+
+    private void resetSelection() {
+        audioUri = null;
+        fileName = null;
+        fileSize = 0;
+        fileNameText.setText("No file selected");
+        processButton.setEnabled(false);
     }
 
     // ================= Helpers =================
@@ -162,7 +174,7 @@ public class UploadAudioActivity extends AppCompatActivity {
         return result != null ? result : uri.getLastPathSegment();
     }
 
-    private long getFileSize(Uri uri) {
+    private long getFileSizeBytes(Uri uri) {
         if (uri == null) return 0;
         long size = 0;
 
@@ -190,6 +202,6 @@ public class UploadAudioActivity extends AppCompatActivity {
             }
         }
 
-        return size > 0 ? size / 1024 : 0;
+        return size;
     }
 }
