@@ -1,5 +1,6 @@
 package com.example.smartstudybuddy2;
 
+import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
@@ -11,19 +12,15 @@ import android.widget.TextView;
 import android.view.View;
 import android.widget.ImageView;
 
+import java.util.ArrayList;
+
 public class SearchActivity extends AppCompatActivity {
 
     SearchView searchView;
     ListView listView;
-    String[] dummyNotes = {
-            "Physics Chapter 1 Notes",
-            "Math Lecture 2 Summary",
-            "Chemistry Quiz 1",
-            "History Notes",
-            "Biology Flashcards"
-    };
-
+    ArrayList<String> allNotes;
     ArrayAdapter<String> adapter;
+    DatabaseHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,8 +30,19 @@ public class SearchActivity extends AppCompatActivity {
         searchView = findViewById(R.id.searchView);
         listView = findViewById(R.id.listView);
 
+        dbHelper = new DatabaseHelper(this);
+        allNotes = new ArrayList<>();
+
+        // Load notes from database
+        loadNotesFromDatabase();
+
+        // If no notes in database, use placeholder
+        if (allNotes.isEmpty()) {
+            allNotes.add("No notes found. Create a note to search.");
+        }
+
         // Custom adapter using grey text layout
-        adapter = new ArrayAdapter<>(this, R.layout.list_item_note, R.id.textItem, dummyNotes);
+        adapter = new ArrayAdapter<>(this, R.layout.list_item_note, R.id.textItem, allNotes);
         listView.setAdapter(adapter);
 
         // ---- MAKE HINT COLOR + TEXT COLOR GREY ----
@@ -69,4 +77,17 @@ public class SearchActivity extends AppCompatActivity {
             }
         });
     }
+
+    // Load notes from database
+    private void loadNotesFromDatabase() {
+        Cursor cursor = dbHelper.getAllNotes();
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                String title = cursor.getString(cursor.getColumnIndexOrThrow("title"));
+                allNotes.add(title);
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+    }
+
 }

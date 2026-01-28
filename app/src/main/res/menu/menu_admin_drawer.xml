@@ -14,6 +14,16 @@
             android:icon="@drawable/ic_users" />
 
         <item
+            android:id="@+id/nav_quiz_management"
+            android:title="Manage Quiz Questions"
+            android:icon="@drawable/ic_content" />
+
+        <item
+            android:id="@+id/nav_content_management"
+            android:title="Manage Content"
+            android:icon="@drawable/ic_info" />
+
+        <item
             android:id="@+id/nav_settings"
             android:title="Settings"
             android:icon="@drawable/ic_settings" />

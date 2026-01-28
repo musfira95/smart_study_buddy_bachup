@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@drawable/login_bg">
+
+    <!-- TITLE -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add Quiz Question"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="#4F6F64"
+        android:layout_marginBottom="24dp" />
+
+    <!-- SCROLL VIEW FOR FORM -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginBottom="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- QUESTION -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Question"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#4F6F64"
+                android:layout_marginBottom="8dp" />
+
+            <EditText
+                android:id="@+id/etQuestion"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:hint="Enter question"
+                android:inputType="textMultiLine"
+                android:padding="12dp"
+                android:textSize="14sp"
+                android:background="@drawable/edittext_bg_rounded"
+                android:gravity="top|start"
+                android:layout_marginBottom="16dp" />
+
+            <!-- OPTION A -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Option A"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#4F6F64"
+                android:layout_marginBottom="8dp" />
+
+            <EditText
+                android:id="@+id/etOptionA"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:hint="Enter option A"
+                android:inputType="text"
+                android:padding="12dp"
+                android:textSize="14sp"
+                android:background="@drawable/edittext_bg_rounded"
+                android:layout_marginBottom="16dp" />
+
+            <!-- OPTION B -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Option B"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#4F6F64"
+                android:layout_marginBottom="8dp" />
+
+            <EditText
+                android:id="@+id/etOptionB"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:hint="Enter option B"
+                android:inputType="text"
+                android:padding="12dp"
+                android:textSize="14sp"
+                android:background="@drawable/edittext_bg_rounded"
+                android:layout_marginBottom="16dp" />
+
+            <!-- OPTION C -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Option C"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#4F6F64"
+                android:layout_marginBottom="8dp" />
+
+            <EditText
+                android:id="@+id/etOptionC"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:hint="Enter option C"
+                android:inputType="text"
+                android:padding="12dp"
+                android:textSize="14sp"
+                android:background="@drawable/edittext_bg_rounded"
+                android:layout_marginBottom="16dp" />
+
+            <!-- OPTION D -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Option D"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#4F6F64"
+                android:layout_marginBottom="8dp" />
+
+            <EditText
+                android:id="@+id/etOptionD"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:hint="Enter option D"
+                android:inputType="text"
+                android:padding="12dp"
+                android:textSize="14sp"
+                android:background="@drawable/edittext_bg_rounded"
+                android:layout_marginBottom="16dp" />
+
+            <!-- CORRECT ANSWER -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Correct Answer"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#4F6F64"
+                android:layout_marginBottom="8dp" />
+
+            <EditText
+                android:id="@+id/etAnswer"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:hint="Enter correct answer"
+                android:inputType="text"
+                android:padding="12dp"
+                android:textSize="14sp"
+                android:background="@drawable/edittext_bg_rounded"
+                android:layout_marginBottom="16dp" />
+
+            <!-- CATEGORY -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Category"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#4F6F64"
+                android:layout_marginBottom="8dp" />
+
+            <Spinner
+                android:id="@+id/spinnerCategory"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:padding="12dp"
+                android:background="@drawable/edittext_bg_rounded"
+                android:entries="@array/quiz_categories"
+                android:layout_marginBottom="16dp" />
+
+            <!-- DIFFICULTY -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Difficulty"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#4F6F64"
+                android:layout_marginBottom="8dp" />
+
+            <Spinner
+                android:id="@+id/spinnerDifficulty"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:padding="12dp"
+                android:background="@drawable/edittext_bg_rounded"
+                android:entries="@array/quiz_difficulty"
+                android:layout_marginBottom="16dp" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <!-- ADD BUTTON -->
+    <Button
+        android:id="@+id/btnAddQuestion"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="Add Question"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/white"
+        android:background="@drawable/button_rounded"
+        android:layout_marginTop="16dp" />
+
+</LinearLayout>

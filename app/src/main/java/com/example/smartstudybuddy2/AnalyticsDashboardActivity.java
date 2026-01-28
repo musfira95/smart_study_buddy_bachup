@@ -7,10 +7,10 @@ import android.content.SharedPreferences;
 import androidx.appcompat.app.AppCompatDelegate;
 
 
-
 public class AnalyticsDashboardActivity extends AppCompatActivity {
 
     TextView totalUsers, activeUsers, summaryCount, blockedUsers;
+    DatabaseHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,10 +31,29 @@ public class AnalyticsDashboardActivity extends AppCompatActivity {
         summaryCount = findViewById(R.id.summary_count);
         blockedUsers = findViewById(R.id.blocked_users);
 
-        // Dummy Data (replace with real values if backend added)
-        totalUsers.setText("50");
-        activeUsers.setText("35");
-        summaryCount.setText("90");
-        blockedUsers.setText("5"); // ⭐ NEW BLOCKED USERS COUNT
+        dbHelper = new DatabaseHelper(this);
+
+        // Load actual data from database
+        loadAnalyticsData();
+    }
+
+    private void loadAnalyticsData() {
+        // Total users from database
+        int totalUsersCount = dbHelper.getTotalUsers();
+        totalUsers.setText(String.valueOf(totalUsersCount));
+
+        // Active users (approximate - users not blocked)
+        int totalCount = dbHelper.getTotalUsers();
+        int blockedCount = dbHelper.getBlockedUsersCount();
+        int activeUsersCount = totalCount - blockedCount;
+        activeUsers.setText(String.valueOf(activeUsersCount));
+
+        // Total notes/transcriptions
+        int summaryCountVal = dbHelper.getTotalNotes();
+        summaryCount.setText(String.valueOf(summaryCountVal));
+
+        // Blocked users
+        int blockedUsersCount = dbHelper.getBlockedUsersCount();
+        blockedUsers.setText(String.valueOf(blockedUsersCount));
     }
 }

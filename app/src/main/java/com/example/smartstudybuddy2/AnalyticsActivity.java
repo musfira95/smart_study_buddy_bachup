@@ -13,6 +13,7 @@ public class AnalyticsActivity extends AppCompatActivity {
 
     private TextView tvTotalSessions, tvAvgStudy, tvTopSubject;
     private LineChart lineChart;
+    private DatabaseHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,20 +26,61 @@ public class AnalyticsActivity extends AppCompatActivity {
         tvTopSubject = findViewById(R.id.tvTopSubject);
         lineChart = findViewById(R.id.lineChart);
 
-        // Sample data (replace with real data later)
-        tvTotalSessions.setText("Total Sessions\n15");
-        tvAvgStudy.setText("Avg Study\n2 hr");
-        tvTopSubject.setText("Top Subject\nMathematics");
+        dbHelper = new DatabaseHelper(this);
 
-        // Sample chart data
+        // Load real data from database
+        loadAnalyticsData();
+    }
+
+    private void loadAnalyticsData() {
+        ArrayList<StudySession> sessions = dbHelper.getAllStudySessions();
+
+        // Calculate total sessions
+        int totalSessions = sessions.size();
+        tvTotalSessions.setText("Total Sessions\n" + totalSessions);
+
+        // Calculate average study time
+        int totalDuration = 0;
+        String topSubject = "Not available";
+        int maxSubjectDuration = 0;
+
+        for (StudySession session : sessions) {
+            try {
+                int duration = Integer.parseInt(session.duration);
+                totalDuration += duration;
+
+                // Find top subject
+                if (duration > maxSubjectDuration) {
+                    maxSubjectDuration = duration;
+                    topSubject = session.subject;
+                }
+            } catch (NumberFormatException e) {
+                // Handle parsing error
+            }
+        }
+
+        int avgStudy = sessions.isEmpty() ? 0 : totalDuration / sessions.size();
+        tvAvgStudy.setText("Avg Study\n" + avgStudy + " min");
+        tvTopSubject.setText("Top Subject\n" + topSubject);
+
+        // Create chart data from sessions
         ArrayList<Entry> entries = new ArrayList<>();
-        entries.add(new Entry(1, 1f));
-        entries.add(new Entry(2, 2f));
-        entries.add(new Entry(3, 1.5f));
-        entries.add(new Entry(4, 2.5f));
-        entries.add(new Entry(5, 3f));
+        for (int i = 0; i < Math.min(sessions.size(), 10); i++) {
+            try {
+                int duration = Integer.parseInt(sessions.get(i).duration);
+                entries.add(new Entry(i + 1, duration));
+            } catch (NumberFormatException e) {
+                entries.add(new Entry(i + 1, 0f));
+            }
+        }
 
-        LineDataSet dataSet = new LineDataSet(entries, "Study Hours");
+        // If no data, show placeholder
+        if (entries.isEmpty()) {
+            entries.add(new Entry(1, 0f));
+            entries.add(new Entry(2, 0f));
+        }
+
+        LineDataSet dataSet = new LineDataSet(entries, "Study Duration (minutes)");
         dataSet.setLineWidth(2f);
         dataSet.setCircleRadius(5f);
         dataSet.setColor(getResources().getColor(R.color.purple_500));
@@ -47,6 +89,6 @@ public class AnalyticsActivity extends AppCompatActivity {
 
         LineData lineData = new LineData(dataSet);
         lineChart.setData(lineData);
-        lineChart.invalidate(); // refresh chart
+        lineChart.invalidate();
     }
 }

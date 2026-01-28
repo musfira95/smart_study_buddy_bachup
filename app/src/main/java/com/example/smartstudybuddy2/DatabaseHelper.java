@@ -437,6 +437,85 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     // -----------------------------------------------------------------
+    // TRANSCRIPTION & SUMMARY METHODS (NEW - Backend Processing)
+    // -----------------------------------------------------------------
+
+    /**
+     * Insert transcription from audio processing
+     */
+    public boolean insertTranscription(String fileName, String transcriptionText) {
+        try {
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues cv = new ContentValues();
+            cv.put("title", fileName != null ? fileName : "Transcription_" + System.currentTimeMillis());
+            cv.put("content", transcriptionText);
+            long result = db.insert("notes", null, cv);
+            return result != -1;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Insert summary generated from transcription
+     */
+    public boolean insertSummary(String fileName, String summaryText, String originalTranscription) {
+        try {
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues cv = new ContentValues();
+            cv.put("title", (fileName != null ? fileName : "Summary") + " - Summary");
+            cv.put("content", "ORIGINAL:\n" + originalTranscription + "\n\nSUMMARY:\n" + summaryText);
+            long result = db.insert("notes", null, cv);
+            return result != -1;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Get transcription by title
+     */
+    public String getTranscription(String fileName) {
+        try {
+            SQLiteDatabase db = this.getReadableDatabase();
+            Cursor cursor = db.query("notes", new String[]{"content"},
+                "title=?", new String[]{fileName}, null, null, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                String content = cursor.getString(cursor.getColumnIndex("content"));
+                cursor.close();
+                return content;
+            }
+            if (cursor != null) cursor.close();
+            return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Get all transcriptions
+     */
+    public ArrayList<String> getAllTranscriptions() {
+        ArrayList<String> transcriptions = new ArrayList<>();
+        try {
+            SQLiteDatabase db = this.getReadableDatabase();
+            Cursor cursor = db.rawQuery("SELECT content FROM notes ORDER BY id DESC", null);
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+                    transcriptions.add(cursor.getString(0));
+                }
+                cursor.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return transcriptions;
+    }
+
+    // -----------------------------------------------------------------
     // AUDIO RECORDINGS (File 1 + File 2 merge)
     // -----------------------------------------------------------------
 
@@ -840,6 +919,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         c.close();
         return version;
+    }
+
+    public boolean updateAboutContent(String appVersion, String description, String email, String phone) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put("app_version", appVersion);
+        cv.put("description", description);
+        cv.put("support_email", email);
+        cv.put("support_phone", phone);
+        cv.put("last_updated", new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date()));
+        return db.update(TABLE_ABOUT_CONTENT, cv, null, null) > 0;
+    }
+
+    public boolean updateHelpContent(String category, String title, String content) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put("title", title);
+        cv.put("content", content);
+        cv.put("last_updated", new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date()));
+        return db.update(TABLE_HELP_CONTENT, cv, "category=?", new String[]{category}) > 0;
     }
 
     // ====================================================================

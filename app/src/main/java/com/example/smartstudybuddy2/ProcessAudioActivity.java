@@ -93,29 +93,94 @@ public class ProcessAudioActivity extends BaseActivity {
 
     // Placeholder for Offline Processing (Vosk)
     private void processAudioLocally() {
-        transcriptionText.setText("Initialization of Offline Model in progress... (Step 1/3)");
-        Toast.makeText(this, "Starting Offline Processing...", Toast.LENGTH_SHORT).show();
-        
-        // --- SIMULATED SUCCESS FOR DEMO ---
-        new android.os.Handler().postDelayed(() -> {
-            String dummyTranscript = "This is a simulated transcription text. In a real scenario, this would be the output of your AI model processing the audio file.";
-            
-            transcriptionText.setText("Processing Complete!\n\nTranscription:\n" + dummyTranscript);
-            Toast.makeText(this, "Processing Complete!", Toast.LENGTH_SHORT).show();
+        transcriptionText.setText("Processing audio file... Please wait...");
+        Toast.makeText(this, "Starting Audio Processing", Toast.LENGTH_SHORT).show();
 
-            // Reveal the View Summary button
-            btnViewSummary.setVisibility(View.VISIBLE);
-            
-            // Set OnClickListener for the new button
-            btnViewSummary.setOnClickListener(v -> {
-                Intent intent = new Intent(ProcessAudioActivity.this, SummaryActivity.class);
-                intent.putExtra("transcriptionText", dummyTranscript);
-                startActivity(intent);
-                finish();
-            });
+        // Run processing in background thread
+        new Thread(() -> {
+            try {
+                // Step 1: Convert Uri to File
+                File audioFile = convertUriToFile(audioUri);
+                if (audioFile == null) {
+                    runOnUiThread(() -> {
+                        transcriptionText.setText("Error: Could not read audio file");
+                        Toast.makeText(ProcessAudioActivity.this, "File read error", Toast.LENGTH_SHORT).show();
+                    });
+                    return;
+                }
 
-        }, 2000); // 2 seconds delay to simulate processing
+                // Step 2: Simulate Speech-to-Text Processing
+                String transcription = performSpeechToText(audioFile);
+
+                // Step 3: Save to database
+                DatabaseHelper db = new DatabaseHelper(this);
+                db.insertTranscription(fileName, transcription);
+
+                // Update UI on main thread
+                runOnUiThread(() -> {
+                    transcriptionText.setText(transcription);
+                    Toast.makeText(ProcessAudioActivity.this, "Processing Complete!", Toast.LENGTH_SHORT).show();
+
+                    // Enable summary button
+                    btnViewSummary.setOnClickListener(v -> {
+                        Intent summaryIntent = new Intent(ProcessAudioActivity.this, SummaryActivity.class);
+                        summaryIntent.putExtra("transcription", transcription);
+                        summaryIntent.putExtra("fileName", fileName);
+                        startActivity(summaryIntent);
+                    });
+                });
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                runOnUiThread(() -> {
+                    transcriptionText.setText("Error during processing: " + e.getMessage());
+                    Toast.makeText(ProcessAudioActivity.this, "Processing failed", Toast.LENGTH_SHORT).show();
+                });
+            }
+        }).start();
     }
 
+    // Real speech-to-text conversion (placeholder implementation)
+    // In production, this would use Vosk or Google Cloud Speech-to-Text
+    private String performSpeechToText(File audioFile) {
+        try {
+            // This is a placeholder - in real implementation, use:
+            // - Vosk (offline)
+            // - Google Cloud Speech-to-Text API
+            // - CMU PocketSphinx
+            // - Mozilla DeepSpeech
 
+            // For now, we'll simulate processing
+            String[] sampleTranscriptions = {
+                "Good morning class, today we will discuss the fundamentals of artificial intelligence and machine learning. " +
+                "AI is a branch of computer science that aims to create intelligent machines. " +
+                "These machines can perform tasks that typically require human intelligence. " +
+                "Some key applications include natural language processing, computer vision, and robotics.",
+
+                "In this lecture, we will cover the basics of data structures. " +
+                "Arrays, linked lists, stacks, queues, and trees are fundamental data structures. " +
+                "Understanding these concepts is crucial for efficient programming. " +
+                "We will implement examples in Java and Python.",
+
+                "Today's topic is about web development. " +
+                "HTML provides the structure, CSS provides the styling, and JavaScript provides interactivity. " +
+                "We will also discuss modern frameworks like React, Vue, and Angular. " +
+                "Building responsive websites is essential in today's mobile-first world.",
+
+                "Welcome to the Physics lecture. Today we discuss Newton's laws of motion. " +
+                "The first law states that an object remains at rest unless acted upon by a force. " +
+                "The second law defines the relationship between force, mass, and acceleration. " +
+                "The third law states that for every action, there is an equal and opposite reaction."
+            };
+
+            // Return a random transcription for demo purposes
+            int randomIndex = (int) (Math.random() * sampleTranscriptions.length);
+            return sampleTranscriptions[randomIndex];
+
+        } catch (Exception e) {
+            return "Error during transcription: " + e.getMessage();
+        }
+    }
 }
+
+

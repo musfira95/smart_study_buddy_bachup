@@ -46,4 +46,25 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
+    <!-- Quiz Categories -->
+    <string-array name="quiz_categories">
+        <item>Programming</item>
+        <item>Science</item>
+        <item>Geography</item>
+        <item>Mathematics</item>
+        <item>Literature</item>
+        <item>History</item>
+        <item>General Knowledge</item>
+        <item>Technology</item>
+        <item>Economics</item>
+        <item>Physics</item>
+    </string-array>
+
+    <!-- Quiz Difficulty -->
+    <string-array name="quiz_difficulty">
+        <item>Easy</item>
+        <item>Medium</item>
+        <item>Hard</item>
+    </string-array>
+
 </resources>

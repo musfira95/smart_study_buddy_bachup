@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@drawable/login_bg">
+
+    <!-- TITLE -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Manage Content"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="#4F6F64"
+        android:layout_marginBottom="24dp" />
+
+    <!-- SCROLL VIEW FOR FORM -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginBottom="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- APP VERSION -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="App Version"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#4F6F64"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp" />
+
+            <EditText
+                android:id="@+id/etAppVersion"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:hint="e.g., 1.0.0"
+                android:inputType="text"
+                android:padding="12dp"
+                android:textSize="14sp"
+                android:background="@drawable/edittext_bg_rounded"
+                android:layout_marginBottom="16dp" />
+
+            <!-- APP DESCRIPTION -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="App Description"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#4F6F64"
+                android:layout_marginBottom="8dp" />
+
+            <EditText
+                android:id="@+id/etAppDescription"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:hint="Enter app description"
+                android:inputType="textMultiLine"
+                android:padding="12dp"
+                android:textSize="14sp"
+                android:background="@drawable/edittext_bg_rounded"
+                android:gravity="top|start"
+                android:layout_marginBottom="16dp" />
+
+            <!-- SUPPORT EMAIL -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Support Email"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#4F6F64"
+                android:layout_marginBottom="8dp" />
+
+            <EditText
+                android:id="@+id/etSupportEmail"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:hint="support@example.com"
+                android:inputType="textEmailAddress"
+                android:padding="12dp"
+                android:textSize="14sp"
+                android:background="@drawable/edittext_bg_rounded"
+                android:layout_marginBottom="16dp" />
+
+            <!-- SUPPORT PHONE -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Support Phone"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#4F6F64"
+                android:layout_marginBottom="8dp" />
+
+            <EditText
+                android:id="@+id/etSupportPhone"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:hint="+1-555-1234"
+                android:inputType="phone"
+                android:padding="12dp"
+                android:textSize="14sp"
+                android:background="@drawable/edittext_bg_rounded"
+                android:layout_marginBottom="16dp" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <!-- SAVE BUTTON -->
+    <Button
+        android:id="@+id/btnSaveContent"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="Save Content"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/white"
+        android:background="@drawable/button_rounded"
+        android:layout_marginTop="16dp" />
+
+</LinearLayout>

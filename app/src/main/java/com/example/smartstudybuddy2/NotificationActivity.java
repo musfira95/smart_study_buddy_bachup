@@ -19,43 +19,41 @@ public class NotificationActivity extends AppCompatActivity {
     TextView tvEmpty;
 
     ArrayList<String> notificationList;
-    ArrayAdapter<String> adapter;
+    NotificationAdapter adapter;
+    DatabaseHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_notification); // ✅ correct layout
+        setContentView(R.layout.activity_notification);
 
-        // ✅ MATCHING IDs FROM XML
         btnClearNotifications = findViewById(R.id.btnClearNotifications);
         listNotifications = findViewById(R.id.listNotifications);
         tvEmpty = findViewById(R.id.tvEmpty);
 
-        // Dummy notifications (example)
-        notificationList = new ArrayList<>();
-        notificationList.add("📘 New note saved");
-        notificationList.add("⏰ Reminder: Study at 7 PM");
-        notificationList.add("✅ Quiz completed");
-        notificationList.add("💾 Backup created successfully");
+        dbHelper = new DatabaseHelper(this);
 
-        adapter = new ArrayAdapter<>(
-                this,
-                android.R.layout.simple_list_item_1,
-                notificationList
-        );
+        // Load notifications from database
+        notificationList = dbHelper.getAllNotifications();
 
-        NotificationAdapter adapter;
+        if (notificationList.isEmpty()) {
+            checkEmptyState();
+        } else {
+            adapter = new NotificationAdapter(this, notificationList);
+            listNotifications.setAdapter(adapter);
+            checkEmptyState();
+        }
 
-        notificationList = new ArrayList<>();
-        notificationList.add("New note saved");
-        notificationList.add("Reminder: Study at 7 PM");
-        notificationList.add("Quiz completed successfully");
-        notificationList.add("Your notes are safely stored");
-
-
-        adapter = new NotificationAdapter(this, notificationList);
-        listNotifications.setAdapter(adapter);
-
+        // Clear all notifications
+        btnClearNotifications.setOnClickListener(v -> {
+            dbHelper.clearAllNotifications();
+            notificationList.clear();
+            if (adapter != null) {
+                adapter.notifyDataSetChanged();
+            }
+            checkEmptyState();
+            Toast.makeText(this, "Notifications cleared", Toast.LENGTH_SHORT).show();
+        });
     }
 
     private void checkEmptyState() {

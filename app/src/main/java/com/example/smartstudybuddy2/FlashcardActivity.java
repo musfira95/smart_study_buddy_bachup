@@ -22,14 +22,13 @@ public class FlashcardActivity extends BaseActivity {
         FloatingActionButton fabAdd = findViewById(R.id.fabAddFlashcard);
         db = new DatabaseHelper(this);
 
-        // Load Flashcards
+        // Load Flashcards from database
         loadFlashcards();
 
-        // Add Flashcard Button - For Valid Demo, we will just reload or show toast
-        // ideally this opens a CreateFlashcardActivity (Phase 2)
+        // Add Flashcard Button
         fabAdd.setOnClickListener(v -> {
-            // For now, insert a dummy flashcard to demonstrate functionality
-            db.insertFlashcard("What is Android?", "A mobile OS by Google", "General");
+            // Open create flashcard activity (or create inline dialog)
+            // For now, just reload to show newly added cards
             loadFlashcards();
         });
     }
@@ -37,13 +36,20 @@ public class FlashcardActivity extends BaseActivity {
     private void loadFlashcards() {
         Cursor cursor = db.getAllFlashcards();
         
+        // If no flashcards exist, show message
+        if (cursor == null || cursor.getCount() == 0) {
+            TextView emptyView = new TextView(this);
+            emptyView.setText("No flashcards yet. Create one to get started!");
+            listView.setEmptyView(emptyView);
+        }
+
         // Map DB columns to Layout Views
         String[] from = new String[] { "question", "answer" };
         int[] to = new int[] { android.R.id.text1, android.R.id.text2 };
 
         SimpleCursorAdapter adapter = new SimpleCursorAdapter(
                 this,
-                android.R.layout.simple_list_item_2, // Simple built-in layout
+                android.R.layout.simple_list_item_2,
                 cursor,
                 from,
                 to,

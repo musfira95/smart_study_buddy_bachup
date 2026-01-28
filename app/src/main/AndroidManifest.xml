@@ -83,6 +83,10 @@
         <activity android:name=".AdminProfileActivity" />
         <activity android:name=".EditAdminProfileActivity" />
 
+        <!-- ADMIN MANAGEMENT TOOLS -->
+        <activity android:name=".QuizManagementActivity" />
+        <activity android:name=".ContentManagementActivity" />
+
 
 
 

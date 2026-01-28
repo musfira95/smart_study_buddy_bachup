@@ -70,6 +70,12 @@ public class AdminDashboardActivity extends AppCompatActivity {
              else if (id == R.id.search_users) {
                  startActivity(new Intent(this, SearchUsersActivity.class));
              }
+            else if (id == R.id.nav_quiz_management) {
+                startActivity(new Intent(this, QuizManagementActivity.class));
+            }
+            else if (id == R.id.nav_content_management) {
+                startActivity(new Intent(this, ContentManagementActivity.class));
+            }
             else if (id == R.id.nav_logout) {
                 new SessionManager(this).logoutUser();
                 startActivity(new Intent(this, LoginActivity.class));
