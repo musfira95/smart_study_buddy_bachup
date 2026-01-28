@@ -19,6 +19,7 @@ public class QuizActivity extends BaseActivity {
     RadioButton optionA, optionB, optionC, optionD;
     LinearLayout btnNext, btnSubmit;
     android.widget.ImageView btnBack;
+    DatabaseHelper dbHelper;
 
     ArrayList<QuizQuestion> questions = new ArrayList<>();
     int currentIndex = 0;
@@ -40,7 +41,16 @@ public class QuizActivity extends BaseActivity {
         btnSubmit = findViewById(R.id.btnSubmit);
         btnBack = findViewById(R.id.btnBack);
 
-        loadDummyQuestions();
+        dbHelper = new DatabaseHelper(this);
+
+        // Load questions from database
+        loadQuestionsFromDatabase();
+
+        if (questions.isEmpty()) {
+            Toast.makeText(this, "No quiz questions available. Loading defaults...", Toast.LENGTH_SHORT).show();
+            loadDummyQuestions();
+        }
+
         showQuestion();
 
         // -------------------- Next Question --------------------
@@ -99,7 +109,12 @@ public class QuizActivity extends BaseActivity {
         else wrong++;
     }
 
-    // -------------------- Dummy questions --------------------
+    // -------------------- Load questions from database --------------------
+    private void loadQuestionsFromDatabase() {
+        questions = dbHelper.getAllQuizQuestions();
+    }
+
+    // -------------------- Fallback dummy questions --------------------
     private void loadDummyQuestions() {
         questions.add(new QuizQuestion(
                 "What is AI?",

@@ -67,6 +67,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_PROFILE_TABLE);
         db.execSQL(CREATE_FLASHCARD_TABLE);
         db.execSQL(CREATE_SCHEDULE_TABLE);
+        db.execSQL(CREATE_QUIZ_TABLE);
+        db.execSQL(CREATE_NOTIFICATIONS_TABLE);
+        db.execSQL(CREATE_HELP_TABLE);
+        db.execSQL(CREATE_ABOUT_TABLE);
+
+        // Insert default help and about content
+        insertDefaultHelpContent(db);
+        insertDefaultAboutContent(db);
+        insertDefaultQuizQuestions(db);
 
     }
 
@@ -78,6 +87,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS audio_files");
         db.execSQL("DROP TABLE IF EXISTS study_sessions");
         db.execSQL("DROP TABLE IF EXISTS profile");
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_QUIZ_QUESTIONS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NOTIFICATIONS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_HELP_CONTENT);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ABOUT_CONTENT);
         onCreate(db);
     }
 
@@ -263,6 +276,54 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     "description TEXT," +
                     "time TEXT," +
                     "date TEXT)";
+
+    // QUIZ QUESTIONS
+    public static final String TABLE_QUIZ_QUESTIONS = "quiz_questions";
+    public static final String CREATE_QUIZ_TABLE =
+            "CREATE TABLE IF NOT EXISTS " + TABLE_QUIZ_QUESTIONS + "(" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    "question TEXT," +
+                    "optionA TEXT," +
+                    "optionB TEXT," +
+                    "optionC TEXT," +
+                    "optionD TEXT," +
+                    "answer TEXT," +
+                    "category TEXT," +
+                    "difficulty TEXT," +
+                    "created_date TEXT)";
+
+    // NOTIFICATIONS
+    public static final String TABLE_NOTIFICATIONS = "notifications";
+    public static final String CREATE_NOTIFICATIONS_TABLE =
+            "CREATE TABLE IF NOT EXISTS " + TABLE_NOTIFICATIONS + "(" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    "title TEXT," +
+                    "message TEXT," +
+                    "timestamp TEXT," +
+                    "type TEXT," +
+                    "is_read INTEGER DEFAULT 0)";
+
+    // HELP & SUPPORT CONTENT
+    public static final String TABLE_HELP_CONTENT = "help_content";
+    public static final String CREATE_HELP_TABLE =
+            "CREATE TABLE IF NOT EXISTS " + TABLE_HELP_CONTENT + "(" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    "title TEXT," +
+                    "content TEXT," +
+                    "category TEXT," +
+                    "last_updated TEXT)";
+
+    // ABOUT CONTENT
+    public static final String TABLE_ABOUT_CONTENT = "about_content";
+    public static final String CREATE_ABOUT_TABLE =
+            "CREATE TABLE IF NOT EXISTS " + TABLE_ABOUT_CONTENT + "(" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    "app_name TEXT," +
+                    "app_version TEXT," +
+                    "description TEXT," +
+                    "support_email TEXT," +
+                    "support_phone TEXT," +
+                    "last_updated TEXT)";
 
     public boolean insertFlashcard(String question, String answer, String topic) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -605,6 +666,244 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return null;
     }
 
+    // ====================================================================
+    // QUIZ QUESTIONS MANAGEMENT
+    // ====================================================================
+
+    public boolean insertQuizQuestion(String question, String optionA, String optionB,
+                                      String optionC, String optionD, String answer,
+                                      String category, String difficulty) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put("question", question);
+        cv.put("optionA", optionA);
+        cv.put("optionB", optionB);
+        cv.put("optionC", optionC);
+        cv.put("optionD", optionD);
+        cv.put("answer", answer);
+        cv.put("category", category);
+        cv.put("difficulty", difficulty);
+        cv.put("created_date", new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date()));
+        return db.insert(TABLE_QUIZ_QUESTIONS, null, cv) != -1;
+    }
+
+    public ArrayList<QuizQuestion> getAllQuizQuestions() {
+        ArrayList<QuizQuestion> list = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT * FROM " + TABLE_QUIZ_QUESTIONS + " ORDER BY RANDOM() LIMIT 10", null);
+
+        if (c.moveToFirst()) {
+            do {
+                list.add(new QuizQuestion(
+                        c.getString(c.getColumnIndexOrThrow("question")),
+                        c.getString(c.getColumnIndexOrThrow("optionA")),
+                        c.getString(c.getColumnIndexOrThrow("optionB")),
+                        c.getString(c.getColumnIndexOrThrow("optionC")),
+                        c.getString(c.getColumnIndexOrThrow("optionD")),
+                        c.getString(c.getColumnIndexOrThrow("answer"))
+                ));
+            } while (c.moveToNext());
+        }
+        c.close();
+        return list;
+    }
+
+    public ArrayList<QuizQuestion> getQuizQuestionsByCategory(String category) {
+        ArrayList<QuizQuestion> list = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT * FROM " + TABLE_QUIZ_QUESTIONS + " WHERE category=? ORDER BY RANDOM()",
+                              new String[]{category});
+
+        if (c.moveToFirst()) {
+            do {
+                list.add(new QuizQuestion(
+                        c.getString(c.getColumnIndexOrThrow("question")),
+                        c.getString(c.getColumnIndexOrThrow("optionA")),
+                        c.getString(c.getColumnIndexOrThrow("optionB")),
+                        c.getString(c.getColumnIndexOrThrow("optionC")),
+                        c.getString(c.getColumnIndexOrThrow("optionD")),
+                        c.getString(c.getColumnIndexOrThrow("answer"))
+                ));
+            } while (c.moveToNext());
+        }
+        c.close();
+        return list;
+    }
+
+    // ====================================================================
+    // NOTIFICATIONS MANAGEMENT
+    // ====================================================================
+
+    public boolean insertNotification(String title, String message, String type) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put("title", title);
+        cv.put("message", message);
+        cv.put("timestamp", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date()));
+        cv.put("type", type);
+        cv.put("is_read", 0);
+        return db.insert(TABLE_NOTIFICATIONS, null, cv) != -1;
+    }
+
+    public ArrayList<String> getAllNotifications() {
+        ArrayList<String> list = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT title, message FROM " + TABLE_NOTIFICATIONS + " ORDER BY id DESC LIMIT 20", null);
+
+        if (c.moveToFirst()) {
+            do {
+                String title = c.getString(c.getColumnIndexOrThrow("title"));
+                String message = c.getString(c.getColumnIndexOrThrow("message"));
+                list.add(title + ": " + message);
+            } while (c.moveToNext());
+        }
+        c.close();
+        return list;
+    }
+
+    public boolean markNotificationAsRead(int id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put("is_read", 1);
+        return db.update(TABLE_NOTIFICATIONS, cv, "id=?", new String[]{String.valueOf(id)}) > 0;
+    }
+
+    public void clearAllNotifications() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_NOTIFICATIONS, null, null);
+    }
+
+    // ====================================================================
+    // HELP CONTENT MANAGEMENT
+    // ====================================================================
+
+    public String getHelpContent(String category) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT content FROM " + TABLE_HELP_CONTENT + " WHERE category=? LIMIT 1",
+                              new String[]{category});
+
+        String content = "";
+        if (c.moveToFirst()) {
+            content = c.getString(c.getColumnIndexOrThrow("content"));
+        }
+        c.close();
+        return content;
+    }
+
+    public String getHelpSupportEmail() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT support_email FROM " + TABLE_ABOUT_CONTENT + " LIMIT 1", null);
+
+        String email = "support@smartstudybuddy.com";
+        if (c.moveToFirst()) {
+            email = c.getString(c.getColumnIndexOrThrow("support_email"));
+        }
+        c.close();
+        return email;
+    }
+
+    public String getHelpSupportPhone() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT support_phone FROM " + TABLE_ABOUT_CONTENT + " LIMIT 1", null);
+
+        String phone = "+1 234 567 890";
+        if (c.moveToFirst()) {
+            phone = c.getString(c.getColumnIndexOrThrow("support_phone"));
+        }
+        c.close();
+        return phone;
+    }
+
+    // ====================================================================
+    // ABOUT CONTENT MANAGEMENT
+    // ====================================================================
+
+    public String getAboutAppDescription() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT description FROM " + TABLE_ABOUT_CONTENT + " LIMIT 1", null);
+
+        String desc = "Smart Study Buddy helps you record audio, generate transcriptions, save notes, and stay organized.";
+        if (c.moveToFirst()) {
+            desc = c.getString(c.getColumnIndexOrThrow("description"));
+        }
+        c.close();
+        return desc;
+    }
+
+    public String getAboutAppVersion() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT app_version FROM " + TABLE_ABOUT_CONTENT + " LIMIT 1", null);
+
+        String version = "1.0.0";
+        if (c.moveToFirst()) {
+            version = c.getString(c.getColumnIndexOrThrow("app_version"));
+        }
+        c.close();
+        return version;
+    }
+
+    // ====================================================================
+    // DEFAULT DATA INITIALIZATION
+    // ====================================================================
+
+    private void insertDefaultHelpContent(SQLiteDatabase db) {
+        ContentValues cv = new ContentValues();
+
+        // General help
+        cv.put("title", "Getting Started");
+        cv.put("content", "Welcome to Smart Study Buddy! Start by recording lectures or uploading audio files to generate transcriptions.");
+        cv.put("category", "getting_started");
+        cv.put("last_updated", new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date()));
+        db.insert(TABLE_HELP_CONTENT, null, cv);
+
+        // FAQ
+        cv = new ContentValues();
+        cv.put("title", "How do I record audio?");
+        cv.put("content", "Navigate to the Record Mic section, tap the record button, and speak clearly. Your audio will be saved automatically.");
+        cv.put("category", "faq_recording");
+        cv.put("last_updated", new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date()));
+        db.insert(TABLE_HELP_CONTENT, null, cv);
+    }
+
+    private void insertDefaultAboutContent(SQLiteDatabase db) {
+        ContentValues cv = new ContentValues();
+        cv.put("app_name", "Smart Study Buddy");
+        cv.put("app_version", "1.0.0");
+        cv.put("description", "Smart Study Buddy helps you record audio, generate transcription, save notes, view analytics, and stay organized with your studies. Designed with simplicity and power — all in one app!");
+        cv.put("support_email", "support@smartstudybuddy.com");
+        cv.put("support_phone", "+1 234 567 890");
+        cv.put("last_updated", new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date()));
+        db.insert(TABLE_ABOUT_CONTENT, null, cv);
+    }
+
+    private void insertDefaultQuizQuestions(SQLiteDatabase db) {
+        ContentValues cv = new ContentValues();
+
+        // Question 1
+        cv.put("question", "What is Artificial Intelligence?");
+        cv.put("optionA", "Artificial Input");
+        cv.put("optionB", "Automatic Intelligence");
+        cv.put("optionC", "Artificial Intelligence");
+        cv.put("optionD", "Auto Internet");
+        cv.put("answer", "Artificial Intelligence");
+        cv.put("category", "Technology");
+        cv.put("difficulty", "Easy");
+        cv.put("created_date", new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date()));
+        db.insert(TABLE_QUIZ_QUESTIONS, null, cv);
+
+        // Question 2
+        cv = new ContentValues();
+        cv.put("question", "Which one is a programming language?");
+        cv.put("optionA", "HTML");
+        cv.put("optionB", "CSS");
+        cv.put("optionC", "Java");
+        cv.put("optionD", "Photoshop");
+        cv.put("answer", "Java");
+        cv.put("category", "Programming");
+        cv.put("difficulty", "Easy");
+        cv.put("created_date", new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date()));
+        db.insert(TABLE_QUIZ_QUESTIONS, null, cv);
+    }
 
 
 
