@@ -12,12 +12,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
 
-public class QuizActivity extends AppCompatActivity {
+public class QuizActivity extends BaseActivity {
 
     TextView tvQuestion;
     RadioGroup rgOptions;
     RadioButton optionA, optionB, optionC, optionD;
-    LinearLayout btnNext, btnSubmit, btnSkip; // <-- Added btnSkip
+    LinearLayout btnNext, btnSubmit;
+    android.widget.ImageView btnBack;
 
     ArrayList<QuizQuestion> questions = new ArrayList<>();
     int currentIndex = 0;
@@ -37,7 +38,7 @@ public class QuizActivity extends AppCompatActivity {
         optionD = findViewById(R.id.optionD);
         btnNext = findViewById(R.id.btnNext);
         btnSubmit = findViewById(R.id.btnSubmit);
-        btnSkip = findViewById(R.id.btnSkip);
+        btnBack = findViewById(R.id.btnBack);
 
         loadDummyQuestions();
         showQuestion();
@@ -70,11 +71,12 @@ public class QuizActivity extends AppCompatActivity {
             finish();
         });
 
-        // -------------------- Skip Quiz --------------------
-        btnSkip.setOnClickListener(v -> {
-            Toast.makeText(this, "Quiz Skipped", Toast.LENGTH_SHORT).show();
-            finish();
-        });
+        // Initialize and set listener for back button in Quiz Activity
+        if (btnBack != null) {
+            btnBack.setOnClickListener(v -> finish());
+        }
+
+
     }
 
     // -------------------- Display current question --------------------

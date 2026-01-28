@@ -7,10 +7,11 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-public class QuizResultActivity extends AppCompatActivity {
+public class QuizResultActivity extends BaseActivity {
 
     TextView tvScoreTitle, tvScore, tvCorrect, tvWrong;
-    LinearLayout btnBack; // Changed from Button to LinearLayout
+    LinearLayout btnBackToDashboard; // Renamed to avoid name conflict with btnBack arrow
+    android.widget.ImageView btnBackArrow;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,7 +23,8 @@ public class QuizResultActivity extends AppCompatActivity {
         tvScore = findViewById(R.id.tvScore);
         tvCorrect = findViewById(R.id.tvCorrect);
         tvWrong = findViewById(R.id.tvWrong);
-        btnBack = findViewById(R.id.btnBackToDashboard); // LinearLayout
+        btnBackToDashboard = findViewById(R.id.btnBackToDashboard); // LinearLayout
+        btnBackArrow = findViewById(R.id.btnBack);
 
         // Get score values from intent
         int correct = getIntent().getIntExtra("correctCount", 0);
@@ -34,13 +36,18 @@ public class QuizResultActivity extends AppCompatActivity {
         tvCorrect.setText("Correct Answers: " + correct);
         tvWrong.setText("Wrong Answers: " + wrong);
 
-        // Back button action
-        btnBack.setOnClickListener(v -> {
+        // Back to Dashboard button action
+        btnBackToDashboard.setOnClickListener(v -> {
             Intent intent = new Intent(QuizResultActivity.this, DashboardActivity.class);
             // Clear previous activities so user doesn't return to summary/quiz by back press
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
             finish(); // Finish current QuizResultActivity
         });
+        
+        // Manual Back Arrow Logic
+        if (btnBackArrow != null) {
+            btnBackArrow.setOnClickListener(v -> finish());
+        }
     }
 }

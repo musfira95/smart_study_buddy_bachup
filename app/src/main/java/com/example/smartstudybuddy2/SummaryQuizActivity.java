@@ -6,7 +6,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.content.Intent;
 
-public class SummaryQuizActivity extends AppCompatActivity {
+public class SummaryQuizActivity extends BaseActivity {
 
     TextView summaryText, quizText;
     Button backButton, submitButton; // Add submit button

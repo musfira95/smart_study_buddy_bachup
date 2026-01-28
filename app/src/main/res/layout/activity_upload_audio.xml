@@ -12,16 +12,31 @@
         android:orientation="vertical"
         android:padding="24dp">
 
-        <!-- TITLE AT TOP -->
-        <TextView
-            android:layout_width="wrap_content"
+        <!-- HEADER WITH BACK BUTTON -->
+        <FrameLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Upload or Record Audio"
-            android:textSize="26sp"
-            android:textStyle="bold"
-            android:textColor="#4F6F64"
-            android:layout_gravity="center"
-            android:layout_marginBottom="24dp"/>
+            android:layout_marginBottom="24dp">
+            
+            <ImageView
+                android:id="@+id/btnBack"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_back_arrow"
+                android:layout_gravity="center_vertical|start"
+                app:tint="#4F6F64"
+                android:clickable="true"
+                android:focusable="true"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Upload or Record Audio"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="#4F6F64"
+                android:layout_gravity="center"/>
+        </FrameLayout>
 
         <!-- MAIN CARD (COLOR ADDED) -->
         <androidx.cardview.widget.CardView

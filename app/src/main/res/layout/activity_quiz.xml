@@ -12,17 +12,32 @@
         android:orientation="vertical"
         android:padding="20dp">
 
-        <!-- 🔷 HEADER -->
-        <TextView
-            android:id="@+id/tvQuizHeader"
-            android:layout_width="wrap_content"
+        <!-- HEADER WITH BACK BUTTON -->
+        <FrameLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Quiz"
-            android:textSize="32sp"
-            android:textStyle="bold"
-            android:textColor="#4F6F64"
-            android:layout_gravity="center"
-            android:layout_marginBottom="24dp"/>
+            android:layout_marginBottom="16dp">
+
+            <ImageView
+                android:id="@+id/btnBack"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_back_arrow"
+                android:layout_gravity="center_vertical|start"
+                app:tint="#4F6F64"
+                android:clickable="true"
+                android:focusable="true"/>
+            
+            <TextView
+                android:id="@+id/tvQuizHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Quiz"
+                android:textSize="32sp"
+                android:textStyle="bold"
+                android:textColor="#4F6F64"
+                android:layout_gravity="center"/>
+        </FrameLayout>
 
 
         <!-- ❓ QUESTION CARD -->
@@ -142,26 +157,7 @@
         </LinearLayout>
 
 
-        <!-- ⏭ SKIP QUIZ BUTTON -->
-        <LinearLayout
-            android:id="@+id/btnSkip"
-            android:layout_width="220dp"
-            android:layout_height="50dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="12dp"
-            android:gravity="center"
-            android:background="@drawable/button_rounded"
-            android:clickable="true"
-            android:focusable="true">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Skip Quiz"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="@android:color/white"/>
-        </LinearLayout>
 
 
     </LinearLayout>

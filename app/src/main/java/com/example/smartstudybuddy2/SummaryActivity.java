@@ -9,10 +9,12 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.widget.Toast;
 
-public class SummaryActivity extends AppCompatActivity {
+public class SummaryActivity extends BaseActivity {
 
     private TextView tvSummary;
+
     private LinearLayout btnGenerateQuiz, btnSkipQuiz;
+    private android.widget.ImageView btnBack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,6 +24,7 @@ public class SummaryActivity extends AppCompatActivity {
         tvSummary = findViewById(R.id.tvSummaryContent);
         btnGenerateQuiz = findViewById(R.id.btnGenerateQuiz); // LinearLayout reference
         btnSkipQuiz = findViewById(R.id.btnSkipQuiz);
+        btnBack = findViewById(R.id.btnBack);
 
         String transcriptionText = getIntent().getStringExtra("transcriptionText");
 
@@ -44,6 +47,12 @@ public class SummaryActivity extends AppCompatActivity {
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(intent);
             finish();
+
         });
+
+        // Initialize and set listener for back button in Summary Activity
+        if (btnBack != null) {
+            btnBack.setOnClickListener(v -> finish());
+        }
     }
 }

@@ -16,7 +16,7 @@ import android.content.res.AssetFileDescriptor;
 
 import java.io.IOException;
 
-public class UploadAudioActivity extends AppCompatActivity {
+public class UploadAudioActivity extends BaseActivity {
 
     private static final int PICK_AUDIO_REQUEST = 1;
     private static final int RECORD_AUDIO_REQUEST = 200;
@@ -39,10 +39,17 @@ public class UploadAudioActivity extends AppCompatActivity {
         setContentView(R.layout.activity_upload_audio);
 
         // ===== Upload Audio Views =====
+        // ===== Upload Audio Views =====
         uploadButton = findViewById(R.id.btnSelectAudio);
         recordButton = findViewById(R.id.btnRecordAudio);
         processButton = findViewById(R.id.btnProcessAudio);
         fileNameText = findViewById(R.id.tvFileStatus);
+        
+        // Manual Back Button
+        ImageView btnBack = findViewById(R.id.btnBack);
+        if (btnBack != null) {
+            btnBack.setOnClickListener(v -> finish());
+        }
 
         processButton.setEnabled(false);
 

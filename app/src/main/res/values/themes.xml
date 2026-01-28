@@ -1,6 +1,6 @@
 <resources>
 
-    <style name="Theme.Smartstudybuddy2" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Theme.Smartstudybuddy2" parent="Theme.MaterialComponents.DayNight">
 
         <!-- ❌ purple hata diya -->
         <!-- <item name="colorPrimary">@color/purple_500</item> -->
@@ -14,6 +14,13 @@
         <item name="colorSurface">@android:color/white</item>
         <item name="colorOnSurface">@android:color/black</item>
 
+
+    </style>
+
+    <style name="Theme.Smartstudybuddy2.NoActionBar" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">#4F6F64</item>
+        <item name="colorPrimaryVariant">#4F6F64</item>
+        <item name="colorOnPrimary">@android:color/white</item>
     </style>
 
 </resources>

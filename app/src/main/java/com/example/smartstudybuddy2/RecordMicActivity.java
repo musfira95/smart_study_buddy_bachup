@@ -19,7 +19,7 @@ import androidx.core.content.ContextCompat;
 import java.io.File;
 import java.io.IOException;
 
-public class RecordMicActivity extends AppCompatActivity {
+public class RecordMicActivity extends BaseActivity {
 
     private static final int RECORD_AUDIO_PERMISSION_CODE = 100;
 

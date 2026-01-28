@@ -4,7 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
 
-public class ViewUploadedDetailsActivity extends AppCompatActivity {
+public class ViewUploadedDetailsActivity extends BaseActivity {
 
     TextView fileNameTv, fileSizeTv, uploadTimeTv;
 
