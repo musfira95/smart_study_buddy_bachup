@@ -14,6 +14,10 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
+        // ✅ Restore Admin if missing (Fix for user deleting admin)
+        DatabaseHelper db = new DatabaseHelper(this);
+        db.ensureAdminExists();
+
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {

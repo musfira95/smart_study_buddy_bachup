@@ -19,6 +19,19 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     @Override
+    public void setContentView(int layoutResID) {
+        super.setContentView(layoutResID);
+        setupBackButton();
+    }
+
+    protected void setupBackButton() {
+        android.view.View backBtn = findViewById(R.id.btnBack);
+        if (backBtn != null) {
+            backBtn.setOnClickListener(v -> finish());
+        }
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             finish(); // Go back when arrow is clicked

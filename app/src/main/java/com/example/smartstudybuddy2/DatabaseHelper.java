@@ -33,8 +33,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "isBlocked INTEGER DEFAULT 0)");     // from File 2
 
         // DEFAULT ADMIN
-        db.execSQL("INSERT INTO Users (email, username, password, role) VALUES (" +
+        // DEFAULT ADMIN - Use INSERT OR IGNORE to prevent crash if exists
+        db.execSQL("INSERT OR IGNORE INTO Users (email, username, password, role) VALUES (" +
                 "'musfira@gmail.com', 'Musfira', 'Musfira123.', 'admin')");
+
 
         // NOTES TABLE (same in both files)
         db.execSQL("CREATE TABLE IF NOT EXISTS notes (" +
@@ -75,6 +77,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS study_sessions");
         db.execSQL("DROP TABLE IF EXISTS profile");
         onCreate(db);
+    }
+
+    // New method to restore admin if deleted
+    public void ensureAdminExists() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM Users WHERE email='musfira@gmail.com'", null);
+        if (!cursor.moveToFirst()) {
+            db.execSQL("INSERT INTO Users (email, username, password, role) VALUES (" +
+                    "'musfira@gmail.com', 'Musfira', 'Musfira123.', 'admin')");
+        }
+        cursor.close();
     }
 
 
