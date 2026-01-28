@@ -62,6 +62,7 @@
         <activity android:name=".ExportActivity" />
         <activity android:name=".TimetableActivity" />
         <activity android:name=".SearchActivity" />
+        <activity android:name=".FlashcardActivity" />
         <activity android:name=".AboutActivity" />
         <activity android:name=".HelpActivity" />
         <activity android:name=".AllTranscriptionsActivity" />

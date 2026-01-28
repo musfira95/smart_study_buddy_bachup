@@ -65,6 +65,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 // ✅ ADD THIS LINE (approx line 65–66)
         db.execSQL(CREATE_PROFILE_TABLE);
+        db.execSQL(CREATE_FLASHCARD_TABLE);
+        db.execSQL(CREATE_SCHEDULE_TABLE);
 
     }
 
@@ -79,6 +81,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
+
     // New method to restore admin if deleted
     public void ensureAdminExists() {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -88,6 +91,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     "'musfira@gmail.com', 'Musfira', 'Musfira123.', 'admin')");
         }
         cursor.close();
+        
+        // Ensure new tables exist too
+        ensureTablesExist();
+    }
+
+    public void ensureTablesExist() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL(CREATE_FLASHCARD_TABLE);
+        db.execSQL(CREATE_SCHEDULE_TABLE);
     }
 
 
@@ -229,7 +241,69 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     "semester TEXT," +
                     "study_preference TEXT," +
                     "daily_goal TEXT," +
+                    "daily_goal TEXT," +
                     "language TEXT)";
+
+    // FLASHCARDS
+    public static final String TABLE_FLASHCARDS = "flashcards";
+    public static final String CREATE_FLASHCARD_TABLE =
+            "CREATE TABLE IF NOT EXISTS " + TABLE_FLASHCARDS + "(" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    "question TEXT," +
+                    "answer TEXT," +
+                    "topic TEXT," +
+                    "created_date TEXT)";
+
+    // SCHEDULES / TIMETABLE
+    public static final String TABLE_SCHEDULES = "schedules";
+    public static final String CREATE_SCHEDULE_TABLE =
+            "CREATE TABLE IF NOT EXISTS " + TABLE_SCHEDULES + "(" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    "title TEXT," +
+                    "description TEXT," +
+                    "time TEXT," +
+                    "date TEXT)";
+
+    public boolean insertFlashcard(String question, String answer, String topic) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put("question", question);
+        cv.put("answer", answer);
+        cv.put("topic", topic);
+        cv.put("created_date", new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date()));
+        return db.insert(TABLE_FLASHCARDS, null, cv) != -1;
+    }
+
+    public Cursor getAllFlashcards() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        // CursorAdapter requires a column named "_id"
+        return db.rawQuery("SELECT id AS _id, * FROM " + TABLE_FLASHCARDS, null);
+    }
+    
+    public Cursor getFlashcardsByTopic(String topic) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT * FROM " + TABLE_FLASHCARDS + " WHERE topic=?", new String[]{topic});
+    }
+
+    public boolean insertSchedule(String title, String description, String time, String date) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put("title", title);
+        cv.put("description", description);
+        cv.put("time", time);
+        cv.put("date", date);
+        return db.insert(TABLE_SCHEDULES, null, cv) != -1;
+    }
+
+    public Cursor getAllSchedules() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT * FROM " + TABLE_SCHEDULES, null);
+    }
+    
+    public Cursor getSchedulesByDate(String date) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT * FROM " + TABLE_SCHEDULES + " WHERE date=?", new String[]{date});
+    }
 
     public boolean isLastAdmin(String email) {
         SQLiteDatabase db = this.getReadableDatabase();

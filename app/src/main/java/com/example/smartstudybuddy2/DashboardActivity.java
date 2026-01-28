@@ -41,6 +41,7 @@ public class DashboardActivity extends AppCompatActivity {
         btnTimetable = findViewById(R.id.btnTimetable);
         exportPdfBtn = findViewById(R.id.btnBookmarks);
         btnHistoryTracking = findViewById(R.id.btnHistoryTracking);
+        CardView btnFlashcards = findViewById(R.id.btnFlashcards);
 
         // Search bar
         searchBar = findViewById(R.id.searchBar);
@@ -88,6 +89,13 @@ public class DashboardActivity extends AppCompatActivity {
                 startActivity(new Intent(this, HistoryActivity.class))
         );
 
+        // Flashcards
+        if (btnFlashcards != null) {
+            btnFlashcards.setOnClickListener(v ->
+                    startActivity(new Intent(this, FlashcardActivity.class))
+            );
+        }
+
         // Search
         searchBar.setOnClickListener(v ->
                 startActivity(new Intent(this, SearchActivity.class))
@@ -100,8 +108,10 @@ public class DashboardActivity extends AppCompatActivity {
 
 
         // Export PDF
-        exportPdfBtn.setOnClickListener(v ->
-                startActivity(new Intent(this, ExportActivity.class))
+        exportPdfBtn.setOnClickListener(v -> {
+                    Toast.makeText(this, "This is a dummy text for export PDF.", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(this, ExportActivity.class));
+                }
         );
 
         // 🔔 Notification click
