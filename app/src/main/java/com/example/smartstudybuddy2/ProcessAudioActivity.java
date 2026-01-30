@@ -7,10 +7,21 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ImageView; // Added import
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.smartstudybuddy2.network.ApiClient;
+import com.example.smartstudybuddy2.network.ApiService;
+import com.example.smartstudybuddy2.network.TranscriptionResponse;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -19,7 +30,8 @@ import java.io.InputStream;
 public class ProcessAudioActivity extends BaseActivity {
 
     TextView transcriptionText;
-    CardView processAudioBtn, viewDetailsBtn, btnViewSummary;   // Added btnViewSummary
+    CardView processAudioBtn, viewDetailsBtn, btnViewSummary;
+    ProgressBar progressBar;
 
     String fileName;
     String audioUriString;
@@ -35,6 +47,14 @@ public class ProcessAudioActivity extends BaseActivity {
         processAudioBtn = findViewById(R.id.processButton);
         viewDetailsBtn = findViewById(R.id.viewDetailsBtn);
         btnViewSummary = findViewById(R.id.btnViewSummary);
+        progressBar = findViewById(R.id.progressBar);
+        if (progressBar == null) {
+            progressBar = new ProgressBar(this);
+        }
+
+        // Initially hide summary button - will show after processing
+        btnViewSummary.setVisibility(android.view.View.GONE);
+        progressBar.setVisibility(android.view.View.GONE);
 
         // Manual Back Button logic
         ImageView btnBack = findViewById(R.id.btnBack);
@@ -50,8 +70,8 @@ public class ProcessAudioActivity extends BaseActivity {
         audioUri = Uri.parse(audioUriString);
 
 
-        // PROCESS AUDIO
-        processAudioBtn.setOnClickListener(v -> processAudioLocally());
+        // PROCESS AUDIO - Call FastAPI server instead of local processing
+        processAudioBtn.setOnClickListener(v -> uploadAudioToServer());
 
         // VIEW DETAILS
         viewDetailsBtn.setOnClickListener(v -> {
@@ -91,96 +111,113 @@ public class ProcessAudioActivity extends BaseActivity {
         }
     }
 
-    // Placeholder for Offline Processing (Vosk)
-    private void processAudioLocally() {
-        transcriptionText.setText("Processing audio file... Please wait...");
-        Toast.makeText(this, "Starting Audio Processing", Toast.LENGTH_SHORT).show();
+    // Upload audio to FastAPI server for transcription
+    private void uploadAudioToServer() {
+        if (audioUri == null) {
+            Toast.makeText(this, "No audio file selected", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-        // Run processing in background thread
-        new Thread(() -> {
-            try {
-                // Step 1: Convert Uri to File
-                File audioFile = convertUriToFile(audioUri);
-                if (audioFile == null) {
-                    runOnUiThread(() -> {
-                        transcriptionText.setText("Error: Could not read audio file");
-                        Toast.makeText(ProcessAudioActivity.this, "File read error", Toast.LENGTH_SHORT).show();
-                    });
-                    return;
+        processAudioBtn.setEnabled(false);
+        progressBar.setVisibility(android.view.View.VISIBLE);
+        transcriptionText.setText("Uploading audio to server...");
+
+        try {
+            File audioFile = convertUriToFile(audioUri);
+            if (audioFile == null) {
+                throw new Exception("Could not read audio file");
+            }
+
+            // Create multipart request
+            RequestBody requestFile = RequestBody.create(
+                    MediaType.parse("audio/mpeg"),
+                    audioFile
+            );
+
+            MultipartBody.Part body = MultipartBody.Part.createFormData(
+                    "file",
+                    audioFile.getName(),
+                    requestFile
+            );
+
+            // Send to FastAPI server
+            ApiService apiService = ApiClient.getClient().create(ApiService.class);
+            Call<TranscriptionResponse> call = apiService.uploadAudio(body);
+
+            call.enqueue(new Callback<TranscriptionResponse>() {
+                @Override
+                public void onResponse(Call<TranscriptionResponse> call, Response<TranscriptionResponse> response) {
+                    progressBar.setVisibility(android.view.View.GONE);
+                    processAudioBtn.setEnabled(true);
+
+                    if (response.isSuccessful() && response.body() != null) {
+                        String transcription = response.body().getText();
+
+                        // Save to database
+                        try {
+                            DatabaseHelper db = new DatabaseHelper(ProcessAudioActivity.this);
+                            db.insertTranscription(fileName, transcription);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                        // Update UI
+                        transcriptionText.setText(transcription);
+                        Toast.makeText(ProcessAudioActivity.this, "Transcription complete!", Toast.LENGTH_SHORT).show();
+
+                        // Show summary button
+                        btnViewSummary.setVisibility(android.view.View.VISIBLE);
+                        btnViewSummary.setOnClickListener(v -> {
+                            Intent summaryIntent = new Intent(ProcessAudioActivity.this, SummaryActivity.class);
+                            summaryIntent.putExtra("transcription", transcription);
+                            summaryIntent.putExtra("fileName", fileName);
+                            startActivity(summaryIntent);
+                        });
+                    } else {
+                        transcriptionText.setText("Error: Server returned " + response.code());
+                        Toast.makeText(ProcessAudioActivity.this, "Server error: " + response.code(), Toast.LENGTH_SHORT).show();
+                    }
                 }
 
-                // Step 2: Simulate Speech-to-Text Processing
-                String transcription = performSpeechToText(audioFile);
-
-                // Step 3: Save to database
-                DatabaseHelper db = new DatabaseHelper(this);
-                db.insertTranscription(fileName, transcription);
-
-                // Update UI on main thread
-                runOnUiThread(() -> {
-                    transcriptionText.setText(transcription);
-                    Toast.makeText(ProcessAudioActivity.this, "Processing Complete!", Toast.LENGTH_SHORT).show();
-
-                    // Enable summary button
-                    btnViewSummary.setOnClickListener(v -> {
-                        Intent summaryIntent = new Intent(ProcessAudioActivity.this, SummaryActivity.class);
-                        summaryIntent.putExtra("transcription", transcription);
-                        summaryIntent.putExtra("fileName", fileName);
-                        startActivity(summaryIntent);
-                    });
-                });
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                runOnUiThread(() -> {
-                    transcriptionText.setText("Error during processing: " + e.getMessage());
-                    Toast.makeText(ProcessAudioActivity.this, "Processing failed", Toast.LENGTH_SHORT).show();
-                });
-            }
-        }).start();
-    }
-
-    // Real speech-to-text conversion (placeholder implementation)
-    // In production, this would use Vosk or Google Cloud Speech-to-Text
-    private String performSpeechToText(File audioFile) {
-        try {
-            // This is a placeholder - in real implementation, use:
-            // - Vosk (offline)
-            // - Google Cloud Speech-to-Text API
-            // - CMU PocketSphinx
-            // - Mozilla DeepSpeech
-
-            // For now, we'll simulate processing
-            String[] sampleTranscriptions = {
-                "Good morning class, today we will discuss the fundamentals of artificial intelligence and machine learning. " +
-                "AI is a branch of computer science that aims to create intelligent machines. " +
-                "These machines can perform tasks that typically require human intelligence. " +
-                "Some key applications include natural language processing, computer vision, and robotics.",
-
-                "In this lecture, we will cover the basics of data structures. " +
-                "Arrays, linked lists, stacks, queues, and trees are fundamental data structures. " +
-                "Understanding these concepts is crucial for efficient programming. " +
-                "We will implement examples in Java and Python.",
-
-                "Today's topic is about web development. " +
-                "HTML provides the structure, CSS provides the styling, and JavaScript provides interactivity. " +
-                "We will also discuss modern frameworks like React, Vue, and Angular. " +
-                "Building responsive websites is essential in today's mobile-first world.",
-
-                "Welcome to the Physics lecture. Today we discuss Newton's laws of motion. " +
-                "The first law states that an object remains at rest unless acted upon by a force. " +
-                "The second law defines the relationship between force, mass, and acceleration. " +
-                "The third law states that for every action, there is an equal and opposite reaction."
-            };
-
-            // Return a random transcription for demo purposes
-            int randomIndex = (int) (Math.random() * sampleTranscriptions.length);
-            return sampleTranscriptions[randomIndex];
+                @Override
+                public void onFailure(Call<TranscriptionResponse> call, Throwable t) {
+                    progressBar.setVisibility(android.view.View.GONE);
+                    processAudioBtn.setEnabled(true);
+                    transcriptionText.setText("Error: " + t.getMessage());
+                    Toast.makeText(ProcessAudioActivity.this, "Connection error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
 
         } catch (Exception e) {
-            return "Error during transcription: " + e.getMessage();
+            progressBar.setVisibility(android.view.View.GONE);
+            processAudioBtn.setEnabled(true);
+            transcriptionText.setText("Error: " + e.getMessage());
+            Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    // Convert Uri → File
+    private File convertUriToFile(Uri uri) {
+        try {
+            InputStream inputStream = getContentResolver().openInputStream(uri);
+            File tempFile = new File(getCacheDir(), "audio_upload.mp3");
+
+            FileOutputStream outputStream = new FileOutputStream(tempFile);
+            byte[] buffer = new byte[1024];
+            int len;
+
+            while ((len = inputStream.read(buffer)) > 0) {
+                outputStream.write(buffer, 0, len);
+            }
+
+            outputStream.close();
+            inputStream.close();
+
+            return tempFile;
+
+        } catch (Exception e) {
+            Toast.makeText(this, "File conversion error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            return null;
         }
     }
 }
-
-

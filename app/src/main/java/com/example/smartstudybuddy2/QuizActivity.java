@@ -43,15 +43,29 @@ public class QuizActivity extends BaseActivity {
 
         dbHelper = new DatabaseHelper(this);
 
-        // Load questions from database
-        loadQuestionsFromDatabase();
+        // ✅ NEW: Check if transcription/summary passed from SummaryActivity
+        String transcription = getIntent().getStringExtra("transcription");
+        String summaryText = getIntent().getStringExtra("summaryText");
 
-        if (questions.isEmpty()) {
-            Toast.makeText(this, "No quiz questions available. Loading defaults...", Toast.LENGTH_SHORT).show();
-            loadDummyQuestions();
+        // If we received transcription/summary, generate dynamic quiz
+        if (transcription != null && !transcription.isEmpty()) {
+            generateDynamicQuiz(transcription);
+            Toast.makeText(this, "Generating Quiz from your lecture...", Toast.LENGTH_SHORT).show();
+        } else {
+            // Fallback: Load questions from database
+            loadQuestionsFromDatabase();
+
+            if (questions.isEmpty()) {
+                Toast.makeText(this, "No quiz questions available. Loading defaults...", Toast.LENGTH_SHORT).show();
+                loadDummyQuestions();
+            }
         }
 
-        showQuestion();
+        if (!questions.isEmpty()) {
+            showQuestion();
+        } else {
+            Toast.makeText(this, "Failed to generate quiz", Toast.LENGTH_SHORT).show();
+        }
 
         // -------------------- Next Question --------------------
         btnNext.setOnClickListener(v -> {
@@ -86,7 +100,27 @@ public class QuizActivity extends BaseActivity {
             btnBack.setOnClickListener(v -> finish());
         }
 
+    }
 
+    /**
+     * Generate dynamic quiz from transcription using QuizGenerator
+     */
+    private void generateDynamicQuiz(String transcription) {
+        try {
+            QuizGenerator quizGenerator = new QuizGenerator(transcription, dbHelper);
+            questions = quizGenerator.generateQuiz();
+
+            if (questions.isEmpty()) {
+                Toast.makeText(this, "Could not generate questions. Using defaults.", Toast.LENGTH_SHORT).show();
+                loadDummyQuestions();
+            } else {
+                Toast.makeText(this, "Generated " + questions.size() + " questions!", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Error generating quiz: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            loadDummyQuestions();
+        }
     }
 
     // -------------------- Display current question --------------------

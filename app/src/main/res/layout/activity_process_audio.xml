@@ -140,6 +140,15 @@
 
                 </LinearLayout>
 
+                <!-- PROGRESS BAR -->
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginVertical="20dp"
+                    android:visibility="gone"
+                    android:indeterminate="true"/>
+
                 <!-- RESULT -->
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
