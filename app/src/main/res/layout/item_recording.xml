@@ -1,56 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
-    android:gravity="center_vertical"
-    android:padding="10dp"
+    android:orientation="vertical"
+    android:padding="14dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="#F3F3F3"
     android:layout_marginBottom="8dp">
 
-    <!-- Recording Info -->
+    <!-- Recording Info - Name and Date (Entire item clickable) -->
     <LinearLayout
         android:orientation="vertical"
-        android:layout_width="0dp"
-        android:layout_weight="1"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <TextView
             android:id="@+id/tvRecordingName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="recorded_1.3gp"
+            android:text="recorded_1"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:textColor="#4F6F64" />
+            android:textColor="#4F6F64"
+            android:layout_marginBottom="6dp" />
 
         <TextView
             android:id="@+id/tvRecordingDate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="2025-10-20"
-            android:textSize="12sp"
+            android:text="2025-10-20 14:30:45"
+            android:textSize="13sp"
             android:textColor="#666" />
 
     </LinearLayout>
-
-    <!-- Play Button -->
-    <ImageButton
-        android:id="@+id/btnPlayRecording"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:src="@android:drawable/ic_media_play"
-        android:background="@android:color/transparent"
-        android:contentDescription="Play Recording" />
-
-    <!-- Delete Button -->
-    <ImageButton
-        android:id="@+id/btnDeleteRecording"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:src="@android:drawable/ic_delete"
-        android:background="@android:color/transparent"
-        android:contentDescription="Delete Recording" />
 
 </LinearLayout>

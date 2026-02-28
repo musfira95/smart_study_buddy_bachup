@@ -16,6 +16,7 @@
 
     <application
         android:allowBackup="true"
+        android:usesCleartextTraffic="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
@@ -48,6 +49,7 @@
         <activity android:name=".MainActivity" />
         <activity android:name=".NotesActivity" />
         <activity android:name=".RecordMicActivity" />
+        <activity android:name=".SaveRecordingActivity" />
         <activity android:name=".ProcessAudioActivity" />
         <activity android:name=".RecordingListActivity" />
         <activity android:name=".AdminDashboardActivity" />
@@ -63,12 +65,19 @@
         <activity android:name=".TimetableActivity" />
         <activity android:name=".SearchActivity" />
         <activity android:name=".FlashcardActivity" />
+        <activity android:name=".SelectSessionForFlashcardsActivity"
+            android:label="Select Session"
+            android:exported="true"/>
+        <activity android:name=".FlashcardDetailActivity" />
         <activity android:name=".AboutActivity" />
         <activity android:name=".HelpActivity" />
         <activity android:name=".AllTranscriptionsActivity" />
         <activity android:name=".AnalyticsActivity" />
         <activity android:name=".HistoryActivity"
             android:label="History Tracking"
+            android:exported="true"/>
+        <activity android:name=".StudySessionDetailActivity"
+            android:label="Session Details"
             android:exported="true"/>
         <activity android:name=".RoleManagementActivity" />
         <activity android:name=".SearchUsersActivity" />
@@ -106,7 +115,16 @@
         <activity android:name=".ResetPasswordActivity" />
         <activity android:name=".RecordingDetailActivity" />
 
-
+        <!-- FileProvider for secure file sharing -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
 
     </application>
 

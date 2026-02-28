@@ -1,60 +1,417 @@
 package com.example.smartstudybuddy2;
 
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
-import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import android.widget.Toast;
+import android.util.Log;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-public class FlashcardActivity extends BaseActivity {
+import java.util.ArrayList;
 
-    private ListView listView;
-    private DatabaseHelper db;
+/**
+ * ✅ Flashcard Activity with Review Tracking & Mastery Levels
+ * 
+ * Features:
+ * - Display all flashcards from database with mastery levels
+ * - Track review count for each card
+ * - Visual mastery indicators (🟥 Learning → 🟢 Mastered)
+ * - Click to review and rate difficulty
+ * - Summary stats showing mastered cards progress
+ */
+public class FlashcardActivity extends AppCompatActivity {
+    private static final String TAG = "FlashcardActivity";
+    
+    private RecyclerView rvFlashcards;
+    private FlashcardAdapter adapter;
+    private DatabaseHelper dbHelper;
+    private ArrayList<Flashcard> flashcards;
+    private TextView tvStatsBar;
+    
+    // ✅ NEW: Session tracking
+    private int sessionId = -1;
+    private String sessionTitle = "Flashcards";
+    private StudySession currentSession;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_flashcard);
 
-        listView = findViewById(R.id.listViewFlashcards);
-        FloatingActionButton fabAdd = findViewById(R.id.fabAddFlashcard);
-        db = new DatabaseHelper(this);
+        dbHelper = new DatabaseHelper(this);
+        rvFlashcards = findViewById(R.id.rvFlashcards);
+        tvStatsBar = findViewById(R.id.tvStatsBar);
 
-        // Load Flashcards from database
+        // ✅ NEW: Get session_id from Intent (passed from SelectSessionForFlashcardsActivity)
+        sessionId = getIntent().getIntExtra("session_id", -1);
+        sessionTitle = getIntent().getStringExtra("session_title");
+        if (sessionTitle == null) {
+            sessionTitle = "Flashcards";
+        }
+        
+        Log.d(TAG, "📚 FlashcardActivity opened for session_id=" + sessionId + ", title=" + sessionTitle);
+        
+        // Update title/header
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle(sessionTitle);
+        }
+
+        // Load flashcards with mastery tracking
         loadFlashcards();
+        updateMasteryStats();
 
-        // Add Flashcard Button
-        fabAdd.setOnClickListener(v -> {
-            // Open create flashcard activity (or create inline dialog)
-            // For now, just reload to show newly added cards
-            loadFlashcards();
-        });
+
+        Log.d(TAG, "✅ FlashcardActivity initialized with mastery tracking");
     }
 
     private void loadFlashcards() {
-        Cursor cursor = db.getAllFlashcards();
-        
-        // If no flashcards exist, show message
-        if (cursor == null || cursor.getCount() == 0) {
-            TextView emptyView = new TextView(this);
-            emptyView.setText("No flashcards yet. Create one to get started!");
-            listView.setEmptyView(emptyView);
+        try {
+            flashcards = new ArrayList<>();
+            
+            if (sessionId <= 0) {
+                Log.e(TAG, "❌ Invalid session ID: " + sessionId);
+                Toast.makeText(this, "Invalid session", Toast.LENGTH_SHORT).show();
+                finish();
+                return;
+            }
+            
+            Log.d(TAG, "📚 Loading flashcards from session_id=" + sessionId);
+            
+            // Step 1: Fetch session from database
+            currentSession = dbHelper.getStudySessionById(sessionId);
+            
+            if (currentSession == null) {
+                Log.d(TAG, "⚠️ Not found in study_sessions, checking recordings...");
+                Recording recording = dbHelper.getRecordingById(sessionId);
+                
+                if (recording == null) {
+                    Log.e(TAG, "❌ Session/Recording not found with ID: " + sessionId);
+                    Toast.makeText(this, "Session not found", Toast.LENGTH_SHORT).show();
+                    finish();
+                    return;
+                }
+                
+                // Convert Recording to StudySession
+                currentSession = new StudySession(
+                        recording.getId(),
+                        recording.getTitle() != null ? recording.getTitle() : "Recording",
+                        recording.getFilePath() != null ? recording.getFilePath() : "",
+                        recording.getTranscription() != null ? recording.getTranscription() : "",
+                        "",  // No summary for recordings
+                        "[]",
+                        recording.getDate(),
+                        0,
+                        0,
+                        0.0,
+                        false
+                );
+            }
+            
+            if (currentSession == null) {
+                Toast.makeText(this, "Could not load session data", Toast.LENGTH_SHORT).show();
+                finish();
+                return;
+            }
+            
+            // Step 2: Get summary text from session (prefer summary, but fall back to transcription)
+            String summaryText = currentSession.getSummary();
+            Log.d(TAG, "📝 Summary text: " + (summaryText != null ? summaryText.substring(0, Math.min(80, summaryText.length())) + "..." : "NULL"));
+
+            // ✅ If no summary, fall back to transcription
+            if (summaryText == null || summaryText.trim().isEmpty()) {
+                Log.w(TAG, "⚠️ No summary available, using transcription for flashcards");
+                summaryText = currentSession.getTranscription();
+            }
+            
+            // ✅ Only abort if both summary AND transcription are missing
+            if (summaryText == null || summaryText.trim().isEmpty()) {
+                Log.e(TAG, "❌ No summary or transcription available for session_id=" + sessionId);
+                Toast.makeText(this, "No content available for flashcards", Toast.LENGTH_SHORT).show();
+                finish();
+                return;
+            }
+            
+            // Step 3: Split summary into sentences
+            flashcards = generateFlashcardsFromSummary(summaryText);
+            
+            if (flashcards == null || flashcards.isEmpty()) {
+                Log.e(TAG, "❌ No flashcards generated from summary");
+                Toast.makeText(this, "Could not generate flashcards", Toast.LENGTH_SHORT).show();
+                finish();
+                return;
+            }
+            
+            // ✅ NEW: Load database stats back into flashcard model
+            loadFlashcardStatsFromDatabase(flashcards);
+            
+            Log.d(TAG, "✅ Generated " + flashcards.size() + " flashcards from summary");
+            
+            // Step 4: Display in RecyclerView
+            adapter = new FlashcardAdapter(flashcards, flashcard -> {
+                if (flashcard != null) {
+                    onFlashcardItemClick(flashcard);
+                } else {
+                    Log.e(TAG, "❌ Flashcard is null");
+                    Toast.makeText(this, "Error: Flashcard data is invalid", Toast.LENGTH_SHORT).show();
+                }
+            });
+            
+            if (rvFlashcards != null) {
+                rvFlashcards.setLayoutManager(new LinearLayoutManager(this));
+                rvFlashcards.setAdapter(adapter);
+            } else {
+                Log.e(TAG, "❌ RecyclerView not found");
+            }
+            
+            Log.d(TAG, "✅ Flashcards displayed: " + flashcards.size() + " cards");
+            
+        } catch (Exception e) {
+            Log.e(TAG, "❌ Error loading flashcards: " + e.getMessage());
+            e.printStackTrace();
+            Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
+    }
+    
+    /**
+     * ✅ NEW: Load database stats into flashcard model
+     * Syncs reviewCount and isMastered from FlashcardStat table
+     */
+    private void loadFlashcardStatsFromDatabase(ArrayList<Flashcard> cards) {
+        if (cards == null || cards.isEmpty()) return;
+        
+        try {
+            for (Flashcard card : cards) {
+                FlashcardStat stat = dbHelper.getFlashcardStat(card.getId());
+                if (stat != null) {
+                    card.setReviewCount(stat.getReviewCount());
+                    if (stat.getMasteryLevel() >= 4) {
+                        card.setMastered(true);
+                    }
+                    Log.d(TAG, "✅ Loaded stat for card " + card.getId() + ": reviews=" + stat.getReviewCount() + ", mastered=" + (stat.getMasteryLevel() >= 4));
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "❌ Error loading stats from database: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Generate flashcards from summary text by splitting into sentences
+     * One flashcard per sentence with dynamic questions based on content
+     */
+    private ArrayList<Flashcard> generateFlashcardsFromSummary(String summaryText) {
+        ArrayList<Flashcard> generatedCards = new ArrayList<>();
+        
+        if (summaryText == null || summaryText.trim().isEmpty()) {
+            Log.e(TAG, "❌ Summary text is null or empty");
+            return generatedCards;
+        }
+        
+        // Step 1: Split by period delimiter
+        String[] sentences = summaryText.split("\\.");
+        Log.d(TAG, "🔍 Split into " + sentences.length + " sentences");
+        
+        int cardId = 1;
+        
+        // Step 2: Process each sentence
+        for (String sentence : sentences) {
+            // Step 3: Trim whitespace
+            sentence = sentence.trim();
+            
+            // Step 4: Ignore empty sentences
+            if (sentence.isEmpty() || sentence.length() < 10) {
+                continue;
+            }
+            
+            // Step 5: Generate dynamic question based on sentence content
+            String question = generateDynamicQuestion(sentence);
+            String answer = sentence;
+            
+            // Format as: Q: <question>\n\nA: <answer>
+            String formattedText = "Q: " + question + "\n\nA: " + answer;
+            
+            // Step 6: Create flashcard object with formatted text
+            Flashcard card = new Flashcard(
+                    cardId++,
+                    formattedText,  // Full Q/A formatted text as question field
+                    answer,         // Original sentence as answer field
+                    sessionTitle,
+                    java.time.LocalDateTime.now().toString()
+            );
+            
+            // Step 7: Add to list
+            generatedCards.add(card);
+            Log.d(TAG, "  ✅ [Card " + (cardId-1) + "] Q: " + question);
+            Log.d(TAG, "     A: " + answer.substring(0, Math.min(60, answer.length())));
+        }
+        
+        Log.d(TAG, "✅ Total flashcards created: " + generatedCards.size());
+        return generatedCards;
+    }
+    
+    /**
+     * Generate dynamic question based on sentence content
+     * Creates questions that relate directly to the answer text
+     * 
+     * Strategy:
+     * 1. Extract key terms from the beginning of the sentence
+     * 2. Create "What is X?" or "Describe X" questions
+     * 3. For sentences with "is/are" → "What is described?"
+     * 4. For sentences with years → "When did this occur?"
+     */
+    private String generateDynamicQuestion(String sentence) {
+        // ✅ Validate input
+        if (sentence == null || sentence.trim().isEmpty()) {
+            return "Explain this concept.";
+        }
+        
+        sentence = sentence.trim();
+        String lowerSentence = sentence.toLowerCase();
+        
+        // ✅ RULE 1: Extract first key noun/topic for "What is X?" questions
+        // Look for first 1-3 words as the topic
+        String[] words = sentence.split("[\\s,]");
+        
+        if (words.length > 0) {
+            // Build a question from first few words
+            String firstWord = words[0];
+            String secondWord = words.length > 1 ? words[1] : "";
+            String thirdWord = words.length > 2 ? words[2] : "";
+            
+            // Skip small words like "The", "It", "A"
+            if (firstWord.length() <= 3 && words.length > 1) {
+                firstWord = words[1];
+                secondWord = words.length > 2 ? words[2] : "";
+                thirdWord = words.length > 3 ? words[3] : "";
+            }
+            
+            // Remove punctuation
+            firstWord = firstWord.replaceAll("[^a-zA-Z0-9]", "");
+            secondWord = secondWord.replaceAll("[^a-zA-Z0-9]", "");
+            thirdWord = thirdWord.replaceAll("[^a-zA-Z0-9]", "");
+            
+            // Build topic phrase
+            String topic = firstWord;
+            if (!secondWord.isEmpty() && !secondWord.equalsIgnoreCase("and")) {
+                topic += " " + secondWord;
+            }
+            if (!thirdWord.isEmpty() && !thirdWord.equalsIgnoreCase("and") && !thirdWord.equalsIgnoreCase("the")) {
+                topic += " " + thirdWord;
+            }
+            
+            // ✅ RULE 2: Check for year - "When did X occur?"
+            if (sentence.matches(".*\\d{4}.*")) {
+                Log.d(TAG, "📅 Year detected - " + topic);
+                return "When did " + topic + " occur?";
+            }
+            
+            // ✅ RULE 3: Check for "is/are/was/were" - "What is X?"
+            if (lowerSentence.contains(" is ") || lowerSentence.contains(" are ") || 
+                lowerSentence.contains(" was ") || lowerSentence.contains(" were ")) {
+                Log.d(TAG, "🔍 Definition question - " + topic);
+                return "What is " + topic + "?";
+            }
+            
+            // ✅ RULE 4: Default - "Describe X" or "Explain X"
+            if (topic.length() > 0) {
+                Log.d(TAG, "⚙️ Default question - " + topic);
+                return "Describe " + topic + ".";
+            }
+        }
+        
+        // Fallback
+        return "Explain this concept.";
+    }
 
-        // Map DB columns to Layout Views
-        String[] from = new String[] { "question", "answer" };
-        int[] to = new int[] { android.R.id.text1, android.R.id.text2 };
+    private void onFlashcardItemClick(Flashcard flashcard) {
+        Log.d(TAG, "🎯 Flashcard review started: " + flashcard.getQuestion());
+        
+        // ✅ Calculate progress stats
+        int totalCards = flashcards.size();
+        int masteredCount = 0;
+        for (Flashcard card : flashcards) {
+            if (card.isMastered()) {
+                masteredCount++;
+            }
+        }
+        
+        // Open flashcard detail for review with mastery tracking
+        Intent intent = new Intent(this, FlashcardDetailActivity.class);
+        intent.putExtra("flashcard_id", flashcard.getId());
+        intent.putExtra("question", flashcard.getQuestion());
+        intent.putExtra("answer", flashcard.getAnswer());
+        intent.putExtra("topic", flashcard.getTopic());
+        
+        // ✅ NEW: Pass progress tracking data
+        intent.putExtra("total_cards", totalCards);
+        intent.putExtra("review_count", flashcard.getReviewCount());
+        intent.putExtra("is_mastered", flashcard.isMastered());
+        intent.putExtra("mastered_count", masteredCount);
+        
+        startActivity(intent);
+    }
 
-        SimpleCursorAdapter adapter = new SimpleCursorAdapter(
-                this,
-                android.R.layout.simple_list_item_2,
-                cursor,
-                from,
-                to,
-                0);
+    private void updateMasteryStats() {
+        try {
+            if (flashcards == null || flashcards.isEmpty()) {
+                if (tvStatsBar != null) {
+                    tvStatsBar.setText("🟥 Learning • 0/0 Mastered");
+                }
+                return;
+            }
+            
+            // ✅ Use Flashcard model fields instead of database stats
+            int masteredCount = 0;
+            int totalCards = flashcards.size();
+            int reviewedCount = 0;
+            
+            for (Flashcard card : flashcards) {
+                if (card.getReviewCount() > 0) {
+                    reviewedCount++;
+                    if (card.isMastered()) {
+                        masteredCount++;
+                    }
+                }
+            }
+            
+            // ✅ Calculate mastery percentage
+            String masteryLevel = "🟥 Learning";
+            if (reviewedCount > 0) {
+                double masteredPercent = (masteredCount * 100.0) / reviewedCount;
+                if (masteredPercent >= 80) {
+                    masteryLevel = "🟢 Mastered!";
+                } else if (masteredPercent >= 60) {
+                    masteryLevel = "🟩 Confident";
+                } else if (masteredPercent >= 40) {
+                    masteryLevel = "🟨 Familiar";
+                } else {
+                    masteryLevel = "🟥 Learning";
+                }
+            }
+            
+            // ✅ Display stats with total card count
+            String statsText = String.format("%s • %d/%d Mastered", masteryLevel, masteredCount, totalCards);
+            
+            if (tvStatsBar != null) {
+                tvStatsBar.setText(statsText);
+            }
+            
+            Log.d(TAG, "📊 Mastery Progress: " + statsText + " (reviewed: " + reviewedCount + ")");
+            
+        } catch (Exception e) {
+            Log.e(TAG, "❌ Error updating mastery stats: " + e.getMessage());
+        }
+    }
 
-        listView.setAdapter(adapter);
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Refresh flashcard list whenever returning to this activity
+        loadFlashcards();
+        updateMasteryStats();
     }
 }

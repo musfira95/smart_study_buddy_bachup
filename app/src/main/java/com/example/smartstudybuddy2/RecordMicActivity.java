@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,6 +23,7 @@ import java.io.IOException;
 public class RecordMicActivity extends BaseActivity {
 
     private static final int RECORD_AUDIO_PERMISSION_CODE = 100;
+    private static final String TAG = "RecordMicActivity";
 
     // ✅ Buttons are TextView now (as per XML)
     private TextView startButton, pauseButton, stopButton;
@@ -40,6 +42,8 @@ public class RecordMicActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_record_mic);
+
+        Log.d(TAG, "RecordMicActivity created");
 
         startButton = findViewById(R.id.btnStartRecording);
         pauseButton = findViewById(R.id.btnPauseRecording);
@@ -97,6 +101,8 @@ public class RecordMicActivity extends BaseActivity {
 
             audioFilePath = audioDir.getAbsolutePath() + "/recorded_" + System.currentTimeMillis() + ".3gp";
 
+            Log.d(TAG, "🎙️ Starting recording: " + audioFilePath);
+
             recorder = new MediaRecorder();
             recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
             recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
@@ -116,8 +122,10 @@ public class RecordMicActivity extends BaseActivity {
             stopButton.setEnabled(true);
 
             Toast.makeText(this, "Recording Started...", Toast.LENGTH_SHORT).show();
+            Log.d(TAG, "✅ Recording started successfully");
 
         } catch (IOException e) {
+            Log.e(TAG, "❌ Error starting recording: " + e.getMessage());
             e.printStackTrace();
             Toast.makeText(this, "Recording failed", Toast.LENGTH_SHORT).show();
         }
@@ -133,6 +141,7 @@ public class RecordMicActivity extends BaseActivity {
                 pauseButton.setText("▶ Resume Recording");
                 handler.removeCallbacks(updateTimer);
                 Toast.makeText(this, "Recording Paused", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "⏸️ Recording paused");
             } else {
                 recorder.resume();
                 startTime = System.currentTimeMillis();
@@ -140,6 +149,7 @@ public class RecordMicActivity extends BaseActivity {
                 pauseButton.setText("⏸ Pause Recording");
                 handler.post(updateTimer);
                 Toast.makeText(this, "Recording Resumed", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "▶️ Recording resumed");
             }
         }
     }
@@ -158,19 +168,17 @@ public class RecordMicActivity extends BaseActivity {
 
             Toast.makeText(this, "Recording Stopped!", Toast.LENGTH_SHORT).show();
 
-            // Dummy transcription
-            String transcribedText = "🗒 Transcription: This is a dummy transcription of recorded audio.";
-            LastTranscriptionHolder.lastTranscription = transcribedText;
+            Log.d(TAG, "📁 Recording stopped, opening save screen...");
+            Log.d(TAG, "   filePath: " + audioFilePath);
 
-            // Insert into DB (ONLY ONCE)
-            DatabaseHelper db = new DatabaseHelper(this);
-            db.insertRecording("Recorded Audio", audioFilePath);
-
-            Intent intent = new Intent(RecordMicActivity.this, NotesActivity.class);
-            intent.putExtra("TRANSCRIPTION_TEXT", transcribedText);
+            // Open SaveRecordingActivity instead of dialog
+            Intent intent = new Intent(RecordMicActivity.this, SaveRecordingActivity.class);
+            intent.putExtra("audioFilePath", audioFilePath);
             startActivity(intent);
+            finish();  // Close recording screen
 
         } catch (Exception e) {
+            Log.e(TAG, "❌ Error stopping recording: " + e.getMessage());
             e.printStackTrace();
             Toast.makeText(this, "Error stopping recording", Toast.LENGTH_SHORT).show();
         }

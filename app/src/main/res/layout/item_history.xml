@@ -40,7 +40,9 @@
                 android:text="Title"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:textColor="#4F6F64" />
+                android:textColor="#4F6F64"
+                android:ellipsize="end"
+                android:maxLines="1" />
 
             <!-- DATE -->
             <TextView
@@ -52,7 +54,30 @@
                 android:textColor="#777777"
                 android:layout_marginTop="4dp" />
 
+            <!-- METADATA (Duration, Quiz Score) -->
+            <TextView
+                android:id="@+id/tvMetadata"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="⏱ 120s | 🎯 85.0%"
+                android:textSize="12sp"
+                android:textColor="#999999"
+                android:layout_marginTop="3dp" />
+
         </LinearLayout>
+
+        <!-- DELETE BUTTON -->
+        <ImageView
+            android:id="@+id/btnDelete"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_delete"
+            android:scaleType="centerInside"
+            android:padding="6dp"
+            android:layout_marginStart="8dp"
+            android:contentDescription="Delete"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:tint="#D9534F" />
 
     </LinearLayout>
 

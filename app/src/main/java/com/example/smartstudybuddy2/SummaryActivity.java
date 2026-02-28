@@ -28,6 +28,7 @@ public class SummaryActivity extends BaseActivity {
 
         String transcriptionText = getIntent().getStringExtra("transcription");
         String fileName = getIntent().getStringExtra("fileName");
+        long recordingId = getIntent().getLongExtra("recordingId", -1);  // ✅ GET RECORDING ID
 
         // Generate real summary from transcription
         String summaryText = generateSummary(transcriptionText);
@@ -36,6 +37,14 @@ public class SummaryActivity extends BaseActivity {
         // Save summary to database
         DatabaseHelper db = new DatabaseHelper(this);
         db.insertSummary(fileName, summaryText, transcriptionText);
+        
+        // ✅ ALSO UPDATE AUDIO_FILES TABLE WITH SUMMARY (for PDF export)
+        if (recordingId > 0) {
+            boolean updated = db.updateRecordingSummary((int) recordingId, summaryText);
+            android.util.Log.d("SummaryActivity", "📝 Summary saved to audio_files: " + updated + " (recordingId=" + recordingId + ")");
+        } else {
+            android.util.Log.w("SummaryActivity", "⚠️ No recordingId available to save summary");
+        }
 
         Toast.makeText(this, "Summary Generated Successfully", Toast.LENGTH_SHORT).show();
 
@@ -44,6 +53,7 @@ public class SummaryActivity extends BaseActivity {
             Intent intent = new Intent(SummaryActivity.this, QuizActivity.class);
             intent.putExtra("summaryText", summaryText);
             intent.putExtra("transcription", transcriptionText);
+            intent.putExtra("recordingId", recordingId);  // ✅ PASS RECORDING ID
             startActivity(intent);
         });
 

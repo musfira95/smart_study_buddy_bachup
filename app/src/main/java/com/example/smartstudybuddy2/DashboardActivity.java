@@ -5,6 +5,7 @@ import androidx.cardview.widget.CardView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -12,7 +13,6 @@ import android.widget.Toast;
 public class DashboardActivity extends AppCompatActivity {
 
     private CardView uploadAudioBtn, btnLastTranscription, btnRecordingList, btnTimetable;
-    private CardView exportPdfBtn;
     private CardView btnHistoryTracking;
     private LinearLayout logoutBtn;
 
@@ -33,13 +33,16 @@ public class DashboardActivity extends AppCompatActivity {
 
         session = new SessionManager(this);
         dbHelper = new DatabaseHelper(this);
+        
+        // ✅ Clean up dummy data on dashboard load (belt and suspenders)
+        Log.d("DashboardActivity", "🗑️ Cleaning up dummy data...");
+        dbHelper.cleanupAllDummyData();
 
         // CardViews
         uploadAudioBtn = findViewById(R.id.uploadAudioBtn);
         btnLastTranscription = findViewById(R.id.btnLastTranscription);
         btnRecordingList = findViewById(R.id.btnRecordingList);
         btnTimetable = findViewById(R.id.btnTimetable);
-        exportPdfBtn = findViewById(R.id.btnBookmarks);
         btnHistoryTracking = findViewById(R.id.btnHistoryTracking);
         CardView btnFlashcards = findViewById(R.id.btnFlashcards);
 
@@ -92,7 +95,7 @@ public class DashboardActivity extends AppCompatActivity {
         // Flashcards
         if (btnFlashcards != null) {
             btnFlashcards.setOnClickListener(v ->
-                    startActivity(new Intent(this, FlashcardActivity.class))
+                    startActivity(new Intent(this, SelectSessionForFlashcardsActivity.class))
             );
         }
 
@@ -106,13 +109,6 @@ public class DashboardActivity extends AppCompatActivity {
                 startActivity(new Intent(this, Reminders.class))
         );
 
-
-        // Export PDF
-        exportPdfBtn.setOnClickListener(v -> {
-                    Toast.makeText(this, "This is a dummy text for export PDF.", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(this, ExportActivity.class));
-                }
-        );
 
         // 🔔 Notification click
         btnNotification.setOnClickListener(v ->

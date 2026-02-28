@@ -27,33 +27,54 @@ public class NotificationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notification);
 
-        btnClearNotifications = findViewById(R.id.btnClearNotifications);
-        listNotifications = findViewById(R.id.listNotifications);
-        tvEmpty = findViewById(R.id.tvEmpty);
+        try {
+            btnClearNotifications = findViewById(R.id.btnClearNotifications);
+            listNotifications = findViewById(R.id.listNotifications);
+            tvEmpty = findViewById(R.id.tvEmpty);
 
-        dbHelper = new DatabaseHelper(this);
+            dbHelper = new DatabaseHelper(this);
 
-        // Load notifications from database
-        notificationList = dbHelper.getAllNotifications();
+            // Load notifications from database with error handling
+            notificationList = dbHelper.getAllNotifications();
+            
+            if (notificationList == null) {
+                notificationList = new ArrayList<>();
+            }
 
-        if (notificationList.isEmpty()) {
-            checkEmptyState();
-        } else {
-            adapter = new NotificationAdapter(this, notificationList);
-            listNotifications.setAdapter(adapter);
+            if (notificationList.isEmpty()) {
+                checkEmptyState();
+            } else {
+                adapter = new NotificationAdapter(this, notificationList);
+                if (listNotifications != null) {
+                    listNotifications.setAdapter(adapter);
+                }
+                checkEmptyState();
+            }
+        } catch (Exception e) {
+            Toast.makeText(this, "Error loading notifications: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            android.util.Log.e("NotificationActivity", "Error: " + e.getMessage());
+            notificationList = new ArrayList<>();
             checkEmptyState();
         }
 
         // Clear all notifications
-        btnClearNotifications.setOnClickListener(v -> {
-            dbHelper.clearAllNotifications();
-            notificationList.clear();
-            if (adapter != null) {
-                adapter.notifyDataSetChanged();
-            }
-            checkEmptyState();
-            Toast.makeText(this, "Notifications cleared", Toast.LENGTH_SHORT).show();
-        });
+        if (btnClearNotifications != null) {
+            btnClearNotifications.setOnClickListener(v -> {
+                try {
+                    dbHelper.clearAllNotifications();
+                    if (notificationList != null) {
+                        notificationList.clear();
+                    }
+                    if (adapter != null) {
+                        adapter.notifyDataSetChanged();
+                    }
+                    checkEmptyState();
+                    Toast.makeText(this, "Notifications cleared", Toast.LENGTH_SHORT).show();
+                } catch (Exception e) {
+                    Toast.makeText(this, "Error clearing notifications", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
     private void checkEmptyState() {

@@ -107,6 +107,88 @@
             </androidx.cardview.widget.CardView>
         </LinearLayout>
 
+        <!-- ✅ NEW STATS ROW 2 -->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:weightSum="3"
+            android:gravity="center"
+            android:layout_marginTop="15dp">
+
+            <!-- TOTAL RECORDINGS -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardTotalRecordings"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="110dp"
+                android:layout_margin="8dp"
+                android:clipToOutline="true"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="6dp"
+                android:backgroundTint="#FF9E67">
+
+                <TextView
+                    android:id="@+id/tvTotalRecordings"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Total Recordings\n0"
+                    android:textColor="#FFFFFF"
+                    android:textSize="17sp"
+                    android:gravity="center"
+                    android:textStyle="bold"
+                    android:padding="8dp" />
+            </androidx.cardview.widget.CardView>
+
+            <!-- AVG QUIZ SCORE -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardAverageQuizScore"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="110dp"
+                android:layout_margin="8dp"
+                android:clipToOutline="true"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="6dp"
+                android:backgroundTint="#F26B7B">
+
+                <TextView
+                    android:id="@+id/tvAverageQuizScore"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Avg Quiz Score\n0%"
+                    android:textColor="#FFFFFF"
+                    android:textSize="17sp"
+                    android:gravity="center"
+                    android:textStyle="bold"
+                    android:padding="8dp" />
+            </androidx.cardview.widget.CardView>
+
+            <!-- TOTAL QUIZZES -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardTotalQuizzes"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="110dp"
+                android:layout_margin="8dp"
+                android:clipToOutline="true"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="6dp"
+                android:backgroundTint="#9F8FF1">
+
+                <TextView
+                    android:id="@+id/tvTotalQuizzes"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Total Quizzes\n0"
+                    android:textColor="#FFFFFF"
+                    android:textSize="17sp"
+                    android:gravity="center"
+                    android:textStyle="bold"
+                    android:padding="8dp" />
+            </androidx.cardview.widget.CardView>
+        </LinearLayout>
+
         <!-- SECTION HEADER -->
         <TextView
             android:id="@+id/tvAnalyticsGraphLabel"

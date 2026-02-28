@@ -4,8 +4,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="12dp"
-    android:background="?android:attr/selectableItemBackground">
+    android:background="?android:attr/selectableItemBackground"
+    android:paddingBottom="16dp">
 
+    <!-- Title -->
     <TextView
         android:id="@+id/tvTranscriptionTitle"
         android:layout_width="wrap_content"
@@ -13,8 +15,9 @@
         android:text="Transcription Title"
         android:textStyle="bold"
         android:textSize="16sp"
-        android:textColor="#4F6F64" />   <!-- PURPLE COLOR -->
+        android:textColor="#4F6F64" />
 
+    <!-- Date / Time -->
     <TextView
         android:id="@+id/tvTranscriptionDate"
         android:layout_width="wrap_content"
@@ -22,6 +25,24 @@
         android:text="Date / Time"
         android:textSize="14sp"
         android:textColor="#555555"
-        android:paddingTop="2dp" />
+        android:paddingTop="4dp" />
+
+    <!-- Transcription Preview with ScrollView -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:maxHeight="300dp"
+        android:background="#F5F5F5"
+        android:layout_marginTop="6dp">
+
+        <TextView
+            android:id="@+id/tvTranscriptionPreview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="No transcription yet"
+            android:textSize="13sp"
+            android:textColor="#666666"
+            android:padding="8dp" />
+    </ScrollView>
 
 </LinearLayout>

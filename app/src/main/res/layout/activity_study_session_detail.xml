@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/login_bg">
+
+    <!-- TOOLBAR HEADER -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:background="#FFFFFF"
+        android:elevation="4dp">
+
+        <Button
+            android:id="@+id/btnBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="← Back"
+            android:background="?attr/selectableItemBackground"
+            android:textColor="#4F6F64"
+            android:textSize="14sp"
+            style="?attr/borderlessButtonStyle" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/btnUpdateScore"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Update Score"
+            android:background="?attr/selectableItemBackground"
+            android:textColor="#4F8E7D"
+            android:textSize="12sp"
+            style="?attr/borderlessButtonStyle" />
+
+        <Button
+            android:id="@+id/btnDelete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Delete"
+            android:background="?attr/selectableItemBackground"
+            android:textColor="#D9534F"
+            android:textSize="12sp"
+            style="?attr/borderlessButtonStyle" />
+
+    </LinearLayout>
+
+    <!-- CONTENT SCROLL VIEW -->
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- SESSION TITLE -->
+            <TextView
+                android:id="@+id/tvSessionTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Session Title"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="#4F6F64"
+                android:layout_marginBottom="12dp" />
+
+            <!-- SESSION METADATA -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_card"
+                android:padding="12dp"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:id="@+id/tvCreatedDate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="📅 Created Date"
+                    android:textSize="14sp"
+                    android:textColor="#4F6F64"
+                    android:layout_marginBottom="6dp" />
+
+                <TextView
+                    android:id="@+id/tvDuration"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="⏱ Duration"
+                    android:textSize="14sp"
+                    android:textColor="#4F6F64"
+                    android:layout_marginBottom="6dp" />
+
+                <TextView
+                    android:id="@+id/tvWordCount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="📝 Word Count"
+                    android:textSize="14sp"
+                    android:textColor="#4F6F64" />
+
+            </LinearLayout>
+
+            <!-- TRANSCRIPTION SECTION -->
+            <TextView
+                android:id="@+id/tvTranscriptionLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="📋 Transcription"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#4F6F64"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="12dp" />
+
+            <TextView
+                android:id="@+id/tvTranscription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="13sp"
+                android:textColor="#333333"
+                android:lineSpacingExtra="4dp"
+                android:background="@drawable/bg_card"
+                android:padding="12dp"
+                android:layout_marginBottom="16dp"
+                android:layout_marginEnd="8dp" />
+
+            <!-- SUMMARY SECTION -->
+            <TextView
+                android:id="@+id/tvSummaryLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="📌 Summary"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#4F6F64"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="12dp" />
+
+            <TextView
+                android:id="@+id/tvSummary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="13sp"
+                android:textColor="#333333"
+                android:lineSpacingExtra="4dp"
+                android:background="@drawable/bg_card"
+                android:padding="12dp"
+                android:layout_marginBottom="16dp"
+                android:layout_marginEnd="8dp" />
+
+            <!-- QUIZ SECTION -->
+            <TextView
+                android:id="@+id/tvQuizLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="❓ Quiz Results"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#4F6F64"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="12dp" />
+
+            <TextView
+                android:id="@+id/tvQuizContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="13sp"
+                android:textColor="#333333"
+                android:lineSpacingExtra="4dp"
+                android:background="@drawable/bg_card"
+                android:padding="12dp"
+                android:layout_marginBottom="32dp"
+                android:layout_marginEnd="8dp" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>

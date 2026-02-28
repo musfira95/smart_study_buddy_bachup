@@ -15,6 +15,7 @@ import android.database.Cursor;
 import android.content.res.AssetFileDescriptor;
 
 import java.io.IOException;
+import com.example.smartstudybuddy2.DatabaseHelper;
 
 public class UploadAudioActivity extends BaseActivity {
 
@@ -32,6 +33,7 @@ public class UploadAudioActivity extends BaseActivity {
     private Uri audioUri;
     private String fileName;
     private long fileSize;
+    private String permanentFilePathCache;  // 🔹 Store actual file path
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,15 +66,40 @@ public class UploadAudioActivity extends BaseActivity {
 
         // ================= Process Audio =================
         processButton.setOnClickListener(v -> {
-            if (audioUri != null) {
-                Intent intent = new Intent(UploadAudioActivity.this, ProcessAudioActivity.class);
-                intent.putExtra("fileName", fileName);
-                intent.putExtra("fileSize", fileSize);
-                intent.putExtra("audioUri", audioUri.toString());
-                startActivity(intent);
-            } else {
-                Toast.makeText(this, "Please select an MP3 first", Toast.LENGTH_SHORT).show();
+            // 🔹 Use the permanent file path that was cached during selection
+            if (permanentFilePathCache == null || permanentFilePathCache.isEmpty()) {
+                Toast.makeText(UploadAudioActivity.this, "Error: Audio file not ready. Please select again.", Toast.LENGTH_SHORT).show();
+                return;
             }
+
+            // Verify file still exists before processing
+            java.io.File audioFile = new java.io.File(permanentFilePathCache);
+            if (!audioFile.exists()) {
+                Toast.makeText(UploadAudioActivity.this, "Error: Audio file not found at " + permanentFilePathCache, Toast.LENGTH_LONG).show();
+                android.util.Log.e("UploadAudioActivity", "❌ File does not exist: " + permanentFilePathCache);
+                resetSelection();
+                return;
+            }
+
+            android.util.Log.d("UploadAudioActivity", "✅ File verified before processing");
+            android.util.Log.d("UploadAudioActivity", "   Path: " + permanentFilePathCache);
+            android.util.Log.d("UploadAudioActivity", "   Size: " + audioFile.length() + " bytes");
+            android.util.Log.d("UploadAudioActivity", "   Readable: " + audioFile.canRead());
+
+            // ✅ INSERT INTO DATABASE WITH ACTUAL FILE PATH
+            DatabaseHelper db = new DatabaseHelper(UploadAudioActivity.this);
+            long recordingId = db.insertRecording(fileName, permanentFilePathCache);
+            
+            android.util.Log.d("UploadAudioActivity", "✅ Recording inserted into database");
+            android.util.Log.d("UploadAudioActivity", "   recordingId: " + recordingId);
+            android.util.Log.d("UploadAudioActivity", "   Storage path: " + permanentFilePathCache);
+            
+            Intent intent = new Intent(UploadAudioActivity.this, ProcessAudioActivity.class);
+            intent.putExtra("fileName", fileName);
+            intent.putExtra("recordingId", recordingId);
+            intent.putExtra("fileSize", fileSize);
+            intent.putExtra("audioUri", permanentFilePathCache);  // Pass actual file path
+            startActivity(intent);
         });
 
         // ================= Record Audio =================
@@ -145,6 +172,20 @@ public class UploadAudioActivity extends BaseActivity {
                     return;
                 }
 
+                // 🔹 Copy file from URI to app permanent storage
+                String cachedFilePath = copyAudioFileToCache(audioUri, fileName);
+                if (cachedFilePath != null) {
+                    permanentFilePathCache = cachedFilePath;  // 🔹 Store for later use
+                    android.util.Log.d("UploadAudioActivity", "✅ Audio file copied to permanent storage");
+                    android.util.Log.d("UploadAudioActivity", "   File path: " + cachedFilePath);
+                    android.util.Log.d("UploadAudioActivity", "   File exists: " + new java.io.File(cachedFilePath).exists());
+                    android.util.Log.d("UploadAudioActivity", "   File size: " + new java.io.File(cachedFilePath).length() + " bytes");
+                } else {
+                    Toast.makeText(this, "Failed to copy audio file", Toast.LENGTH_SHORT).show();
+                    resetSelection();
+                    return;
+                }
+
                 fileSize = sizeInBytes / 1024; // Store in KB for display if needed
                 fileNameText.setText("Selected: " + fileName + " (" + fileSize + " KB)");
                 processButton.setEnabled(true);
@@ -156,6 +197,7 @@ public class UploadAudioActivity extends BaseActivity {
         audioUri = null;
         fileName = null;
         fileSize = 0;
+        permanentFilePathCache = null;  // 🔹 Reset this too
         fileNameText.setText("No file selected");
         processButton.setEnabled(false);
     }
@@ -210,5 +252,53 @@ public class UploadAudioActivity extends BaseActivity {
         }
 
         return size;
+    }
+
+    // 🔹 Copy audio file from content URI to app permanent storage (not cache)
+    private String copyAudioFileToCache(android.net.Uri sourceUri, String fileName) {
+        try {
+            java.io.InputStream inputStream = getContentResolver().openInputStream(sourceUri);
+            if (inputStream == null) {
+                android.util.Log.e("UploadAudioActivity", "❌ Could not open input stream for URI: " + sourceUri);
+                return null;
+            }
+
+            // 🔹 Use permanent app storage instead of cache
+            java.io.File appStorageDir = getExternalFilesDir(null);  // Gets /Android/data/app/files/
+            if (appStorageDir == null) {
+                appStorageDir = getFilesDir();  // Fallback to /data/data/app/files/
+            }
+            
+            // Create "Uploads" subdirectory for uploaded files
+            java.io.File uploadsDir = new java.io.File(appStorageDir, "Uploads");
+            if (!uploadsDir.exists()) uploadsDir.mkdirs();
+
+            // Save with timestamp to avoid conflicts
+            String uniqueFileName = System.currentTimeMillis() + "_" + fileName;
+            java.io.File savedFile = new java.io.File(uploadsDir, uniqueFileName);
+
+            // Copy file from URI to permanent storage
+            java.io.FileOutputStream outputStream = new java.io.FileOutputStream(savedFile);
+            byte[] buffer = new byte[1024 * 8]; // 8KB chunks
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+            inputStream.close();
+            outputStream.close();
+
+            android.util.Log.d("UploadAudioActivity", "✅ File copied to permanent storage successfully");
+            android.util.Log.d("UploadAudioActivity", "   Original URI: " + sourceUri);
+            android.util.Log.d("UploadAudioActivity", "   Permanent path: " + savedFile.getAbsolutePath());
+            android.util.Log.d("UploadAudioActivity", "   File size: " + savedFile.length() + " bytes");
+            android.util.Log.d("UploadAudioActivity", "   File exists: " + savedFile.exists());
+
+            return savedFile.getAbsolutePath();
+
+        } catch (Exception e) {
+            android.util.Log.e("UploadAudioActivity", "❌ Error copying file: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
     }
 }

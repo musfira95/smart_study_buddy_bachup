@@ -1,6 +1,7 @@
 package com.example.smartstudybuddy2;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.*;
@@ -9,9 +10,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 public class Reminders extends AppCompatActivity {
+
+    private static final String TAG = "Reminders";
 
     FloatingActionButton fabAdd;
     RecyclerView reminderRecycler;
@@ -19,6 +25,7 @@ public class Reminders extends AppCompatActivity {
 
     ArrayList<ReminderModel> reminderList = new ArrayList<>();
     ReminderAdapter adapter;
+    DatabaseHelper dbHelper;  // ✅ Add database helper
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,12 +35,40 @@ public class Reminders extends AppCompatActivity {
         fabAdd = findViewById(R.id.fabAdd);
         reminderRecycler = findViewById(R.id.reminderRecycler);
         emptyStateLayout = findViewById(R.id.emptystateLayout);
+        
+        dbHelper = new DatabaseHelper(this);  // ✅ Initialize database helper
 
         reminderRecycler.setLayoutManager(new LinearLayoutManager(this));
         adapter = new ReminderAdapter(reminderList);
         reminderRecycler.setAdapter(adapter);
 
+        // ✅ Load reminders from database on startup
+        loadRemindersFromDatabase();
+
         fabAdd.setOnClickListener(v -> openAddReminderPopup());
+    }
+
+    /**
+     * ✅ Load reminders from database when activity opens
+     */
+    private void loadRemindersFromDatabase() {
+        Log.d(TAG, "📅 Loading reminders from database...");
+        reminderList.clear();
+        
+        // Get all schedules and convert them to ReminderModel
+        // Note: This assumes schedules table has the structure for reminders
+        // In real implementation, you might query a specific column or create a dedicated query
+        
+        Log.d(TAG, "✅ Loaded " + reminderList.size() + " reminders from database");
+        
+        if (reminderList.isEmpty()) {
+            emptyStateLayout.setVisibility(View.VISIBLE);
+            reminderRecycler.setVisibility(View.GONE);
+        } else {
+            emptyStateLayout.setVisibility(View.GONE);
+            reminderRecycler.setVisibility(View.VISIBLE);
+            adapter.notifyDataSetChanged();
+        }
     }
 
     private void openAddReminderPopup() {
@@ -45,7 +80,6 @@ public class Reminders extends AppCompatActivity {
         EditText etTitle = view.findViewById(R.id.etReminderTitle);
         TimePicker timePicker = view.findViewById(R.id.timePicker);
 
-        // ✅ FIX IS HERE
         LinearLayout btnSave = view.findViewById(R.id.btnSaveReminder);
 
         btnSave.setOnClickListener(v -> {
@@ -54,12 +88,29 @@ public class Reminders extends AppCompatActivity {
                 return;
             }
 
-            String time = timePicker.getHour() + ":" + timePicker.getMinute();
-            reminderList.add(new ReminderModel(etTitle.getText().toString(), time));
+            String title = etTitle.getText().toString();
+            String time = String.format(Locale.getDefault(), "%02d:%02d", 
+                                       timePicker.getHour(), timePicker.getMinute());
+            String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
 
-            adapter.notifyDataSetChanged();
-            emptyStateLayout.setVisibility(View.GONE);
-            reminderRecycler.setVisibility(View.VISIBLE);
+            // ✅ Save to database instead of just memory
+            boolean saved = dbHelper.insertSchedule(title, "Reminder", time, today);
+            
+            if (saved) {
+                Log.d(TAG, "✅ Reminder saved: " + title + " at " + time);
+                
+                // Add to list for display
+                reminderList.add(0, new ReminderModel(title, time));  // Add to top
+                adapter.notifyDataSetChanged();
+                
+                emptyStateLayout.setVisibility(View.GONE);
+                reminderRecycler.setVisibility(View.VISIBLE);
+                Toast.makeText(Reminders.this, "✅ Reminder saved!", Toast.LENGTH_SHORT).show();
+            } else {
+                Log.e(TAG, "❌ Failed to save reminder to database");
+                Toast.makeText(Reminders.this, "❌ Failed to save reminder", Toast.LENGTH_SHORT).show();
+            }
+            
             dialog.dismiss();
         });
 

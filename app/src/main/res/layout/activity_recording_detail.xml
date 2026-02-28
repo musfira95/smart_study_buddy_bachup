@@ -161,33 +161,14 @@
 
                 </LinearLayout>
 
-                <!-- TRANSCRIPTION -->
-                <androidx.cardview.widget.CardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:cardCornerRadius="14dp"
-                    app:cardElevation="4dp"
-                    app:cardBackgroundColor="#FFFFFF"
-                    android:layout_marginBottom="20dp">
-
-                    <TextView
-                        android:id="@+id/tvTranscription"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:minHeight="80dp"
-                        android:text="Transcription will appear here..."
-                        android:textColor="#333333"
-                        android:textSize="16sp"
-                        android:padding="14dp"/>
-                </androidx.cardview.widget.CardView>
-
-                <!-- SUMMARIZE BUTTON -->
+                <!-- ROW 3 - Summarize -->
                 <LinearLayout
                     android:id="@+id/btnSummarize"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:gravity="center"
-                    android:background="@drawable/button_rounded">
+                    android:background="@drawable/button_rounded"
+                    android:layout_marginBottom="12dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -200,6 +181,54 @@
                         android:textSize="16sp"
                         android:gravity="center"/>
                 </LinearLayout>
+
+                <!-- ROW 4 - Export PDF -->
+                <LinearLayout
+                    android:id="@+id/btnExportPdf"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:gravity="center"
+                    android:background="@drawable/button_rounded"
+                    android:layout_marginBottom="18dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:minWidth="120dp"
+                        android:minHeight="22dp"
+                        android:text="Export PDF"
+                        android:textColor="@android:color/white"
+                        android:textStyle="bold"
+                        android:textSize="16sp"
+                        android:gravity="center"/>
+                </LinearLayout>
+
+                <!-- TRANSCRIPTION -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="14dp"
+                    app:cardElevation="4dp"
+                    app:cardBackgroundColor="#FFFFFF"
+                    android:layout_marginBottom="20dp">
+
+                    <ScrollView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:maxHeight="600dp">
+
+                        <TextView
+                            android:id="@+id/tvTranscription"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:minHeight="120dp"
+                            android:text="Transcription will appear here..."
+                            android:textColor="#333333"
+                            android:textSize="16sp"
+                            android:padding="14dp"
+                            android:lineSpacingMultiplier="1.6"/>
+                    </ScrollView>
+                </androidx.cardview.widget.CardView>
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>

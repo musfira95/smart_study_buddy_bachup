@@ -55,6 +55,7 @@ public class AddUserActivity extends AppCompatActivity {
         ArrayAdapter<String> adapter =
                 new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, roles);
         roleSpinner.setAdapter(adapter);
+        roleSpinner.setThreshold(0);  // Show dropdown on first click
 
         roleSpinner.setOnClickListener(v -> roleSpinner.showDropDown());
         roleSpinner.setOnFocusChangeListener((v, hasFocus) -> {
@@ -62,6 +63,8 @@ public class AddUserActivity extends AppCompatActivity {
         });
 
         roleSpinner.setOnItemClickListener((parent, view, position, id) -> {
+            String selectedRole = roles[position];
+            roleSpinner.setText(selectedRole, false);
             roleLayout.setError(null);
             roleLayout.setErrorEnabled(false);
         });

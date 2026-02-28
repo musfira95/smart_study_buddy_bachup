@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/white">
+
+    <!-- Back Button -->
+    <ImageView
+        android:id="@+id/btnBack"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:src="@drawable/ic_back_arrow"
+        android:contentDescription="Back"
+        android:tint="#4F6F64"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_margin="16dp" />
+
+    <!-- Scrollable Content -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- ✅ Progress Display -->
+            <TextView
+                android:id="@+id/tvProgress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="📚 Learning: 5 | ✅ Mastered: 2"
+                android:textSize="16sp"
+                android:textColor="#2E7D32"
+                android:textStyle="bold"
+                android:background="#E8F5E9"
+                android:padding="12dp"
+                android:layout_marginBottom="16dp"
+                android:gravity="center" />
+
+            <!-- Question Card -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:background="@drawable/bg_card"
+                android:elevation="4dp"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Question:"
+                    android:textSize="14sp"
+                    android:textColor="#666666"
+                    android:textStyle="bold"
+                    android:paddingBottom="8dp" />
+
+                <TextView
+                    android:id="@+id/tvQuestion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="What is the capital of France?"
+                    android:textSize="16sp"
+                    android:textColor="#1B5E20"
+                    android:textStyle="bold"
+                    android:lineSpacingMultiplier="1.2" />
+
+            </LinearLayout>
+
+            <!-- Answer Card -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:background="@drawable/bg_card"
+                android:elevation="4dp"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Answer:"
+                    android:textSize="14sp"
+                    android:textColor="#666666"
+                    android:textStyle="bold"
+                    android:paddingBottom="8dp" />
+
+                <TextView
+                    android:id="@+id/tvAnswer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Paris"
+                    android:textSize="16sp"
+                    android:textColor="#2196F3"
+                    android:textStyle="bold"
+                    android:lineSpacingMultiplier="1.2" />
+
+            </LinearLayout>
+
+            <!-- Review Status -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="12dp"
+                android:background="#FFF9E6"
+                android:elevation="2dp"
+                android:layout_marginBottom="16dp"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/tvReviewCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Reviews: 0"
+                    android:textSize="14sp"
+                    android:textColor="#F57F17"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <!-- ✅ Actions & Export -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:spacing="8dp">
+
+        <!-- Main Action Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:spacing="8dp">
+
+            <!-- Again Button -->
+            <Button
+                android:id="@+id/btnAgain"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:text="📝 Again"
+                android:textSize="14sp"
+                android:background="@drawable/btn_learning"
+                android:textColor="@android:color/white"
+                android:layout_margin="4dp" />
+
+            <!-- Mastered Button -->
+            <Button
+                android:id="@+id/btnMastered"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:text="✅ Mastered!"
+                android:textSize="14sp"
+                android:background="@drawable/btn_know_it"
+                android:textColor="@android:color/white"
+                android:layout_margin="4dp" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+</LinearLayout>
