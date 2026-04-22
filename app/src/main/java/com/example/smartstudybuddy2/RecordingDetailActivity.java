@@ -39,6 +39,16 @@ public class RecordingDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recording_detail);
 
+        // BACK BUTTON
+        android.widget.ImageView btnBack = findViewById(R.id.btnBack);
+        if (btnBack != null) btnBack.setOnClickListener(v -> finish());
+
+        // Enable back button in toolbar
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
+
         tvTitle = findViewById(R.id.tvRecordingTitle);
         tvDate = findViewById(R.id.tvRecordingDate);
         tvTranscription = findViewById(R.id.tvTranscription);
@@ -238,7 +248,7 @@ public class RecordingDetailActivity extends AppCompatActivity {
 
     // ✅ DELETE RECORDING
     private void showDeleteConfirmDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppDialog);
         builder.setTitle("🗑️ Delete Recording");
         builder.setMessage("Are you sure you want to delete '" + title + "'?\n\nThis cannot be undone.");
 
@@ -453,14 +463,14 @@ public class RecordingDetailActivity extends AppCompatActivity {
                 Log.d(TAG, "   Summary length: " + safeSummary.length() + " chars (from audio_files table)");
                 Log.d(TAG, "   Quiz JSON length: " + (quizJson != null ? quizJson.length() : 0) + " chars (from audio_files table)");
                 Log.d(TAG, "   Flashcards count: " + flashcardsList.size());
-                Log.d(TAG, "   URL: http://10.46.38.53:8000/export-pdf/");
+                Log.d(TAG, "   URL: http://10.237.2.53:8000/export-pdf/");
                 
                 okhttp3.MediaType JSON = okhttp3.MediaType.parse("application/json; charset=utf-8");
                 okhttp3.RequestBody body = okhttp3.RequestBody.create(json, JSON);
 
                 okhttp3.OkHttpClient client = new okhttp3.OkHttpClient();
                 okhttp3.Request request = new okhttp3.Request.Builder()
-                        .url("http://10.46.38.53:8000/export-pdf/")
+                        .url("http://10.237.2.53:8000/export-pdf/")
                         .post(body)
                         .build();
 
@@ -600,5 +610,11 @@ public class RecordingDetailActivity extends AppCompatActivity {
             mediaPlayer.release();
             mediaPlayer = null;
         }
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 }

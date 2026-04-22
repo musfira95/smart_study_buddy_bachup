@@ -22,7 +22,7 @@ public class TimetableActivity extends AppCompatActivity {
 
         // 🔗 OPEN REMINDERS SCREEN
         btnAddReminder.setOnClickListener(v -> {
-            Intent intent = new Intent(TimetableActivity.this, Reminders.class);
+            Intent intent = new Intent(TimetableActivity.this, RemindersListActivity.class);
             startActivity(intent);
         });
 

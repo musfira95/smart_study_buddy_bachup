@@ -39,6 +39,12 @@ public class StudySessionDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_study_session_detail);
 
+        // Enable back button in toolbar
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
+
         try {
             initializeViews();
             dbHelper = new DatabaseHelper(this);
@@ -192,7 +198,7 @@ public class StudySessionDetailActivity extends AppCompatActivity {
      * Show dialog to update quiz score
      */
     private void showScoreDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppDialog);
         builder.setTitle("Update Quiz Score")
                 .setMessage("Enter new quiz score (0-100):")
                 .setNegativeButton("Cancel", null);
@@ -232,7 +238,7 @@ public class StudySessionDetailActivity extends AppCompatActivity {
      * Show delete confirmation dialog
      */
     private void showDeleteDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppDialog);
         builder.setTitle("Delete Session")
                 .setMessage("Are you sure you want to delete this session? This action cannot be undone.")
                 .setNegativeButton("Cancel", null)
@@ -246,5 +252,11 @@ public class StudySessionDetailActivity extends AppCompatActivity {
                     }
                 });
         builder.show();
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 }

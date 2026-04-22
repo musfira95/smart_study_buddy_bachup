@@ -12,116 +12,64 @@ import com.example.smartstudybuddy2.DatabaseHelper;
 public class NotificationManager {
 
     private static final String TAG = "NotificationManager";
-    private static DatabaseHelper dbHelper;
 
-    public NotificationManager(Context context) {
-        dbHelper = new DatabaseHelper(context);
-    }
-
-    /**
-     * ✅ Notify when transcription is ready
-     */
-    public static void notifyTranscriptionReady(String recordingTitle) {
-        Log.d(TAG, "🔔 Notification: Transcription ready for '" + recordingTitle + "'");
-        
-        String title = "📝 Transcription Ready!";
-        String message = "Your recording '" + recordingTitle + "' has been transcribed. Ready to summarize? Click to view.";
-        
-        if (dbHelper != null) {
-            boolean inserted = dbHelper.insertNotification(title, message, "transcription");
-            if (inserted) {
-                Log.d(TAG, "✅ Notification saved to database");
-            }
+    private static void save(Context context, String title, String message, String type) {
+        try {
+            DatabaseHelper db = new DatabaseHelper(context);
+            db.insertNotification(title, message, type);
+            Log.d(TAG, "✅ Notification saved: " + title);
+        } catch (Exception e) {
+            Log.e(TAG, "❌ Failed to save notification: " + e.getMessage());
         }
     }
 
-    /**
-     * ✅ Notify when quiz is generated/available
-     */
-    public static void notifyQuizGenerated(String summaryTitle) {
-        Log.d(TAG, "🔔 Notification: Quiz generated for '" + summaryTitle + "'");
-        
-        String title = "🎯 Quiz Ready!";
-        String message = "Your quiz for '" + summaryTitle + "' is ready. Test your knowledge now!";
-        
-        if (dbHelper != null) {
-            boolean inserted = dbHelper.insertNotification(title, message, "quiz");
-            if (inserted) {
-                Log.d(TAG, "✅ Notification saved to database");
-            }
-        }
+    public static void notifyTranscriptionReady(Context context, String recordingTitle) {
+        save(context,
+            "📝 Transcription Ready!",
+            "Recording '" + recordingTitle + "' has been transcribed. Tap to summarize.",
+            "transcription");
     }
 
-    /**
-     * ✅ Alert user if quiz score is low (<60%)
-     */
-    public static void notifyWeakTopic(String category, double score) {
-        if (score >= 60) {
-            return; // Only notify for low scores
-        }
-        
-        Log.d(TAG, "🔔 Notification: Low score alert - " + category + " (" + String.format("%.1f", score) + "%)");
-        
-        String title = "⚠️ Low Score Alert";
-        String message = "Your score in " + category + " is " + String.format("%.1f", score) + "%. " +
-                        "Practice more to improve!";
-        
-        if (dbHelper != null) {
-            boolean inserted = dbHelper.insertNotification(title, message, "warning");
-            if (inserted) {
-                Log.d(TAG, "✅ Low score notification saved to database");
-            }
-        }
+    public static void notifySummaryReady(Context context, String recordingTitle) {
+        save(context,
+            "✨ Summary Ready!",
+            "Summary for '" + recordingTitle + "' has been generated. Tap to view.",
+            "summary");
     }
 
-    /**
-     * ✅ Reminder to study if no activity in 24 hours
-     */
-    public static void notifyStudyReminder() {
-        Log.d(TAG, "🔔 Notification: Study reminder - no recent activity");
-        
-        String title = "📚 Time to Study!";
-        String message = "You haven't studied for a while. Create a new recording or practice a quiz!";
-        
-        if (dbHelper != null) {
-            boolean inserted = dbHelper.insertNotification(title, message, "reminder");
-            if (inserted) {
-                Log.d(TAG, "✅ Study reminder notification saved to database");
-            }
-        }
+    public static void notifyQuizGenerated(Context context, String summaryTitle) {
+        save(context,
+            "🎯 Quiz Ready!",
+            "Your quiz for '" + summaryTitle + "' is ready. Test your knowledge now!",
+            "quiz");
     }
 
-    /**
-     * ✅ Congratulate on-consistency/streak
-     */
-    public static void notifyStudyConsistency(int days) {
-        Log.d(TAG, "🔔 Notification: Study streak - " + days + " days");
-        
-        String title = "🔥 Great Streak!";
-        String message = "You've been studying for " + days + " consecutive days! Keep going!";
-        
-        if (dbHelper != null) {
-            boolean inserted = dbHelper.insertNotification(title, message, "achievement");
-            if (inserted) {
-                Log.d(TAG, "✅ Streak notification saved to database");
-            }
-        }
+    public static void notifyWeakTopic(Context context, String category, double score) {
+        if (score >= 60) return;
+        save(context,
+            "⚠️ Low Score Alert",
+            "Your score in '" + category + "' is " + String.format("%.1f", score) + "%. Practice more!",
+            "warning");
     }
 
-    /**
-     * ✅ New flashcard creation reminder
-     */
-    public static void notifyFlashcardCreated(String topic) {
-        Log.d(TAG, "🔔 Notification: Flashcard created - " + topic);
-        
-        String title = "🎴 New Flashcard Added";
-        String message = "You've added a new flashcard in '" + topic + "'. Start reviewing!";
-        
-        if (dbHelper != null) {
-            boolean inserted = dbHelper.insertNotification(title, message, "flashcard");
-            if (inserted) {
-                Log.d(TAG, "✅ Flashcard notification saved to database");
-            }
-        }
+    public static void notifyStudyReminder(Context context) {
+        save(context,
+            "📚 Time to Study!",
+            "You haven't studied for a while. Create a new recording or practice a quiz!",
+            "reminder");
+    }
+
+    public static void notifyStudyConsistency(Context context, int days) {
+        save(context,
+            "🔥 Great Streak!",
+            "You've been studying for " + days + " consecutive days! Keep going!",
+            "achievement");
+    }
+
+    public static void notifyFlashcardCreated(Context context, String topic) {
+        save(context,
+            "🎴 Flashcards Ready!",
+            "Flashcards for '" + topic + "' have been created. Start reviewing!",
+            "flashcard");
     }
 }

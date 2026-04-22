@@ -73,7 +73,9 @@ public class SaveRecordingActivity extends BaseActivity {
             // Insert into DB and get recording ID
             try {
                 DatabaseHelper db = new DatabaseHelper(SaveRecordingActivity.this);
-                long recordingId = db.insertRecording(fileName, audioFilePath);
+                SessionManager session = new SessionManager(SaveRecordingActivity.this);
+                String userEmail = session.getUserEmail();
+                long recordingId = db.insertRecording(fileName, audioFilePath, userEmail, "recorded");
 
                 Log.d(TAG, "✅ Recording saved to database with ID: " + recordingId);
                 Log.d(TAG, "   fileName: " + fileName);

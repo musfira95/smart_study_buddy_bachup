@@ -35,6 +35,14 @@ public class HistoryActivity extends AppCompatActivity implements
         try {
             setContentView(R.layout.activity_history);
 
+            // Setup Toolbar with back button
+            androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
+            setSupportActionBar(toolbar);
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                getSupportActionBar().setDisplayShowHomeEnabled(true);
+            }
+
             rvHistory = findViewById(R.id.rvHistory);
             if (rvHistory != null) {
                 rvHistory.setLayoutManager(new LinearLayoutManager(this));
@@ -165,7 +173,7 @@ public class HistoryActivity extends AppCompatActivity implements
         Log.d(TAG, "🗑️ Delete requested for: " + session.getTitle());
         
         // Show confirmation dialog
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppDialog);
         builder.setTitle("Delete Session")
                 .setMessage("Are you sure you want to delete \"" + session.getTitle() + "\"?\n\nThis action cannot be undone.")
                 .setIcon(android.R.drawable.ic_dialog_alert)
@@ -215,6 +223,12 @@ public class HistoryActivity extends AppCompatActivity implements
         if (adapter != null) {
             adapter.notifyDataSetChanged();
         }
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 }
 

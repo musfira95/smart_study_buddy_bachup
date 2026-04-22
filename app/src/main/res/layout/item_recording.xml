@@ -1,37 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:padding="14dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#F3F3F3"
-    android:layout_marginBottom="8dp">
+    android:layout_margin="12dp"
+    app:cardCornerRadius="14dp"
+    app:cardElevation="6dp"
+    app:cardBackgroundColor="@android:color/white">
 
-    <!-- Recording Info - Name and Date (Entire item clickable) -->
+    <!-- Main Container -->
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical"
+        android:background="?attr/selectableItemBackground">
 
-        <TextView
-            android:id="@+id/tvRecordingName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="recorded_1"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="#4F6F64"
-            android:layout_marginBottom="6dp" />
+        <!-- Microphone Icon -->
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_mic"
+            android:contentDescription="Recording icon"
+            android:scaleType="centerInside"
+            android:tint="#4F6F64"
+            android:layout_marginEnd="16dp" />
 
-        <TextView
-            android:id="@+id/tvRecordingDate"
-            android:layout_width="match_parent"
+        <!-- Recording Info Container -->
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="2025-10-20 14:30:45"
-            android:textSize="13sp"
-            android:textColor="#666" />
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center_vertical">
+
+            <!-- Recording Title (Bold) -->
+            <TextView
+                android:id="@+id/tvRecordingName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="recorded_1"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#2C3E3C"
+                android:layout_marginBottom="6dp"
+                android:maxLines="2"
+                android:ellipsize="end" />
+
+            <!-- Recording Date (Lighter, Smaller) -->
+            <TextView
+                android:id="@+id/tvRecordingDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="2025-10-20 14:30:45"
+                android:textSize="12sp"
+                android:textColor="#999999"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+        </LinearLayout>
+
+        <!-- Bookmark Button -->
+        <ImageButton
+            android:id="@+id/btnBookmark"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_star"
+            android:contentDescription="Bookmark recording"
+            android:scaleType="centerInside"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:layout_marginStart="12dp"
+            android:padding="8dp" />
 
     </LinearLayout>
 
-</LinearLayout>
+</androidx.cardview.widget.CardView>

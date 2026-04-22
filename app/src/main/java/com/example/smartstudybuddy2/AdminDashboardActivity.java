@@ -35,11 +35,12 @@ public class AdminDashboardActivity extends AppCompatActivity {
         tvTotalNotes = findViewById(R.id.tvTotalNotes);
         tvBlockedUsers = findViewById(R.id.tvBlockedUsers);
         ImageView btnProfile = findViewById(R.id.btnProfile);
-
-        btnProfile.setOnClickListener(v -> {
-            Intent intent = new Intent(AdminDashboardActivity.this, AdminProfileActivity.class);
-            startActivity(intent);
-        });
+        if (btnProfile != null) {
+            btnProfile.setOnClickListener(v -> {
+                Intent intent = new Intent(AdminDashboardActivity.this, AdminProfileActivity.class);
+                startActivity(intent);
+            });
+        }
 
 
         // INIT DRAWER
@@ -51,9 +52,11 @@ public class AdminDashboardActivity extends AppCompatActivity {
         loadDashboardData();
 
         // 🍔 HAMBURGER CLICK
-        btnMenu.setOnClickListener(v ->
-                drawerLayout.openDrawer(Gravity.START)
-        );
+        if (btnMenu != null) {
+            btnMenu.setOnClickListener(v ->
+                    drawerLayout.openDrawer(Gravity.START)
+            );
+        }
 
         // 📌 DRAWER MENU CLICK HANDLING
         navigationView.setNavigationItemSelectedListener(item -> {
@@ -66,12 +69,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
 
             else if (id == R.id.nav_settings) {
                 startActivity(new Intent(this, ThemeSettingsActivity.class));
-            }
-             else if (id == R.id.search_users) {
-                 startActivity(new Intent(this, SearchUsersActivity.class));
-             }
-            else if (id == R.id.nav_quiz_management) {
-                startActivity(new Intent(this, QuizManagementActivity.class));
             }
             else if (id == R.id.nav_content_management) {
                 startActivity(new Intent(this, ContentManagementActivity.class));
@@ -88,21 +85,20 @@ public class AdminDashboardActivity extends AppCompatActivity {
     }
 
     private void loadDashboardData() {
+        try {
+            int totalUsers = db.getTotalUsers();
+            if (tvTotalUsers != null) tvTotalUsers.setText(String.valueOf(totalUsers));
 
-        // 🔢 TOTAL USERS
-        int totalUsers = db.getTotalUsers();
-        tvTotalUsers.setText(String.valueOf(totalUsers));
+            int totalAudios = db.getTotalAudios();
+            if (tvTotalAudios != null) tvTotalAudios.setText(String.valueOf(totalAudios));
 
-        // 🎧 TOTAL AUDIOS
-        int totalAudios = db.getTotalAudios();
-        tvTotalAudios.setText(String.valueOf(totalAudios));
+            int totalNotes = db.getTotalNotes();
+            if (tvTotalNotes != null) tvTotalNotes.setText(String.valueOf(totalNotes));
 
-        // 📝 TOTAL NOTES / TRANSCRIPTIONS
-        int totalNotes = db.getTotalNotes();
-        tvTotalNotes.setText(String.valueOf(totalNotes));
-
-        // 🚫 BLOCKED USERS
-        int blockedUsers = db.getBlockedUsersCount();
-        tvBlockedUsers.setText(String.valueOf(blockedUsers));
+            int blockedUsers = db.getBlockedUsersCount();
+            if (tvBlockedUsers != null) tvBlockedUsers.setText(String.valueOf(blockedUsers));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

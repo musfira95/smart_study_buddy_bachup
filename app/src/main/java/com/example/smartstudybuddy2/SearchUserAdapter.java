@@ -44,6 +44,11 @@ public class SearchUserAdapter extends RecyclerView.Adapter<SearchUserAdapter.Vi
 
         holder.usernameText.setText(highlightText(user.getUsername(), searchQuery));
         holder.emailText.setText(highlightText(user.getEmail(), searchQuery));
+
+        // Avatar initial
+        String initial = user.getUsername() != null && !user.getUsername().isEmpty()
+                ? String.valueOf(user.getUsername().charAt(0)).toUpperCase() : "U";
+        if (holder.tvAvatar != null) holder.tvAvatar.setText(initial);
     }
 
     @Override
@@ -59,7 +64,7 @@ public class SearchUserAdapter extends RecyclerView.Adapter<SearchUserAdapter.Vi
         int start = fullText.toLowerCase().indexOf(query);
         if (start >= 0) {
             spannable.setSpan(
-                    new ForegroundColorSpan(Color.parseColor("#6200EE")),  // Purple highlight
+                    new ForegroundColorSpan(Color.parseColor("#4F6F64")),  // Green highlight
                     start,
                     start + query.length(),
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
@@ -70,12 +75,13 @@ public class SearchUserAdapter extends RecyclerView.Adapter<SearchUserAdapter.Vi
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView usernameText, emailText;
+        TextView usernameText, emailText, tvAvatar;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             usernameText = itemView.findViewById(R.id.searchUsernameText);
             emailText = itemView.findViewById(R.id.searchEmailText);
+            tvAvatar = itemView.findViewById(R.id.tvSearchAvatar);
         }
     }
 }

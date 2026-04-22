@@ -8,6 +8,10 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import android.graphics.Typeface;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.StyleSpan;
 import java.util.ArrayList;
 
 public class NotificationAdapter extends BaseAdapter {
@@ -46,7 +50,15 @@ public class NotificationAdapter extends BaseAdapter {
         ImageView icon = convertView.findViewById(R.id.imgIcon);
         TextView text = convertView.findViewById(R.id.tvNotificationText);
 
-        text.setText(list.get(position));
+        String full = list.get(position);
+        int newline = full.indexOf('\n');
+        if (newline > 0) {
+            SpannableString ss = new SpannableString(full);
+            ss.setSpan(new StyleSpan(Typeface.BOLD), 0, newline, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            text.setText(ss);
+        } else {
+            text.setText(full);
+        }
 
         return convertView;
     }

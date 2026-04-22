@@ -3,6 +3,7 @@ package com.example.smartstudybuddy2;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -24,24 +25,31 @@ public class ContentManagementActivity extends AppCompatActivity {
         etSupportPhone = findViewById(R.id.etSupportPhone);
         btnSaveContent = findViewById(R.id.btnSaveContent);
 
+        ImageView btnBack = findViewById(R.id.btnBack);
+        if (btnBack != null) btnBack.setOnClickListener(v -> finish());
+
         dbHelper = new DatabaseHelper(this);
 
         // Load current content
         loadCurrentContent();
 
-        btnSaveContent.setOnClickListener(v -> saveContent());
+        if (btnSaveContent != null) btnSaveContent.setOnClickListener(v -> saveContent());
     }
 
     private void loadCurrentContent() {
-        String description = dbHelper.getAboutAppDescription();
-        String version = dbHelper.getAboutAppVersion();
-        String email = dbHelper.getHelpSupportEmail();
-        String phone = dbHelper.getHelpSupportPhone();
+        try {
+            String description = dbHelper.getAboutAppDescription();
+            String version = dbHelper.getAboutAppVersion();
+            String email = dbHelper.getHelpSupportEmail();
+            String phone = dbHelper.getHelpSupportPhone();
 
-        etAppDescription.setText(description);
-        etAppVersion.setText(version);
-        etSupportEmail.setText(email);
-        etSupportPhone.setText(phone);
+            if (etAppDescription != null) etAppDescription.setText(description);
+            if (etAppVersion != null) etAppVersion.setText(version);
+            if (etSupportEmail != null) etSupportEmail.setText(email);
+            if (etSupportPhone != null) etSupportPhone.setText(phone);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void saveContent() {

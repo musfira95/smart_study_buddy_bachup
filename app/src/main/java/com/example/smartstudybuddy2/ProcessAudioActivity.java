@@ -238,7 +238,7 @@ public class ProcessAudioActivity extends BaseActivity {
             ApiService apiService = ApiClient.getClient().create(ApiService.class);
             Call<TranscriptionResponse> call = apiService.uploadAudio(filePart);
 
-            Log.d("ProcessAudioActivity", "🔵 Request URL: http://10.46.38.53:8000/transcribe/");
+            Log.d("ProcessAudioActivity", "🔵 Request URL: https://devotee-portly-flock.ngrok-free.dev/transcribe/");
             Log.d("ProcessAudioActivity", "🔵 Sending multipart request...");
             Log.d("ProcessAudioActivity", "🔵 File size being uploaded: " + audioFile.length() + " bytes");
             Log.d("ProcessAudioActivity", "🔵 Timeout: 120s connect, 600s read/write");
@@ -285,6 +285,7 @@ public class ProcessAudioActivity extends BaseActivity {
                             if (saved) {
                                 Log.i("ProcessAudioActivity", "✅✅✅ TRANSCRIPTION SAVED TO DATABASE SUCCESSFULLY ✅✅✅");
                                 Toast.makeText(ProcessAudioActivity.this, "✅ Transcription saved to SQLite database!", Toast.LENGTH_LONG).show();
+                                com.example.smartstudybuddy2.utils.NotificationManager.notifyTranscriptionReady(ProcessAudioActivity.this, saveFileName);
                             } else {
                                 Log.e("ProcessAudioActivity", "❌ ERROR: Transcription save to database FAILED!");
                                 Toast.makeText(ProcessAudioActivity.this, "⚠️ Error saving to database but transcription was received", Toast.LENGTH_LONG).show();
@@ -333,14 +334,14 @@ public class ProcessAudioActivity extends BaseActivity {
                     Log.e("ProcessAudioActivity", "❌ NETWORK ERROR OCCURRED");
                     Log.e("ProcessAudioActivity", "Error Type: " + t.getClass().getSimpleName());
                     Log.e("ProcessAudioActivity", "Error Message: " + t.getMessage());
-                    Log.e("ProcessAudioActivity", "Target URL: http://192.168.100.9:8000/transcribe/", t);
+                    Log.e("ProcessAudioActivity", "Target URL: https://devotee-portly-flock.ngrok-free.dev/transcribe/", t);
 
                     // Print full stack trace for debugging
                     t.printStackTrace();
 
                     String errorMsg = t.getMessage();
                     if (t.getMessage().contains("Failed to connect")) {
-                        errorMsg = "❌ Cannot reach server at 192.168.100.9:8000\n\nCheck:\n1. Is FastAPI running?\n2. Are phone & laptop on same WiFi?\n3. Is Firewall blocking port 8000?";
+                        errorMsg = "❌ Cannot reach server at 192.168.100.96:8000\n\nCheck:\n1. Is FastAPI running?\n2. Are phone & laptop on same WiFi?\n3. Is Firewall blocking port 8000?";
                     } else if (t.getMessage().contains("timeout")) {
                         errorMsg = "⏱️ Connection timeout - Server is slow or unreachable";
                     }
@@ -362,37 +363,155 @@ public class ProcessAudioActivity extends BaseActivity {
     // Generate summary from transcribed text
     private void generateSummary(String transcribedText) {
         if (transcribedText == null || transcribedText.isEmpty()) {
-            Log.e("ProcessAudioActivity", "Cannot generate summary - empty text");
+            Log.e("ProcessAudioActivity", "❌ Cannot generate summary - empty text");
             return;
         }
 
-        Log.d("ProcessAudioActivity", "📝 Generating summary...");
+        Log.d("ProcessAudioActivity", "🟢 Generating ENHANCED summary locally (no API call)...");
 
         try {
-            ApiService apiService = ApiClient.getClient().create(ApiService.class);
-            SummaryRequest request = new SummaryRequest(transcribedText);
-            Call<SummaryResponse> call = apiService.generateSummary(request);
-
-            call.enqueue(new Callback<SummaryResponse>() {
-                @Override
-                public void onResponse(Call<SummaryResponse> call, Response<SummaryResponse> response) {
-                    if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-                        String summary = response.body().getSummary();
-                        Log.d("ProcessAudioActivity", "✅ Summary generated: " + summary);
-                        Toast.makeText(ProcessAudioActivity.this, "✅ Summary generated!", Toast.LENGTH_SHORT).show();
+            // Generate enhanced summary with KEY POINTS (same logic as SummaryActivity)
+            String enhancedSummaryText = generateEnhancedSummary(transcribedText);
+            
+            Log.d("ProcessAudioActivity", "✅ Enhanced summary generated: " + enhancedSummaryText.length() + " chars");
+            
+            // Save to database
+            if (recordingId > 0) {
+                DatabaseHelper db = new DatabaseHelper(ProcessAudioActivity.this);
+                
+                try {
+                    int originalLength = transcribedText.length();
+                    int summaryLength = enhancedSummaryText.length();
+                    float compressionRatio = originalLength > 0 ? (float) summaryLength / originalLength : 0;
+                    
+                    android.database.sqlite.SQLiteDatabase sqliteDb = db.getWritableDatabase();
+                    android.content.ContentValues values = new android.content.ContentValues();
+                    values.put("recording_id", (int) recordingId);
+                    values.put("summary_text", enhancedSummaryText);
+                    values.put("original_length", originalLength);
+                    values.put("summary_length", summaryLength);
+                    values.put("compression_ratio", compressionRatio);
+                    values.put("created_at", System.currentTimeMillis());
+                    values.put("updated_at", System.currentTimeMillis());
+                    
+                    long result = sqliteDb.insertWithOnConflict(
+                        "summaries",
+                        null,
+                        values,
+                        android.database.sqlite.SQLiteDatabase.CONFLICT_REPLACE
+                    );
+                    
+                    if (result >= 0) {
+                        Log.d("ProcessAudioActivity", "💾 Enhanced summary saved to database (recording_id=" + recordingId + ")");
+                        Toast.makeText(ProcessAudioActivity.this, "✅ Enhanced summary generated & saved!", Toast.LENGTH_SHORT).show();
                     } else {
-                        Log.e("ProcessAudioActivity", "❌ Summary generation failed: " + response.code());
+                        Log.e("ProcessAudioActivity", "❌ Failed to save summary to database");
                     }
+                    sqliteDb.close();
+                } catch (Exception e) {
+                    Log.e("ProcessAudioActivity", "⚠️ Error saving summary to database: " + e.getMessage());
+                    e.printStackTrace();
                 }
-
-                @Override
-                public void onFailure(Call<SummaryResponse> call, Throwable t) {
-                    Log.e("ProcessAudioActivity", "❌ Summary API error: " + t.getMessage());
-                }
-            });
+            } else {
+                Log.w("ProcessAudioActivity", "⚠️ recordingId not available, cannot save summary");
+            }
         } catch (Exception e) {
-            Log.e("ProcessAudioActivity", "Summary generation error: " + e.getMessage());
+            Log.e("ProcessAudioActivity", "❌ Summary generation error: " + e.getMessage());
+            e.printStackTrace();
         }
+    }
+
+    /**
+     * Generate ENHANCED summary with KEY POINTS (same format everywhere)
+     * Returns format: "SUMMARY:\n[text]\n\nKEY POINTS:\n• keyword1\n• keyword2\n..."
+     */
+    private String generateEnhancedSummary(String transcription) {
+        if (transcription == null || transcription.isEmpty()) {
+            return "No summary available.";
+        }
+
+        try {
+            // Step 1: Split into sentences
+            String[] sentences = transcription.split("[.!?]+");
+
+            // Step 2: Find key sentences (first 30% usually contain main ideas)
+            int summaryLength = Math.max(1, sentences.length / 3);
+            StringBuilder summary = new StringBuilder();
+
+            // Add "SUMMARY:" header and main paragraph
+            summary.append("SUMMARY:\n");
+            for (int i = 0; i < Math.min(summaryLength, sentences.length); i++) {
+                String sentence = sentences[i].trim();
+                if (!sentence.isEmpty()) {
+                    summary.append(sentence).append(". ");
+                }
+            }
+
+            // Step 3: Extract important keywords
+            String keywordsSummary = extractKeywords(transcription);
+            
+            // Combine into enhanced format
+            return summary.toString() + "\n\nKEY POINTS:\n" + keywordsSummary;
+
+        } catch (Exception e) {
+            Log.e("ProcessAudioActivity", "Error generating enhanced summary: " + e.getMessage());
+            return "Error generating summary: " + e.getMessage();
+        }
+    }
+
+    /**
+     * Extract important keywords from transcription
+     */
+    private String extractKeywords(String text) {
+        String[] stopWords = {
+            "the", "a", "an", "and", "or", "but", "in", "on", "at", "to", "for",
+            "of", "with", "by", "from", "is", "are", "was", "were", "be", "been"
+        };
+
+        try {
+            String[] words = text.toLowerCase().split("\\s+");
+            java.util.Map<String, Integer> wordFreq = new java.util.HashMap<>();
+
+            // Count word frequencies
+            for (String word : words) {
+                String cleanWord = word.replaceAll("[^a-z0-9]", "");
+                if (cleanWord.length() > 4 && !isStopWord(cleanWord, stopWords)) {
+                    wordFreq.put(cleanWord, wordFreq.getOrDefault(cleanWord, 0) + 1);
+                }
+            }
+
+            // Sort by frequency
+            java.util.List<java.util.Map.Entry<String, Integer>> sortedWords =
+                new java.util.ArrayList<>(wordFreq.entrySet());
+            sortedWords.sort((a, b) -> b.getValue().compareTo(a.getValue()));
+
+            // Get top 10 keywords
+            StringBuilder keywords = new StringBuilder();
+            int count = 0;
+            for (java.util.Map.Entry<String, Integer> entry : sortedWords) {
+                if (count >= 10) break;
+                keywords.append("• ").append(entry.getKey()).append("\n");
+                count++;
+            }
+
+            return keywords.toString();
+
+        } catch (Exception e) {
+            Log.e("ProcessAudioActivity", "Error extracting keywords: " + e.getMessage());
+            return "Unable to extract keywords";
+        }
+    }
+
+    /**
+     * Check if word is a stop word
+     */
+    private boolean isStopWord(String word, String[] stopWords) {
+        for (String stopWord : stopWords) {
+            if (word.equals(stopWord)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // Generate quiz from transcribed text
@@ -406,8 +525,10 @@ public class ProcessAudioActivity extends BaseActivity {
 
         try {
             ApiService apiService = ApiClient.getClient().create(ApiService.class);
-            QuizRequest request = new QuizRequest(transcribedText, 3);
-            Log.d("ProcessAudioActivity", "📤 PASSING TO API - /quiz/ endpoint");
+            // ✅ NEW: Pass recording_id for database persistence
+            QuizRequest request = new QuizRequest(transcribedText, 3, (int)recordingId);
+            Log.d("ProcessAudioActivity", "📤 PASSING TO API - /quiz/ endpoint with recording_id=" + recordingId);
+            Log.d("ProcessAudioActivity", "💾 Quiz will be saved to database with recording_id=" + recordingId);
             Call<QuizResponse> call = apiService.generateQuiz(request);
 
             call.enqueue(new Callback<QuizResponse>() {

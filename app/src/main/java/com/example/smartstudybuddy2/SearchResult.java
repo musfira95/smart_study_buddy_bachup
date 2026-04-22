@@ -4,9 +4,10 @@ public class SearchResult {
     public static final int TYPE_RECORDING = 1;
     public static final int TYPE_NOTE = 2;
     public static final int TYPE_FLASHCARD = 3;
+    public static final int TYPE_QUIZ = 4;
 
     private int id;
-    private int type;  // TYPE_RECORDING, TYPE_NOTE, or TYPE_FLASHCARD
+    private int type;  // TYPE_RECORDING, TYPE_NOTE, TYPE_FLASHCARD, or TYPE_QUIZ
     private String title;
     private String contentPreview;
     private String timestamp;
@@ -48,6 +49,8 @@ public class SearchResult {
                 return "📝 Note";
             case TYPE_FLASHCARD:
                 return "🎴 Flashcard";
+            case TYPE_QUIZ:
+                return "❓ Quiz";
             default:
                 return "Unknown";
         }

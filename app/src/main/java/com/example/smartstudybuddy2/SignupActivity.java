@@ -16,7 +16,6 @@ public class SignupActivity extends AppCompatActivity {
 
     EditText etName, etEmail, etPassword, etConfirmPassword;
     LinearLayout signupButton;
-    ImageView googleSignUpBtn, facebookSignUpBtn;
     TextView tvLoginLink;
     DatabaseHelper dbHelper;
 
@@ -32,8 +31,6 @@ public class SignupActivity extends AppCompatActivity {
         etPassword = findViewById(R.id.etPassword);
         etConfirmPassword = findViewById(R.id.etConfirmPassword);
         signupButton = findViewById(R.id.signupButton);
-        googleSignUpBtn = findViewById(R.id.googleSignUpBtn);
-        facebookSignUpBtn = findViewById(R.id.facebookSignUpBtn);
         tvLoginLink = findViewById(R.id.tvLoginLink);
 
         etPassword.setOnTouchListener(getPasswordTouchListener(etPassword));

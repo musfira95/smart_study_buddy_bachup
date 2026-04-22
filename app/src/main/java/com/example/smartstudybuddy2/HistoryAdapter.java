@@ -100,7 +100,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
                 // Show confirmation dialog before deleting
                 Log.d("HistoryAdapter", "🗑️ Delete Recording requested: " + r.getTitle());
                 
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AppDialog);
                 builder.setTitle("Delete Recording")
                         .setMessage("Are you sure you want to delete \"" + r.getTitle() + "\"?\n\nThis action cannot be undone.")
                         .setIcon(android.R.drawable.ic_dialog_alert)
@@ -142,9 +142,32 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
             holder.tvMetadata.setText(String.format("%d/%d correct", q.getCorrectCount(), q.getTotalQuestions()));
             holder.ivIcon.setImageResource(R.drawable.ic_quiz);
             
-            // Non-clickable, no delete button for Quiz
+            // Non-clickable, but show delete button for Quiz
             holder.itemView.setClickable(false);
-            holder.btnDelete.setVisibility(android.view.View.GONE);
+            holder.btnDelete.setVisibility(android.view.View.VISIBLE);
+            holder.btnDelete.setOnClickListener(v -> {
+                AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AppDialog);
+                builder.setTitle("Delete Quiz Result")
+                        .setMessage("Remove this quiz result from history?")
+                        .setNegativeButton("Cancel", null)
+                        .setPositiveButton("Delete", (dialog, which) -> {
+                            try {
+                                DatabaseHelper dbHelper = new DatabaseHelper(context);
+                                dbHelper.getWritableDatabase().delete("quiz_results", "id = ?",
+                                        new String[]{String.valueOf(q.getId())});
+                                int pos = historyList.indexOf(q);
+                                if (pos >= 0) {
+                                    historyList.remove(pos);
+                                    notifyItemRemoved(pos);
+                                    notifyItemRangeChanged(pos, historyList.size());
+                                }
+                                Toast.makeText(context, "Quiz result deleted", Toast.LENGTH_SHORT).show();
+                            } catch (Exception e) {
+                                Toast.makeText(context, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                builder.show();
+            });
         }
     }
 

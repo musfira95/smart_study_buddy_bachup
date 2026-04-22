@@ -88,7 +88,9 @@ public class UploadAudioActivity extends BaseActivity {
 
             // ✅ INSERT INTO DATABASE WITH ACTUAL FILE PATH
             DatabaseHelper db = new DatabaseHelper(UploadAudioActivity.this);
-            long recordingId = db.insertRecording(fileName, permanentFilePathCache);
+            SessionManager session = new SessionManager(UploadAudioActivity.this);
+            String userEmail = session.getUserEmail();
+            long recordingId = db.insertRecording(fileName, permanentFilePathCache, userEmail, "uploaded");
             
             android.util.Log.d("UploadAudioActivity", "✅ Recording inserted into database");
             android.util.Log.d("UploadAudioActivity", "   recordingId: " + recordingId);

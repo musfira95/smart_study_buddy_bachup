@@ -36,6 +36,12 @@ public class SelectSessionForFlashcardsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_session_for_flashcards);
 
+        // Set up Toolbar with back button
+        androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+
         rvSessions = findViewById(R.id.rvSessions);
         dbHelper = new DatabaseHelper(this);
         sessionList = new ArrayList<>();
@@ -47,9 +53,6 @@ public class SelectSessionForFlashcardsActivity extends AppCompatActivity {
 
         // Load all study sessions
         loadStudySessions();
-        
-        // ✅ Back button handler
-        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
 
         Log.d(TAG, "✅ SelectSessionForFlashcardsActivity initialized");
     }
@@ -150,5 +153,11 @@ public class SelectSessionForFlashcardsActivity extends AppCompatActivity {
         super.onResume();
         // Refresh list when returning
         loadStudySessions();
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 }

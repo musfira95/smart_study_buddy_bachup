@@ -12,11 +12,14 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.smartstudybuddy2.network.ApiClient;
+import com.example.smartstudybuddy2.network.LocalApiClient;
 import com.example.smartstudybuddy2.network.ApiService;
 import com.example.smartstudybuddy2.network.QuizRequest;
 import com.example.smartstudybuddy2.network.QuizResponse;
 
 import java.util.ArrayList;
+
+import com.example.smartstudybuddy2.Recording;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -67,8 +70,9 @@ public class QuizActivity extends BaseActivity {
 
         // If we received transcription/summary, generate dynamic quiz
         if (transcription != null && !transcription.isEmpty()) {
-            generateDynamicQuiz(transcription);
             Toast.makeText(this, "Generating Quiz from your lecture...", Toast.LENGTH_SHORT).show();
+            generateDynamicQuiz(transcription);
+            // ✅ showQuestion() will be called inside the callback after API response
         } else {
             // Fallback: Load questions from database
             loadQuestionsFromDatabase();
@@ -77,12 +81,11 @@ public class QuizActivity extends BaseActivity {
                 Toast.makeText(this, "No quiz questions available. Loading defaults...", Toast.LENGTH_SHORT).show();
                 loadDummyQuestions();
             }
-        }
-
-        if (!questions.isEmpty()) {
-            showQuestion();
-        } else {
-            Toast.makeText(this, "Failed to generate quiz", Toast.LENGTH_SHORT).show();
+            
+            // Show first question from database/dummy data
+            if (!questions.isEmpty()) {
+                showQuestion();
+            }
         }
 
         // -------------------- Next Question --------------------
@@ -124,7 +127,18 @@ public class QuizActivity extends BaseActivity {
             intent.putExtra("correctCount", correct);
             intent.putExtra("wrongCount", wrong);
             intent.putExtra("durationSeconds", durationSeconds);
-            intent.putExtra("category", "General");
+
+            // Use recording title as category if available, else "General"
+            String category = "General";
+            if (recordingId != -1) {
+                try {
+                    Recording rec = dbHelper.getRecordingById((int) recordingId);
+                    if (rec != null && rec.getTitle() != null && !rec.getTitle().isEmpty()) {
+                        category = rec.getTitle();
+                    }
+                } catch (Exception ignored) {}
+            }
+            intent.putExtra("category", category);
             startActivity(intent);
             finish();
         });
@@ -141,16 +155,24 @@ public class QuizActivity extends BaseActivity {
      */
     private void generateDynamicQuiz(String transcription) {
         try {
-            Log.d("QuizActivity", "🎯 Calling FastAPI /quiz/ endpoint...");
+            Log.d("QuizActivity", "🎯 Calling LOCAL FastAPI /quiz/ endpoint...");
+            Log.d("QuizActivity", "📝 Transcription length: " + (transcription != null ? transcription.length() : 0) + " chars");
+            Log.d("QuizActivity", "🔗 Using LocalApiClient (local backend at 192.168.100.96:8000)");
             
-            ApiService apiService = ApiClient.getClient().create(ApiService.class);
-            QuizRequest request = new QuizRequest(transcription, 4);  // 4 questions
+            // ✅ USE LOCAL API CLIENT FOR QUIZ (not ngrok transcription API)
+            ApiService apiService = LocalApiClient.getClient().create(ApiService.class);
+            QuizRequest request = new QuizRequest(transcription, 4, (int)recordingId);  // 4 questions
+            Log.d("QuizActivity", "💾 Quiz request created - num_questions: 4, recording_id=" + recordingId);
+            Log.d("QuizActivity", "📤 Sending request to LOCAL /quiz/ endpoint...");
             
             apiService.generateQuiz(request).enqueue(new Callback<QuizResponse>() {
                 @Override
                 public void onResponse(Call<QuizResponse> call, Response<QuizResponse> response) {
+                    Log.d("QuizActivity", "📨 API Response received - Status Code: " + response.code());
+                    
                     if (response.isSuccessful() && response.body() != null) {
-                        Log.d("QuizActivity", "✅ Quiz API returned: " + response.body().getQuestions().size() + " questions");
+                        Log.d("QuizActivity", "✅ Quiz API SUCCESS! Returned: " + response.body().getQuestions().size() + " questions");
+                        Log.d("QuizActivity", "📊 First question preview: " + (response.body().getQuestions().size() > 0 ? response.body().getQuestions().get(0).question.substring(0, Math.min(50, response.body().getQuestions().get(0).question.length())) : "No questions"));
                         
                         // Convert API response to QuizQuestion objects
                         questions.clear();
@@ -186,6 +208,9 @@ public class QuizActivity extends BaseActivity {
                         if (questions.isEmpty()) {
                             Log.e("QuizActivity", "❌ No valid questions received!");
                             loadDummyQuestions();
+                            if (!questions.isEmpty()) {
+                                showQuestion();
+                            }
                         } else {
                             Log.d("QuizActivity", "✅ Generated " + questions.size() + " questions from API!");
                             Toast.makeText(QuizActivity.this, "✅ Generated " + questions.size() + " questions!", Toast.LENGTH_SHORT).show();
@@ -197,22 +222,50 @@ public class QuizActivity extends BaseActivity {
                             showQuestion();
                         }
                     } else {
-                        Log.e("QuizActivity", "❌ API error: " + response.code());
+                        Log.e("QuizActivity", "❌ API ERROR Response!");
+                        Log.e("QuizActivity", "   Status Code: " + response.code());
+                        Log.e("QuizActivity", "   Message: " + response.message());
+                        try {
+                            if (response.errorBody() != null) {
+                                String errorBodyStr = response.errorBody().string();
+                                Log.e("QuizActivity", "   Error Body: " + errorBodyStr);
+                            }
+                        } catch (Exception e) {
+                            Log.e("QuizActivity", "   Could not read error body: " + e.getMessage());
+                        }
+                        Log.e("QuizActivity", "❌ Quiz API error - falling back to dummy quiz");
                         loadDummyQuestions();
+                        if (!questions.isEmpty()) {
+                            showQuestion();
+                        }
                     }
                 }
                 
                 @Override
                 public void onFailure(Call<QuizResponse> call, Throwable t) {
-                    Log.e("QuizActivity", "❌ API call failed: " + t.getMessage());
+                    Log.e("QuizActivity", "❌ API CALL FAILED - Network/Connection Error");
+                    Log.e("QuizActivity", "   Error Type: " + t.getClass().getSimpleName());
+                    Log.e("QuizActivity", "   Error Message: " + t.getMessage());
+                    Log.e("QuizActivity", "   Cause: " + (t.getCause() != null ? t.getCause().getMessage() : "Unknown"));
+                    t.printStackTrace();
+                    Log.e("QuizActivity", "❌ Network error - falling back to dummy quiz");
                     loadDummyQuestions();
+                    if (!questions.isEmpty()) {
+                        showQuestion();
+                    }
                 }
             });
             
         } catch (Exception e) {
-            Log.e("QuizActivity", "❌ Exception: " + e.getMessage());
+            Log.e("QuizActivity", "❌ EXCEPTION in generateDynamicQuiz!");
+            Log.e("QuizActivity", "   Error: " + e.getMessage());
+            Log.e("QuizActivity", "   Class: " + e.getClass().getSimpleName());
             e.printStackTrace();
+            Log.e("QuizActivity", "❌ Exception - falling back to dummy quiz");
             loadDummyQuestions();
+            if (!questions.isEmpty()) {
+                showQuestion();
+            }
         }
     }
 

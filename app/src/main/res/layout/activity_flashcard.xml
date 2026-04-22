@@ -4,33 +4,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:fitsSystemWindows="true"
     android:background="@drawable/login_bg">
 
-    <!-- HEADER -->
-    <FrameLayout
+    <!-- TOOLBAR WITH BACK BUTTON -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="16dp">
-
-        <ImageView
-            android:id="@+id/btnBack"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:src="@drawable/ic_back_arrow"
-            app:tint="#4F6F64"
-            android:layout_gravity="start|center_vertical"
-            android:clickable="true"
-            android:focusable="true"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Flashcards"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:textColor="#4F6F64"
-            android:layout_gravity="center"/>
-    </FrameLayout>
+        android:layout_height="?attr/actionBarSize"
+        android:background="#4F6F64"
+        android:elevation="4dp"
+        app:titleTextColor="@android:color/white"
+        app:title="Flashcards" />
 
     <!-- ✅ Mastery Stats Bar -->
     <LinearLayout

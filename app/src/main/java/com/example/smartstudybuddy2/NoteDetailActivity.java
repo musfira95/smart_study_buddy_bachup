@@ -21,6 +21,12 @@ public class NoteDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_detail);
 
+        // Enable back button in toolbar
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
+
         // ------------------- Find Views -------------------
         etTitle = findViewById(R.id.etDetailTitle);
         etContent = findViewById(R.id.etDetailContent);
@@ -71,7 +77,7 @@ public class NoteDetailActivity extends AppCompatActivity {
 
         // ------------------- Delete note -------------------
         btnDelete.setOnClickListener(v -> {
-            new AlertDialog.Builder(this)
+            new AlertDialog.Builder(this, R.style.AppDialog)
                     .setTitle("Delete Note")
                     .setMessage("Are you sure you want to delete this note?")
                     .setPositiveButton("Yes", (dialog, which) -> {
@@ -94,5 +100,11 @@ public class NoteDetailActivity extends AppCompatActivity {
                 Toast.makeText(this, "No content to summarize", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 }

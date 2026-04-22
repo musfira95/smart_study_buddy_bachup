@@ -6,18 +6,32 @@
     android:padding="20dp"
     android:background="@drawable/login_bg">
 
-    <!-- TITLE HEADING -->
-    <TextView
-        android:id="@+id/tvAllTranscriptionsTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="All Transcriptions"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        android:textColor="#4F6F64"
-        android:layout_gravity="center_horizontal"
-        android:paddingBottom="14dp"
-        android:letterSpacing="0.03" />
+    <!-- HEADER WITH BACK BUTTON -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginBottom="6dp">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_back_arrow"
+            android:layout_gravity="center_vertical|start"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="4dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="All Transcriptions"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="#4F6F64"
+            android:layout_gravity="center"
+            android:letterSpacing="0.03"/>
+    </FrameLayout>
 
     <!-- RECYCLER WHITE CONTAINER (OPTIONAL BEAUTY BOX) -->
     <LinearLayout

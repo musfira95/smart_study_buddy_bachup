@@ -17,7 +17,6 @@ public class LoginActivity extends AppCompatActivity {
     TextView signupRedirect;
     DatabaseHelper dbHelper;
     SessionManager session;
-    ImageView googleLoginBtn, facebookLoginBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,8 +30,6 @@ public class LoginActivity extends AppCompatActivity {
         passwordEditText = findViewById(R.id.loginPasswordEditText);
         loginButton = findViewById(R.id.loginButton);
         signupRedirect = findViewById(R.id.signupRedirect);
-        googleLoginBtn = findViewById(R.id.googleLoginButton);
-        facebookLoginBtn = findViewById(R.id.facebookLoginButton);
         TextView forgotPasswordText = findViewById(R.id.forgotPasswordText);
 
         forgotPasswordText.setOnClickListener(v ->
@@ -110,12 +107,5 @@ public class LoginActivity extends AppCompatActivity {
             finish();
         });
 
-        googleLoginBtn.setOnClickListener(v ->
-                Toast.makeText(LoginActivity.this, "Google Login Coming Soon", Toast.LENGTH_SHORT).show()
-        );
-
-        facebookLoginBtn.setOnClickListener(v ->
-                Toast.makeText(LoginActivity.this, "Facebook Login Coming Soon", Toast.LENGTH_SHORT).show()
-        );
     }
 }

@@ -3,6 +3,7 @@ package com.example.smartstudybuddy2;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -26,6 +27,10 @@ public class NotesActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notes);
+
+        // Back arrow click listener
+        ImageView btnBackArrow = findViewById(R.id.btnBackArrow);
+        btnBackArrow.setOnClickListener(v -> finish());
 
         recyclerView = findViewById(R.id.notesRecyclerView);
         etTitle = findViewById(R.id.etTitle);
@@ -87,5 +92,11 @@ public class NotesActivity extends AppCompatActivity {
             cursor.close();
         }
         adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 }

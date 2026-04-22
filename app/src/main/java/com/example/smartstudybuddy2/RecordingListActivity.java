@@ -2,6 +2,7 @@ package com.example.smartstudybuddy2;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 import android.content.Intent;
@@ -18,14 +19,44 @@ public class RecordingListActivity extends AppCompatActivity {
     private ListView listView;
     private ArrayList<Recording> recordingList;
     private DatabaseHelper dbHelper;
+    private boolean showOnlyBookmarked = false;
+    private RecordingListAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recording_list);
 
+        // Setup Toolbar with back button
+        androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
+
         listView = findViewById(R.id.recordingListView);
         dbHelper = new DatabaseHelper(this);
+
+        // Setup filter buttons
+        Button btnAllRecordings = findViewById(R.id.btnAllRecordings);
+        Button btnBookmarkedOnly = findViewById(R.id.btnBookmarkedOnly);
+
+        btnAllRecordings.setOnClickListener(v -> {
+            showOnlyBookmarked = false;
+            btnAllRecordings.setBackgroundResource(R.drawable.button_rounded);
+            btnBookmarkedOnly.setBackgroundResource(android.R.drawable.btn_default);
+            loadRecordings();
+            Log.d(TAG, "✅ Filter: All recordings");
+        });
+
+        btnBookmarkedOnly.setOnClickListener(v -> {
+            showOnlyBookmarked = true;
+            btnBookmarkedOnly.setBackgroundResource(R.drawable.button_rounded);
+            btnAllRecordings.setBackgroundResource(android.R.drawable.btn_default);
+            loadRecordings();
+            Log.d(TAG, "⭐ Filter: Bookmarks only");
+        });
 
         // ✅ COMPREHENSIVE cleanup of ALL dummy data
         Log.d(TAG, "🗑️ Cleaning up ALL dummy/test recordings...");
@@ -38,8 +69,13 @@ public class RecordingListActivity extends AppCompatActivity {
 
 
     private void loadRecordings() {
-        Log.d(TAG, "📥 Loading recordings using: SELECT * FROM transcriptions ORDER BY timestamp DESC");
-        recordingList = dbHelper.getAllRecordings();
+        if (showOnlyBookmarked) {
+            Log.d(TAG, "⭐ Loading BOOKMARKED recordings only");
+            recordingList = dbHelper.getBookmarkedRecordings();
+        } else {
+            Log.d(TAG, "📥 Loading ALL recordings using: SELECT * FROM transcriptions ORDER BY timestamp DESC");
+            recordingList = dbHelper.getAllRecordings();
+        }
 
         if (recordingList == null) {
             recordingList = new ArrayList<>();
@@ -61,14 +97,20 @@ public class RecordingListActivity extends AppCompatActivity {
         }
 
         if (recordingList.isEmpty()) {
-            Log.i(TAG, "ℹ️ No recordings found in database - showing empty state");
-            Toast.makeText(this, "No recordings found in database yet!", Toast.LENGTH_SHORT).show();
+            if (showOnlyBookmarked) {
+                Log.i(TAG, "ℹ️ No bookmarked recordings found");
+                Toast.makeText(this, "No bookmarked recordings yet!", Toast.LENGTH_SHORT).show();
+            } else {
+                Log.i(TAG, "ℹ️ No recordings found in database - showing empty state");
+                Toast.makeText(this, "No recordings found in database yet!", Toast.LENGTH_SHORT).show();
+            }
         } else {
-            Log.i(TAG, "✅ Displaying " + recordingList.size() + " recordings from database only (NO dummy data)");
+            String filterInfo = showOnlyBookmarked ? " (BOOKMARKED)" : "";
+            Log.i(TAG, "✅ Displaying " + recordingList.size() + " recordings" + filterInfo);
         }
 
-        // ✔ FIXED – Load adapter with ONLY DATABASE DATA
-        RecordingListAdapter adapter = new RecordingListAdapter(this, recordingList);
+        // ✔ FIXED – Load adapter with filtered data
+        adapter = new RecordingListAdapter(this, recordingList);
         listView.setAdapter(adapter);
 
         // ✔ Clicking an item opens detail screen
@@ -83,5 +125,22 @@ public class RecordingListActivity extends AppCompatActivity {
         });
 
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Refresh the list when returning from other activities (bookmark state may have changed)
+        loadRecordings();
+        if (adapter != null) {
+            adapter.notifyDataSetChanged();
+        }
+        Log.d(TAG, "📄 onResume: Refreshed recording list");
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 }

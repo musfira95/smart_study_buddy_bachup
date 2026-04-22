@@ -81,6 +81,45 @@
                     </ScrollView>
                 </androidx.cardview.widget.CardView>
 
+                <!-- 🔊 TEXT-TO-SPEECH CONTROLS -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginBottom="16dp">
+
+                    <ImageButton
+                        android:id="@+id/btnPlaySummary"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:src="@android:drawable/ic_media_play"
+                        android:background="@drawable/button_rounded"
+                        android:scaleType="centerInside"
+                        android:layout_margin="8dp"
+                        android:contentDescription="Play Summary"/>
+
+                    <ImageButton
+                        android:id="@+id/btnPauseSummary"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:src="@android:drawable/ic_media_pause"
+                        android:background="@drawable/button_rounded"
+                        android:scaleType="centerInside"
+                        android:layout_margin="8dp"
+                        android:contentDescription="Pause Summary"/>
+
+                    <ImageButton
+                        android:id="@+id/btnStopSummary"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:src="@drawable/ic_delete"
+                        android:background="@drawable/button_rounded"
+                        android:scaleType="centerInside"
+                        android:layout_margin="8dp"
+                        android:contentDescription="Stop Summary"/>
+                </LinearLayout>
+
                 <!-- GENERATE QUIZ BUTTON (LOGIN BUTTON STYLE) -->
                 <LinearLayout
                     android:id="@+id/btnGenerateQuiz"

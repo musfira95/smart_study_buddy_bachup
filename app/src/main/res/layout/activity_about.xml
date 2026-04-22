@@ -1,62 +1,132 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="20dp"
+    android:fillViewport="true"
     android:background="@drawable/login_bg">
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:padding="24dp">
 
-        <!-- PAGE TITLE -->
-        <TextView
-            android:id="@+id/tvAboutTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="About App"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:textColor="#4F6F64"
-            android:letterSpacing="0.02"
-            android:paddingBottom="20dp" />
-
-        <!-- WHITE CARD BOX -->
-        <LinearLayout
+        <!-- HEADER -->
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@android:color/white"
-            android:elevation="6dp"
-            android:padding="18dp"
-            android:layout_marginTop="8dp">
+            android:layout_height="56dp"
+            android:layout_marginBottom="24dp">
+
+            <ImageView
+                android:id="@+id/btnBack"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_back_arrow"
+                android:layout_gravity="center_vertical|start"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="4dp"/>
 
             <TextView
-                android:id="@+id/tvAboutDescription"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Smart Study Buddy helps you record audio, generate transcription, save notes, view analytics, and stay organized with your studies. Designed with simplicity and power — all in one app!"
-                android:textSize="16sp"
-                android:textColor="#333333"
-                android:lineSpacingExtra="5dp" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#E0E0E0"
-                android:layout_marginVertical="16dp"/>
-
-            <TextView
-                android:id="@+id/tvAppVersion"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="App Version: 1.0.0"
-                android:textSize="14sp"
+                android:text="About App"
+                android:textSize="22sp"
                 android:textStyle="bold"
-                android:textColor="#4F6F64" />
+                android:textColor="#4F6F64"
+                android:layout_gravity="center"/>
+        </FrameLayout>
 
-        </LinearLayout>
+        <!-- APP LOGO AVATAR -->
+        <ImageView
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:src="@drawable/ic_app_logo"
+            android:background="@drawable/circle_green"
+            android:scaleType="centerCrop"
+            android:elevation="4dp"
+            android:clipToOutline="true"
+            android:layout_marginBottom="12dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Smart Study Buddy"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#222222"
+            android:gravity="center"
+            android:layout_marginBottom="6dp"/>
+
+        <TextView
+            android:id="@+id/tvAppVersion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="App Version: 1.0.0"
+            android:textSize="13sp"
+            android:textColor="#4F6F64"
+            android:textStyle="bold"
+            android:background="@drawable/badge_green"
+            android:paddingHorizontal="14dp"
+            android:paddingVertical="5dp"
+            android:layout_marginBottom="24dp"/>
+
+        <!-- INFO CARD -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="8dp"
+            app:cardBackgroundColor="#FFFFFF">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <!-- Description Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="14dp">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_info"/>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="12dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Description"
+                            android:textSize="11sp"
+                            android:textColor="#999999"/>
+
+                        <TextView
+                            android:id="@+id/tvAboutDescription"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Smart Study Buddy helps you record audio, generate transcription, save notes, and stay organized."
+                            android:textSize="14sp"
+                            android:textColor="#222222"
+                            android:lineSpacingExtra="4dp"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
 
     </LinearLayout>
 </ScrollView>

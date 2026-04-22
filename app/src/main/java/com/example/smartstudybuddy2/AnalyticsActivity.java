@@ -26,6 +26,12 @@ public class AnalyticsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_analytics);
 
+        // Enable back button in toolbar
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
+
         // Bind views
         tvTotalSessions = findViewById(R.id.tvTotalSessions);
         tvAvgStudy = findViewById(R.id.tvAvgStudy);
@@ -136,5 +142,11 @@ public class AnalyticsActivity extends AppCompatActivity {
         LineData lineData = new LineData(dataSet);
         lineChart.setData(lineData);
         lineChart.invalidate();
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 }

@@ -13,11 +13,27 @@
         android:orientation="vertical"
         android:padding="24dp">
 
+        <!-- BACK BUTTON -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp">
+
+            <ImageView
+                android:id="@+id/btnBack"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_back_arrow"
+                android:layout_gravity="center_vertical|start"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="4dp"/>
+        </FrameLayout>
+
         <!-- WHITE CARD (LOGIN STYLE) -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="8dp"
             android:layout_marginBottom="40dp"
             app:cardCornerRadius="20dp"
             app:cardElevation="8dp"

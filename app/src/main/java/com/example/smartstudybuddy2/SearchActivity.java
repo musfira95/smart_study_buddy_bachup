@@ -1,5 +1,6 @@
 package com.example.smartstudybuddy2;
 
+import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -7,8 +8,13 @@ import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.AnimationSet;
+import android.view.animation.ScaleAnimation;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,6 +30,10 @@ public class SearchActivity extends AppCompatActivity {
 
     SearchView searchView;
     ListView listView;
+    ProgressBar progressSearching;
+    TextView tvResultsInfo;
+    LinearLayout emptyStateContainer;
+    
     List<SearchResult> allResults;
     SearchResultAdapter adapter;
     DatabaseHelper dbHelper;
@@ -33,8 +43,19 @@ public class SearchActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
+        // Setup Toolbar with back button
+        androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
+
         searchView = findViewById(R.id.searchView);
         listView = findViewById(R.id.listView);
+        progressSearching = findViewById(R.id.progressSearching);
+        tvResultsInfo = findViewById(R.id.tvResultsInfo);
+        emptyStateContainer = findViewById(R.id.emptyStateContainer);
 
         dbHelper = new DatabaseHelper(this);
         allResults = new ArrayList<>();
@@ -43,13 +64,6 @@ public class SearchActivity extends AppCompatActivity {
         loadAllSearchResults();
 
         Log.d(TAG, "Loaded " + allResults.size() + " searchable items");
-
-        // If no results found, add placeholder
-        if (allResults.isEmpty()) {
-            SearchResult noResult = new SearchResult(0, SearchResult.TYPE_NOTE, 
-                    "No content found", "Create recordings, notes, or flashcards to search.", "");
-            allResults.add(noResult);
-        }
 
         // Use SearchResultAdapter
         adapter = new SearchResultAdapter(this, R.layout.item_search_result, allResults);
@@ -70,42 +84,151 @@ public class SearchActivity extends AppCompatActivity {
             }
         });
 
-        // ---- MAKE HINT COLOR + TEXT COLOR GREY ----
-        int textId = searchView.getContext().getResources()
-                .getIdentifier("android:id/search_src_text", null, null);
-        TextView searchText = searchView.findViewById(textId);
-        if (searchText != null) {
-            searchText.setHintTextColor(Color.GRAY);
-            searchText.setTextColor(Color.GRAY);
-        }
+        // ---- CUSTOMIZE SEARCH VIEW COLORS ----
+        customizeSearchViewColors();
 
-        // ---- SEARCH ICON GREY ----
-        int searchIconId = searchView.getContext().getResources()
-                .getIdentifier("android:id/search_mag_icon", null, null);
-        ImageView searchIcon = searchView.findViewById(searchIconId);
-        if (searchIcon != null) {
-            searchIcon.setColorFilter(Color.GRAY, PorterDuff.Mode.SRC_IN);
-        }
-
-        // ---- CLOSE ICON GREY ----
-        int closeIconId = searchView.getContext().getResources()
-                .getIdentifier("android:id/search_close_btn", null, null);
-        ImageView closeIcon = searchView.findViewById(closeIconId);
-        if (closeIcon != null) {
-            closeIcon.setColorFilter(Color.GRAY, PorterDuff.Mode.SRC_IN);
-        }
-
-        // Filter on typing
+        // Filter on typing with animations
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) { return false; }
 
             @Override
             public boolean onQueryTextChange(String newText) {
+                // Show progress animation
+                if (!newText.isEmpty()) {
+                    showSearchProgress();
+                } else {
+                    hideSearchProgress();
+                    showEmptyState();
+                }
+                
                 adapter.getFilter().filter(newText);
+                
+                // Delay to show results with animation
+                listView.postDelayed(() -> updateResultsDisplay(), 200);
                 return false;
             }
         });
+    }
+
+    /**
+     * Customize SearchView colors and styling
+     */
+    private void customizeSearchViewColors() {
+        // ---- MAKE HINT COLOR + TEXT COLOR ----
+        int textId = searchView.getContext().getResources()
+                .getIdentifier("android:id/search_src_text", null, null);
+        TextView searchText = searchView.findViewById(textId);
+        if (searchText != null) {
+            searchText.setHintTextColor(Color.parseColor("#CCCCCC"));
+            searchText.setTextColor(Color.parseColor("#333333"));
+            searchText.setTextSize(14);
+        }
+
+        // ---- SEARCH ICON COLOR ----
+        int searchIconId = searchView.getContext().getResources()
+                .getIdentifier("android:id/search_mag_icon", null, null);
+        ImageView searchIcon = searchView.findViewById(searchIconId);
+        if (searchIcon != null) {
+            searchIcon.setColorFilter(Color.parseColor("#9C27FF"), PorterDuff.Mode.SRC_IN);
+        }
+
+        // ---- CLOSE ICON COLOR ----
+        int closeIconId = searchView.getContext().getResources()
+                .getIdentifier("android:id/search_close_btn", null, null);
+        ImageView closeIcon = searchView.findViewById(closeIconId);
+        if (closeIcon != null) {
+            closeIcon.setColorFilter(Color.parseColor("#9C27FF"), PorterDuff.Mode.SRC_IN);
+        }
+    }
+
+    /**
+     * Show search progress animation
+     */
+    private void showSearchProgress() {
+        progressSearching.setVisibility(View.VISIBLE);
+        ObjectAnimator fadeIn = ObjectAnimator.ofFloat(progressSearching, "alpha", 0f, 1f);
+        fadeIn.setDuration(300);
+        fadeIn.start();
+    }
+
+    /**
+     * Hide search progress animation
+     */
+    private void hideSearchProgress() {
+        ObjectAnimator fadeOut = ObjectAnimator.ofFloat(progressSearching, "alpha", 1f, 0f);
+        fadeOut.setDuration(300);
+        fadeOut.setDuration(300);
+        fadeOut.start();
+    }
+
+    /**
+     * Show empty state with animation
+     */
+    private void showEmptyState() {
+        if (emptyStateContainer != null) {
+            emptyStateContainer.setVisibility(View.VISIBLE);
+            AnimationSet animSet = new AnimationSet(true);
+            
+            AlphaAnimation alpha = new AlphaAnimation(0f, 1f);
+            alpha.setDuration(400);
+            
+            ScaleAnimation scale = new ScaleAnimation(0.9f, 1f, 0.9f, 1f,
+                    ScaleAnimation.RELATIVE_TO_SELF, 0.5f,
+                    ScaleAnimation.RELATIVE_TO_SELF, 0.5f);
+            scale.setDuration(400);
+            
+            animSet.addAnimation(alpha);
+            animSet.addAnimation(scale);
+            emptyStateContainer.startAnimation(animSet);
+        }
+    }
+
+    /**
+     * Hide empty state with animation
+     */
+    private void hideEmptyState() {
+        if (emptyStateContainer != null) {
+            ObjectAnimator fadeOut = ObjectAnimator.ofFloat(emptyStateContainer, "alpha", 1f, 0f);
+            fadeOut.setDuration(300);
+            fadeOut.setDuration(300);
+            fadeOut.start();
+        }
+    }
+
+    /**
+     * Update results display with animations
+     */
+    private void updateResultsDisplay() {
+        if (adapter.getCount() > 0) {
+            hideEmptyState();
+            listView.setVisibility(View.VISIBLE);
+            tvResultsInfo.setVisibility(View.VISIBLE);
+            tvResultsInfo.setText("Found " + adapter.getCount() + " result" + 
+                    (adapter.getCount() != 1 ? "s" : ""));
+            
+            // Animate list items appearance
+            animateListItems();
+        } else {
+            showEmptyState();
+            listView.setVisibility(View.GONE);
+            tvResultsInfo.setVisibility(View.GONE);
+        }
+    }
+
+    /**
+     * Animate list items appearance
+     */
+    private void animateListItems() {
+        for (int i = 0; i < listView.getChildCount(); i++) {
+            View view = listView.getChildAt(i);
+            if (view != null) {
+                AlphaAnimation alphaAnimation = new AlphaAnimation(0f, 1f);
+                alphaAnimation.setStartOffset(i * 50);
+                alphaAnimation.setDuration(300);
+                view.startAnimation(alphaAnimation);
+            }
+        }
     }
 
     /**
@@ -226,6 +349,12 @@ public class SearchActivity extends AppCompatActivity {
             Log.e(TAG, "Error handling result click: " + e.getMessage());
             Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish();
+        return true;
     }
 }
 

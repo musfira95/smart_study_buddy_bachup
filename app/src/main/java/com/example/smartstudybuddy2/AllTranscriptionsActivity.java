@@ -21,6 +21,16 @@ public class AllTranscriptionsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_all_transcriptions);
 
+        // BACK BUTTON
+        android.widget.ImageView btnBack = findViewById(R.id.btnBack);
+        if (btnBack != null) btnBack.setOnClickListener(v -> finish());
+
+        // Enable back button in toolbar
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
+
         rvTranscriptions = findViewById(R.id.rvTranscriptions);
         db = new DatabaseHelper(this);
 
@@ -52,6 +62,12 @@ public class AllTranscriptionsActivity extends AppCompatActivity {
 
         rvTranscriptions.setLayoutManager(new LinearLayoutManager(this));
         rvTranscriptions.setAdapter(adapter);
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 }
 

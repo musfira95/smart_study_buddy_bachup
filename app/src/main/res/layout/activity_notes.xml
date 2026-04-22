@@ -1,34 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/login_bg"
-    android:fillViewport="true">
+    android:background="@drawable/login_bg">
 
-    <LinearLayout
+    <!-- Original Content ScrollView -->
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="24dp"
-        android:gravity="center_horizontal">
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
-        <!-- TITLE TEXT (Instead of Header) -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Your Recordings / Notes"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:textColor="#4F6F64"
-            android:layout_marginBottom="24dp"/>
-
-        <!-- CONTENT -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:padding="24dp"
             android:gravity="center_horizontal">
+
+            <!-- TITLE TEXT (Instead of Header) -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Your Recordings / Notes"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="#4F6F64"
+                android:layout_marginBottom="24dp"/>
 
             <!-- TITLE INPUT CARD -->
             <androidx.cardview.widget.CardView
@@ -106,5 +104,30 @@
 
         </LinearLayout>
 
-    </LinearLayout>
-</ScrollView>
+    </ScrollView>
+
+    <!-- Back Arrow Overlay -->
+    <FrameLayout
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="top|start"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:background="@drawable/circle_white">
+
+        <ImageView
+            android:id="@+id/btnBackArrow"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_back_arrow"
+            android:contentDescription="Back"
+            android:scaleType="centerInside"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="6dp"
+            app:tint="#333333"/>
+
+    </FrameLayout>
+
+</FrameLayout>

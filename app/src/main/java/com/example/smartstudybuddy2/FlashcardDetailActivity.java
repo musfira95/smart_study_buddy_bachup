@@ -38,6 +38,12 @@ public class FlashcardDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_flashcard_detail);
 
+        // Enable back button in toolbar
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
+
         // Initialize database
         dbHelper = new DatabaseHelper(this);
         
@@ -161,5 +167,11 @@ public class FlashcardDetailActivity extends AppCompatActivity {
             Log.e(TAG, "❌ Error updating database: " + e.getMessage());
             Toast.makeText(this, "⚠️ Error saving changes", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 }

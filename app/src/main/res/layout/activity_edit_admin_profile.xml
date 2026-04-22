@@ -1,138 +1,269 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/login_bg"
-    android:fillViewport="true">
+    android:fillViewport="true"
+    android:background="@drawable/login_bg">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:padding="24dp">
 
-        <!-- HEADER -->
-        <LinearLayout
+        <!-- HEADER (same as Admin Profile) -->
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="180dp"
-            android:background="@drawable/button_rounded"
-            android:gravity="center">
+            android:layout_height="56dp"
+            android:layout_marginBottom="24dp">
 
             <ImageView
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:background="@drawable/circle_bgg"
-                android:padding="20dp"
-                android:src="@drawable/ic_user_pro"/>
-        </LinearLayout>
+                android:id="@+id/btnBack"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_back_arrow"
+                android:layout_gravity="center_vertical|start"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="4dp"/>
 
-        <!-- BIG WHITE CARD -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginTop="40dp"
-            android:background="#FFFFFF"
-            android:orientation="vertical"
-            android:padding="20dp"
-            android:elevation="6dp">
-
-            <!-- ADMIN NAME -->
-            <EditText
-                android:id="@+id/etAdminName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Admin Name"
-                android:textColor="#000000"
-                android:textColorHint="#9E9E9E"
-                android:background="#F5F5F5"
-                android:padding="12dp"/>
-
-            <!-- EMAIL -->
-            <EditText
-                android:id="@+id/etAdminEmail"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:enabled="false"
-                android:hint="Email"
-                android:textColor="#666666"
-                android:background="#EDEDED"
-                android:padding="12dp"/>
-
-            <!-- ROLE -->
-            <EditText
-                android:id="@+id/etAdminRole"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:enabled="false"
-                android:text="Admin"
-                android:textColor="#666666"
-                android:background="#EDEDED"
-                android:padding="12dp"/>
-
-            <!-- 🔐 CHANGE PASSWORD TITLE -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Change Password"
+                android:text="Edit Profile"
+                android:textSize="22sp"
                 android:textStyle="bold"
                 android:textColor="#4F6F64"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="8dp"/>
+                android:layout_gravity="center"/>
 
-            <!-- CURRENT PASSWORD -->
-            <EditText
-                android:id="@+id/etCurrentPassword"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Current Password"
-                android:inputType="textPassword"
-                android:background="#F5F5F5"
-                android:padding="12dp"/>
+        </FrameLayout>
 
-            <!-- NEW PASSWORD -->
-            <EditText
-                android:id="@+id/etNewPassword"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:hint="New Password"
-                android:inputType="textPassword"
-                android:background="#F5F5F5"
-                android:padding="12dp"/>
+        <!-- AVATAR with Camera Button -->
+        <FrameLayout
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginBottom="20dp">
 
-            <!-- CONFIRM PASSWORD -->
-            <EditText
-                android:id="@+id/etConfirmPassword"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:hint="Confirm New Password"
-                android:inputType="textPassword"
-                android:background="#F5F5F5"
-                android:padding="12dp"/>
+            <ImageView
+                android:id="@+id/ivEditAvatar"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:src="@drawable/ic_user_pro"
+                android:background="@drawable/circle_green"
+                android:padding="18dp"
+                android:elevation="4dp"
+                android:scaleType="centerCrop"
+                android:clipToOutline="true"/>
 
-            <!-- SAVE BUTTON -->
+            <ImageView
+                android:id="@+id/btnChangePhoto"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/ic_edit"
+                android:background="#4F6F64"
+                android:padding="6dp"
+                android:layout_gravity="bottom|end"
+                android:elevation="6dp"
+                android:clickable="true"
+                android:focusable="true"/>
+
+        </FrameLayout>
+
+        <!-- PROFILE INFO CARD -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="#FFFFFF">
+
             <LinearLayout
-                android:id="@+id/saveBtn"
                 android:layout_width="match_parent"
-                android:layout_height="45dp"
-                android:layout_marginTop="24dp"
-                android:background="@drawable/button_rounded"
-                android:gravity="center">
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Save Changes"
-                    android:textColor="@android:color/white"
+                    android:text="Profile Info"
+                    android:textSize="14sp"
                     android:textStyle="bold"
-                    android:textSize="16sp"/>
-            </LinearLayout>
+                    android:textColor="#4F6F64"
+                    android:layout_marginBottom="12dp"/>
 
-        </LinearLayout>
+                <!-- NAME -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Full Name"
+                    android:textSize="12sp"
+                    android:textColor="#999999"
+                    android:layout_marginBottom="4dp"/>
+
+                <EditText
+                    android:id="@+id/etAdminName"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:hint="Enter name"
+                    android:textColor="#222222"
+                    android:textColorHint="#AAAAAA"
+                    android:textSize="15sp"
+                    android:background="@drawable/edittext_bg_rounded"
+                    android:paddingHorizontal="14dp"
+                    android:layout_marginBottom="12dp"/>
+
+                <!-- EMAIL -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Email"
+                    android:textSize="12sp"
+                    android:textColor="#999999"
+                    android:layout_marginBottom="4dp"/>
+
+                <EditText
+                    android:id="@+id/etAdminEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:enabled="false"
+                    android:hint="Email"
+                    android:textColor="#888888"
+                    android:textSize="15sp"
+                    android:background="@drawable/edittext_bg_rounded"
+                    android:paddingHorizontal="14dp"
+                    android:layout_marginBottom="12dp"/>
+
+                <!-- ROLE -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Role"
+                    android:textSize="12sp"
+                    android:textColor="#999999"
+                    android:layout_marginBottom="4dp"/>
+
+                <EditText
+                    android:id="@+id/etAdminRole"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:enabled="false"
+                    android:text="Admin"
+                    android:textColor="#888888"
+                    android:textSize="15sp"
+                    android:background="@drawable/edittext_bg_rounded"
+                    android:paddingHorizontal="14dp"/>
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- CHANGE PASSWORD CARD -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="#FFFFFF">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Change Password"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="#4F6F64"
+                    android:layout_marginBottom="12dp"/>
+
+                <!-- CURRENT PASSWORD -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Current Password"
+                    android:textSize="12sp"
+                    android:textColor="#999999"
+                    android:layout_marginBottom="4dp"/>
+
+                <EditText
+                    android:id="@+id/etCurrentPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:hint="Enter current password"
+                    android:inputType="textPassword"
+                    android:textColor="#222222"
+                    android:textColorHint="#AAAAAA"
+                    android:textSize="15sp"
+                    android:background="@drawable/edittext_bg_rounded"
+                    android:paddingHorizontal="14dp"
+                    android:layout_marginBottom="12dp"/>
+
+                <!-- NEW PASSWORD -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="New Password"
+                    android:textSize="12sp"
+                    android:textColor="#999999"
+                    android:layout_marginBottom="4dp"/>
+
+                <EditText
+                    android:id="@+id/etNewPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:hint="Enter new password"
+                    android:inputType="textPassword"
+                    android:textColor="#222222"
+                    android:textColorHint="#AAAAAA"
+                    android:textSize="15sp"
+                    android:background="@drawable/edittext_bg_rounded"
+                    android:paddingHorizontal="14dp"
+                    android:layout_marginBottom="12dp"/>
+
+                <!-- CONFIRM PASSWORD -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Confirm New Password"
+                    android:textSize="12sp"
+                    android:textColor="#999999"
+                    android:layout_marginBottom="4dp"/>
+
+                <EditText
+                    android:id="@+id/etConfirmPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:hint="Re-enter new password"
+                    android:inputType="textPassword"
+                    android:textColor="#222222"
+                    android:textColorHint="#AAAAAA"
+                    android:textSize="15sp"
+                    android:background="@drawable/edittext_bg_rounded"
+                    android:paddingHorizontal="14dp"/>
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- SAVE BUTTON -->
+        <Button
+            android:id="@+id/saveBtn"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="24dp"
+            android:text="Save Changes"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:backgroundTint="#4F6F64"/>
 
     </LinearLayout>
 </ScrollView>

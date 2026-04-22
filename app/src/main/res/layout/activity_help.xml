@@ -1,76 +1,208 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="20dp"
+    android:fillViewport="true"
     android:background="@drawable/login_bg">
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:padding="24dp">
 
-        <!-- HEADING -->
+        <!-- HEADER -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="24dp">
+
+            <ImageView
+                android:id="@+id/btnBack"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_back_arrow"
+                android:layout_gravity="center_vertical|start"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="4dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Help &amp; Support"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="#4F6F64"
+                android:layout_gravity="center"/>
+        </FrameLayout>
+
+        <!-- ICON -->
+        <ImageView
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:src="@drawable/ic_help"
+            android:background="@drawable/circle_green"
+            android:scaleType="centerInside"
+            android:elevation="4dp"
+            android:clipToOutline="true"
+            android:padding="20dp"
+            android:layout_marginBottom="12dp"/>
+
         <TextView
-            android:id="@+id/tvHelpTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Help and Support"
-            android:textSize="24sp"
+            android:text="Help &amp; Support"
+            android:textSize="18sp"
             android:textStyle="bold"
-            android:textColor="#4F6F64"
-            android:layout_marginBottom="20dp"
-            android:letterSpacing="0.02"/>
+            android:textColor="#222222"
+            android:gravity="center"
+            android:layout_marginBottom="24dp"/>
 
-        <!-- CARD CONTAINER -->
-        <LinearLayout
+        <!-- INFO CARD -->
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@android:color/white"
-            android:elevation="6dp"
-            android:padding="18dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="20dp">
+            app:cardCornerRadius="24dp"
+            app:cardElevation="8dp"
+            app:cardBackgroundColor="#FFFFFF">
 
-            <TextView
-                android:id="@+id/tvHelpDescription"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="If you need assistance, feel free to contact our support team.\nWe are here to help you with any issues or questions."
-                android:textSize="16sp"
-                android:textColor="#333333"
-                android:lineSpacingExtra="5dp"/>
+                android:orientation="vertical"
+                android:padding="20dp">
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#E0E0E0"
-                android:layout_marginVertical="16dp"/>
+                <!-- Description Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="14dp">
 
-            <!-- CONTACT EMAIL -->
-            <TextView
-                android:id="@+id/tvHelpEmail"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="📧 Email: support@smartstudybuddy.com"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:textColor="#4F6F64"
-                android:layout_marginTop="8dp"/>
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_info"/>
 
-            <!-- CONTACT PHONE -->
-            <TextView
-                android:id="@+id/tvHelpPhone"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="📞 Phone: +1 234 567 890"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:textColor="#4F6F64"
-                android:layout_marginTop="10dp"/>
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="12dp">
 
-        </LinearLayout>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Description"
+                            android:textSize="11sp"
+                            android:textColor="#999999"/>
+
+                        <TextView
+                            android:id="@+id/tvHelpDescription"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="If you need assistance, feel free to contact our support team."
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="#222222"
+                            android:lineSpacingExtra="4dp"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#F0F0F0"
+                    android:layout_marginBottom="14dp"/>
+
+                <!-- Email Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="14dp">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_email"/>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="12dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Email"
+                            android:textSize="11sp"
+                            android:textColor="#999999"/>
+
+                        <TextView
+                            android:id="@+id/tvHelpEmail"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="support@smartstudybuddy.com"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="#222222"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#F0F0F0"
+                    android:layout_marginBottom="14dp"/>
+
+                <!-- Phone Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_notification"/>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="12dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Phone"
+                            android:textSize="11sp"
+                            android:textColor="#999999"/>
+
+                        <TextView
+                            android:id="@+id/tvHelpPhone"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="+1 234 567 890"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="#222222"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
 
     </LinearLayout>
 </ScrollView>

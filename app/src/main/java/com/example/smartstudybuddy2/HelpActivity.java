@@ -15,6 +15,10 @@ public class HelpActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_help);
 
+        // BACK BUTTON
+        android.widget.ImageView btnBack = findViewById(R.id.btnBack);
+        if (btnBack != null) btnBack.setOnClickListener(v -> finish());
+
         dbHelper = new DatabaseHelper(this);
         tvHelpDescription = findViewById(R.id.tvHelpDescription);
         tvHelpEmail = findViewById(R.id.tvHelpEmail);
@@ -26,10 +30,16 @@ public class HelpActivity extends AppCompatActivity {
         String phone = dbHelper.getHelpSupportPhone();
 
         // Set the content
-        if (!helpContent.isEmpty()) {
+        if (helpContent != null && !helpContent.isEmpty()) {
             tvHelpDescription.setText(helpContent);
         }
-        tvHelpEmail.setText("📧 Email: " + email);
-        tvHelpPhone.setText("📞 Phone: " + phone);
+        if (email != null) tvHelpEmail.setText(email);
+        if (phone != null) tvHelpPhone.setText(phone);
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 }

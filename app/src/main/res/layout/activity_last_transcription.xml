@@ -1,23 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
+    android:orientation="vertical"
+    android:fitsSystemWindows="true"
     android:background="@drawable/login_bg">
 
-    <LinearLayout
+    <!-- TOOLBAR WITH BACK BUTTON -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:padding="24dp">
+        android:layout_height="?attr/actionBarSize"
+        android:layout_marginTop="32dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="#4F6F64"
+        android:padding="10dp"
+        app:titleTextColor="@android:color/white"
+        app:title="Last Transcription" />
+
+    <!-- SCROLLABLE CONTENT -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:background="@drawable/login_bg">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="24dp">
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
-            android:layout_marginBottom="40dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginBottom="24dp"
             app:cardCornerRadius="20dp"
             app:cardElevation="6dp"
             app:cardBackgroundColor="@android:color/white"
@@ -31,16 +55,7 @@
                 android:padding="24dp"
                 android:gravity="center_horizontal">
 
-                <!-- TITLE -->
-                <TextView
-                    android:id="@+id/tvScreenHeading"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Last Transcription"
-                    android:textSize="22sp"
-                    android:textStyle="bold"
-                    android:textColor="#4F6F64"
-                    android:layout_marginBottom="20dp"/>
+                <!-- TITLE (REMOVED - Using Toolbar instead) -->
 
                 <!-- TITLE INPUT -->
                 <EditText
@@ -163,5 +178,7 @@
         </androidx.cardview.widget.CardView>
 
 
-    </LinearLayout>
-</ScrollView>
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

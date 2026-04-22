@@ -34,6 +34,10 @@ public class ThemeSettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_theme_settings);
 
+        // BACK BUTTON
+        android.widget.ImageView btnBack = findViewById(R.id.btnBack);
+        if (btnBack != null) btnBack.setOnClickListener(v -> finish());
+
         // INIT
         switchNotifications = findViewById(R.id.switchNotifications);
         aboutLayout = findViewById(R.id.aboutLayout);
@@ -67,5 +71,18 @@ public class ThemeSettingsActivity extends AppCompatActivity {
         helpLayout.setOnClickListener(v ->
                 startActivity(new Intent(this, HelpActivity.class))
         );
+
+        // 💾 Backup Data
+        LinearLayout backupLayout = findViewById(R.id.backupLayout);
+        if (backupLayout != null) {
+            backupLayout.setOnClickListener(v -> {
+                boolean success = BackupManager.createBackup(ThemeSettingsActivity.this);
+                if (success) {
+                    Toast.makeText(ThemeSettingsActivity.this, "✅ Backup successful!", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(ThemeSettingsActivity.this, "❌ Backup failed", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 }

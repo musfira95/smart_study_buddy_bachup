@@ -61,7 +61,7 @@ public class QuizResultActivity extends BaseActivity {
             
             // ✅ SMART NOTIFICATION: Alert if score is low
             if (scorePercentage < 60) {
-                NotificationManager.notifyWeakTopic(category, scorePercentage);
+                NotificationManager.notifyWeakTopic(QuizResultActivity.this, category, scorePercentage);
                 Toast.makeText(this, "⚠️ Your score is low. Consider reviewing this topic.", Toast.LENGTH_LONG).show();
             }
         } else {

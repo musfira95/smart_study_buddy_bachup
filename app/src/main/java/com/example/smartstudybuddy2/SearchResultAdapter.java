@@ -70,6 +70,9 @@ public class SearchResultAdapter extends ArrayAdapter<SearchResult> implements F
                 case SearchResult.TYPE_FLASHCARD:
                     ivTypeIcon.setImageResource(R.drawable.ic_flashcard);
                     break;
+                case SearchResult.TYPE_QUIZ:
+                    ivTypeIcon.setImageResource(R.drawable.ic_quiz);
+                    break;
             }
         }
 

@@ -42,6 +42,14 @@ public class FlashcardActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_flashcard);
 
+        // Setup Toolbar with back button
+        androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
+
         dbHelper = new DatabaseHelper(this);
         rvFlashcards = findViewById(R.id.rvFlashcards);
         tvStatsBar = findViewById(R.id.tvStatsBar);
@@ -145,6 +153,9 @@ public class FlashcardActivity extends AppCompatActivity {
                 return;
             }
             
+            // ✅ CRITICAL: Save generated flashcards to database so /export-pdf can retrieve them
+            saveGeneratedFlashcardsToDatabase(flashcards);
+            
             // ✅ NEW: Load database stats back into flashcard model
             loadFlashcardStatsFromDatabase(flashcards);
             
@@ -174,6 +185,123 @@ public class FlashcardActivity extends AppCompatActivity {
             e.printStackTrace();
             Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
+    }
+    
+    /**
+     * ✅ CRITICAL: Save generated flashcards to database AND backend storage
+     * This ensures /export-pdf can retrieve them using recording_id
+     * 
+     * Uses sessionTitle as the topic for database storage
+     */
+    private void saveGeneratedFlashcardsToDatabase(ArrayList<Flashcard> cards) {
+        if (cards == null || cards.isEmpty()) {
+            Log.w(TAG, "⚠️ No flashcards to save");
+            return;
+        }
+        
+        try {
+            int saved = 0;
+            for (Flashcard card : cards) {
+                // Extract question and answer from the formatted text
+                String fullText = card.getQuestion();  // Contains "Q: ...\n\nA: ..."
+                String answer = card.getAnswer();      // Original sentence
+                
+                // Use sessionTitle as topic for database
+                String topic = sessionTitle != null ? sessionTitle : "Flashcards";
+                
+                // Insert into database - this links flashcard with current recording via timestamp
+                boolean inserted = dbHelper.insertFlashcard(fullText, answer, topic);
+                
+                if (inserted) {
+                    saved++;
+                    Log.d(TAG, "✅ Saved flashcard " + saved + " to database: Topic=" + topic);
+                } else {
+                    Log.w(TAG, "⚠️ Failed to save flashcard: " + fullText.substring(0, Math.min(50, fullText.length())));
+                }
+            }
+            
+            Log.d(TAG, "✅ COMPLETE: Saved " + saved + "/" + cards.size() + " flashcards to database for /export-pdf");
+            
+            // ✅ AFTER saving to local database, also save to BACKEND storage
+            // This ensures /export-pdf endpoint can fetch them
+            if (sessionId > 0) {
+                saveFlashcardsToBackendStorage(cards, sessionId);
+            }
+            
+            Toast.makeText(this, "✅ " + saved + " flashcards saved", Toast.LENGTH_SHORT).show();
+            if (saved > 0) {
+                String topic = sessionTitle != null ? sessionTitle : "Recording";
+                com.example.smartstudybuddy2.utils.NotificationManager.notifyFlashcardCreated(this, topic);
+            }
+            
+        } catch (Exception e) {
+            Log.e(TAG, "❌ Error saving flashcards to database: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * ✅ NEW: Save flashcards to backend storage
+     * Calls /save-flashcards/ endpoint on FastAPI backend
+     * This allows /export-pdf to fetch flashcards using recording_id
+     */
+    private void saveFlashcardsToBackendStorage(ArrayList<Flashcard> cards, int recordingId) {
+        new Thread(() -> {
+            try {
+                Log.d(TAG, "💾 Uploading flashcards to backend storage...");
+                
+                // Build list of flashcard maps
+                java.util.List<java.util.Map<String, String>> flashcardsList = new java.util.ArrayList<>();
+                for (Flashcard card : cards) {
+                    java.util.Map<String, String> cardMap = new java.util.HashMap<>();
+                    cardMap.put("question", card.getQuestion());
+                    cardMap.put("answer", card.getAnswer());
+                    flashcardsList.add(cardMap);
+                }
+                
+                // Build request JSON
+                java.util.Map<String, Object> requestMap = new java.util.HashMap<>();
+                requestMap.put("recording_id", recordingId);
+                requestMap.put("flashcards", flashcardsList);
+                
+                com.google.gson.Gson gson = new com.google.gson.Gson();
+                String json = gson.toJson(requestMap);
+                
+                Log.d(TAG, "📤 POST to /save-flashcards/");
+                Log.d(TAG, "   Recording ID: " + recordingId);
+                Log.d(TAG, "   Flashcard count: " + flashcardsList.size());
+                
+                okhttp3.MediaType JSON = okhttp3.MediaType.parse("application/json; charset=utf-8");
+                okhttp3.RequestBody body = okhttp3.RequestBody.create(json, JSON);
+                
+                // ✅ Use LocalApiClient for save-flashcards endpoint (local backend)
+                okhttp3.OkHttpClient client = new okhttp3.OkHttpClient.Builder()
+                        .connectTimeout(120, java.util.concurrent.TimeUnit.SECONDS)
+                        .writeTimeout(600, java.util.concurrent.TimeUnit.SECONDS)
+                        .readTimeout(600, java.util.concurrent.TimeUnit.SECONDS)
+                        .build();
+                okhttp3.Request request = new okhttp3.Request.Builder()
+                        .url("http://192.168.100.96:8000/save-flashcards/")
+                        .post(body)
+                        .build();
+                
+                okhttp3.Response response = client.newCall(request).execute();
+                
+                if (response.isSuccessful()) {
+                    Log.d(TAG, "✅ Flashcards saved to backend successfully!");
+                    Log.d(TAG, "   Response: " + response.body().string());
+                } else {
+                    Log.w(TAG, "⚠️ Backend save failed: HTTP " + response.code());
+                    Log.w(TAG, "   Response: " + (response.body() != null ? response.body().string() : "No body"));
+                }
+                response.close();
+                
+            } catch (Exception e) {
+                Log.w(TAG, "⚠️ Error uploading flashcards to backend: " + e.getMessage());
+                e.printStackTrace();
+                // Don't fail - local storage is already successful
+            }
+        }).start();
     }
     
     /**
@@ -413,5 +541,11 @@ public class FlashcardActivity extends AppCompatActivity {
         // Refresh flashcard list whenever returning to this activity
         loadFlashcards();
         updateMasteryStats();
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 }

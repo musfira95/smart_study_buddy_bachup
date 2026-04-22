@@ -30,6 +30,14 @@ public class LastTranscriptionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_last_transcription);
 
+        // Setup Toolbar with back button
+        androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
+
         Log.d(TAG, "LastTranscriptionActivity created");
 
         // FIND VIEWS
@@ -129,5 +137,11 @@ public class LastTranscriptionActivity extends AppCompatActivity {
         navProfile.setOnClickListener(v ->
                 startActivity(new Intent(this, ProfileActivity.class))
         );
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 }

@@ -1,108 +1,231 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/login_bg"
-    android:fillViewport="true">
+    android:fillViewport="true"
+    android:background="@drawable/login_bg">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:padding="24dp">
 
         <!-- HEADER -->
-        <LinearLayout
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="180dp"
-            android:background="@drawable/button_rounded"
-            android:gravity="center">
+            android:layout_height="56dp"
+            android:layout_marginBottom="24dp">
 
-            <!-- PROFILE ICON CENTER -->
             <ImageView
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:background="@drawable/circle_bgg"
-                android:padding="20dp"
-                android:src="@drawable/ic_user_pro"/>
-        </LinearLayout>
+                android:id="@+id/btnBack"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_back_arrow"
+                android:layout_gravity="center_vertical|start"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="4dp"/>
 
-        <!-- BIG WHITE CARD -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Admin Profile"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="#4F6F64"
+                android:layout_gravity="center"/>
+
+            <ImageView
+                android:id="@+id/btnEditAdminProfile"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_edit"
+                android:layout_gravity="center_vertical|end"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="4dp"/>
+
+        </FrameLayout>
+
+        <!-- AVATAR -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginTop="40dp"
-            android:layout_gravity="center"
-            android:background="#FFFFFF"
-            android:orientation="vertical"
-            android:padding="20dp"
-            android:elevation="6dp">
+            android:gravity="center"
+            android:layout_marginBottom="16dp">
 
-            <!-- EDIT ICON -->
-            <ImageView
-                android:id="@+id/btnEditAdminProfile"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_gravity="end"
-                android:src="@drawable/ic_edit"/>
+            <FrameLayout
+                android:layout_width="96dp"
+                android:layout_height="96dp">
 
-            <!-- ADMIN NAME -->
-            <TextView
-                android:id="@+id/tvAdminName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Admin Name"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="#333333"
-                android:layout_marginTop="12dp"/>
-
-            <!-- EMAIL -->
-            <TextView
-                android:id="@+id/tvAdminEmail"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="admin@email.com"
-                android:textColor="#666666"
-                android:layout_marginTop="4dp"/>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#DDDDDD"
-                android:layout_marginVertical="12dp"/>
-
-            <!-- ROLE -->
-            <TextView
-                android:id="@+id/tvAdminRole"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Admin"
-                android:textColor="#333333"/>
-
+                <ImageView
+                    android:id="@+id/ivAdminAvatar"
+                    android:layout_width="96dp"
+                    android:layout_height="96dp"
+                    android:src="@drawable/ic_user_pro"
+                    android:background="@drawable/circle_green"
+                    android:padding="18dp"
+                    android:elevation="4dp"
+                    android:scaleType="centerCrop"
+                    android:clipToOutline="true"/>
+            </FrameLayout>
         </LinearLayout>
+
+        <!-- INFO CARD -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="8dp"
+            app:cardBackgroundColor="#FFFFFF">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <!-- NAME ROW -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="14dp">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_user"/>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="12dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Name"
+                            android:textSize="11sp"
+                            android:textColor="#999999"/>
+
+                        <TextView
+                            android:id="@+id/tvAdminName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Admin"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="#222222"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#F0F0F0"
+                    android:layout_marginBottom="14dp"/>
+
+                <!-- EMAIL ROW -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="14dp">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_email"/>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="12dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Email"
+                            android:textSize="11sp"
+                            android:textColor="#999999"/>
+
+                        <TextView
+                            android:id="@+id/tvAdminEmail"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="admin@email.com"
+                            android:textSize="15sp"
+                            android:textColor="#444444"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#F0F0F0"
+                    android:layout_marginBottom="14dp"/>
+
+                <!-- ROLE ROW -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_role"/>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="12dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Role"
+                            android:textSize="11sp"
+                            android:textColor="#999999"/>
+
+                        <TextView
+                            android:id="@+id/tvAdminRole"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Admin"
+                            android:textSize="15sp"
+                            android:textColor="#4F6F64"
+                            android:textStyle="bold"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
 
         <!-- LOGOUT BUTTON -->
-        <LinearLayout
+        <Button
             android:id="@+id/logoutBtn"
             android:layout_width="match_parent"
-            android:layout_height="45dp"
-            android:layout_marginTop="36dp"
-            android:layout_marginStart="40dp"
-            android:layout_marginEnd="40dp"
-            android:gravity="center"
-            android:background="@drawable/button_rounded"
-            android:clickable="true">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Logout"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="@android:color/white" />
-        </LinearLayout>
+            android:layout_height="50dp"
+            android:layout_marginTop="20dp"
+            android:text="Logout"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:backgroundTint="#4F6F64"/>
 
     </LinearLayout>
 </ScrollView>

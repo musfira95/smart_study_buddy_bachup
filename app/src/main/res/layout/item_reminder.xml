@@ -1,63 +1,149 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardReminder"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="12dp"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="6dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp"
     app:cardBackgroundColor="@android:color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="14dp"
-        android:gravity="center_vertical">
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <!-- ICON -->
-        <ImageView
-            android:id="@+id/ivIcon"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:src="@drawable/ic_reminders"
-            android:tint="#4F6F64"
-            android:layout_marginEnd="12dp"/>
-
-        <!-- TEXT AREA -->
+        <!-- HEADER ROW: Title + Icons -->
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
 
+            <!-- FEATURE ICON + TYPE -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginEnd="12dp">
+
+                <TextView
+                    android:id="@+id/tvFeatureIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="📌"
+                    android:textSize="18sp"
+                    android:layout_marginEnd="4dp" />
+
+                <TextView
+                    android:id="@+id/tvFeatureType"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Reminder"
+                    android:textSize="12sp"
+                    android:textColor="#9C27FF"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- TITLE (Takes remaining space) -->
             <TextView
                 android:id="@+id/tvReminderTitle"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="Reminder Title"
-                android:textSize="16sp"
+                android:textSize="15sp"
+                android:textColor="#2E5F54"
                 android:textStyle="bold"
-                android:textColor="#4F6F64"/>
+                android:ellipsize="end"
+                android:maxLines="2" />
+
+            <!-- EDIT BUTTON -->
+            <ImageButton
+                android:id="@+id/btnEditReminder"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="?attr/selectableItemBackground"
+                android:src="@drawable/ic_edit"
+                android:contentDescription="Edit Reminder"
+                android:scaleType="centerInside"
+                app:tint="#4F6F64"
+                android:layout_marginEnd="8dp" />
+
+            <!-- DELETE BUTTON -->
+            <ImageButton
+                android:id="@+id/btnDeleteReminder"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="?attr/selectableItemBackground"
+                android:src="@drawable/ic_delete"
+                android:contentDescription="Delete Reminder"
+                android:scaleType="centerInside"
+                app:tint="#FF6B6B" />
+        </LinearLayout>
+
+        <!-- TIME + DATE -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
 
             <TextView
                 android:id="@+id/tvReminderTime"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="08:30 PM"
+                android:text="3:30 PM"
                 android:textSize="13sp"
-                android:textColor="#777777"
-                android:layout_marginTop="4dp"/>
+                android:textColor="#4F6F64"
+                android:textStyle="bold"
+                android:layout_marginEnd="12dp" />
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="14dp"
+                android:background="#E0E0E0"
+                android:layout_marginEnd="12dp" />
+
+            <TextView
+                android:id="@+id/tvReminderDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2026-03-01"
+                android:textSize="13sp"
+                android:textColor="#999999" />
         </LinearLayout>
 
-        <!-- DELETE ICON -->
-        <ImageView
-            android:id="@+id/btnDelete"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:src="@drawable/ic_delete"
-            android:tint="#C62828"/>
-    </LinearLayout>
+        <!-- DESCRIPTION (if available) -->
+        <TextView
+            android:id="@+id/tvReminderDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Description text"
+            android:textSize="12sp"
+            android:textColor="#666666"
+            android:layout_marginBottom="8dp"
+            android:visibility="gone" />
 
+        <!-- COMPLETION CHECKBOX -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <CheckBox
+                android:id="@+id/cbReminderCompleted"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mark as Completed"
+                android:textSize="12sp"
+                android:textColor="#4F6F64" />
+        </LinearLayout>
+    </LinearLayout>
 </androidx.cardview.widget.CardView>

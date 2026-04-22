@@ -4,220 +4,287 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/drawerLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/login_bg">
+    android:layout_height="match_parent">
 
-    <!-- ================= MAIN CONTENT ================= -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true">
+        android:fillViewport="true"
+        android:background="@drawable/login_bg">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:gravity="center_horizontal"
+            android:padding="20dp">
 
-            <!-- ================= TOP BAR ================= -->
-            <LinearLayout
+            <!-- TOP BAR -->
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="16dp">
+                android:layout_height="56dp"
+                android:layout_marginBottom="24dp">
 
-                <!-- 🍔 HAMBURGER -->
                 <ImageView
                     android:id="@+id/btnMenu"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
                     android:src="@drawable/ic_menu"
-                    android:tint="#4F6F64"
-                    android:padding="6dp"/>
-
-                <!-- TITLE -->
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Admin Dashboard"
-                    android:textSize="22sp"
-                    android:textStyle="bold"
-                    android:textColor="#4F6F64"
-                    android:gravity="center"/>
-
-                <!-- PROFILE -->
-                <ImageView
-                    android:id="@+id/btnProfile"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:src="@drawable/ic_user"
-                    android:background="@drawable/circle_white"
-                    android:padding="8dp"/>
-
-            </LinearLayout>
-
-            <!-- ================= SEARCH ================= -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:background="@drawable/search_bg"
-                android:gravity="center_vertical"
-                android:paddingHorizontal="12dp"
-                android:layout_marginBottom="18dp">
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_search"
-                    android:tint="#777777"/>
+                    android:layout_gravity="center_vertical|start"
+                    android:padding="6dp"
+                    android:clickable="true"
+                    android:focusable="true"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:text="Search users, audios..."
-                    android:textColor="#777777"/>
-            </LinearLayout>
+                    android:text="Admin Dashboard"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:textColor="#4F6F64"
+                    android:layout_gravity="center"/>
 
-            <!-- ================= STATS GRID ================= -->
-            <GridLayout
+                <ImageView
+                    android:id="@+id/btnProfile"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/ic_user"
+                    android:background="@drawable/circle_green"
+                    android:padding="8dp"
+                    android:layout_gravity="center_vertical|end"
+                    android:clickable="true"
+                    android:focusable="true"/>
+            </FrameLayout>
+
+            <!-- STATS SECTION TITLE -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Overview"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#333333"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="14dp"/>
+
+            <!-- ROW 1: Total Users + Audios -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:columnCount="2"
-                android:useDefaultMargins="true">
+                android:orientation="horizontal"
+                android:layout_marginBottom="12dp">
 
                 <!-- TOTAL USERS -->
                 <androidx.cardview.widget.CardView
                     android:layout_width="0dp"
-                    android:layout_height="110dp"
-                    android:layout_columnWeight="1"
-                    app:cardCornerRadius="18dp"
-                    app:cardElevation="6dp">
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="6dp"
+                    app:cardBackgroundColor="#FFFFFF">
 
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="14dp">
+                        android:padding="18dp"
+                        android:gravity="center_horizontal">
+
+                        <LinearLayout
+                            android:layout_width="52dp"
+                            android:layout_height="52dp"
+                            android:background="#E8F5E9"
+                            android:gravity="center">
+
+                            <ImageView
+                                android:layout_width="26dp"
+                                android:layout_height="26dp"
+                                android:src="@drawable/ic_user"/>
+                        </LinearLayout>
 
                         <TextView
                             android:id="@+id/tvTotalUsers"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="120"
-                            android:textSize="24sp"
+                            android:text="0"
+                            android:textSize="28sp"
                             android:textStyle="bold"
-                            android:textColor="#4F6F64"/>
+                            android:textColor="#4F6F64"
+                            android:layout_marginTop="8dp"/>
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Total Users"
-                            android:textColor="#777777"/>
+                            android:textColor="#777777"
+                            android:textSize="12sp"
+                            android:layout_marginTop="2dp"/>
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 
-                <!-- TOTAL AUDIOS -->
+                <!-- AUDIOS UPLOADED -->
                 <androidx.cardview.widget.CardView
                     android:layout_width="0dp"
-                    android:layout_height="110dp"
-                    android:layout_columnWeight="1"
-                    app:cardCornerRadius="18dp"
-                    app:cardElevation="6dp">
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="6dp"
+                    app:cardBackgroundColor="#FFFFFF">
 
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="14dp">
+                        android:padding="18dp"
+                        android:gravity="center_horizontal">
+
+                        <LinearLayout
+                            android:layout_width="52dp"
+                            android:layout_height="52dp"
+                            android:background="#E3F2FD"
+                            android:gravity="center">
+
+                            <ImageView
+                                android:layout_width="26dp"
+                                android:layout_height="26dp"
+                                android:src="@drawable/ic_recording"/>
+                        </LinearLayout>
 
                         <TextView
                             android:id="@+id/tvTotalAudios"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="85"
-                            android:textSize="24sp"
+                            android:text="0"
+                            android:textSize="28sp"
                             android:textStyle="bold"
-                            android:textColor="#4F6F64"/>
+                            android:textColor="#1565C0"
+                            android:layout_marginTop="8dp"/>
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Audios Uploaded"
-                            android:textColor="#777777"/>
+                            android:textColor="#777777"
+                            android:textSize="12sp"
+                            android:layout_marginTop="2dp"/>
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 
-                <!-- TOTAL NOTES -->
+            </LinearLayout>
+
+            <!-- ROW 2: Transcriptions + Blocked Users -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <!-- TRANSCRIPTIONS -->
                 <androidx.cardview.widget.CardView
                     android:layout_width="0dp"
-                    android:layout_height="110dp"
-                    android:layout_columnWeight="1"
-                    app:cardCornerRadius="18dp"
-                    app:cardElevation="6dp">
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="6dp"
+                    app:cardBackgroundColor="#FFFFFF">
 
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="14dp">
+                        android:padding="18dp"
+                        android:gravity="center_horizontal">
+
+                        <LinearLayout
+                            android:layout_width="52dp"
+                            android:layout_height="52dp"
+                            android:background="#FFF8E1"
+                            android:gravity="center">
+
+                            <ImageView
+                                android:layout_width="26dp"
+                                android:layout_height="26dp"
+                                android:src="@drawable/ic_study"/>
+                        </LinearLayout>
 
                         <TextView
                             android:id="@+id/tvTotalNotes"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="230"
-                            android:textSize="24sp"
+                            android:text="0"
+                            android:textSize="28sp"
                             android:textStyle="bold"
-                            android:textColor="#4F6F64"/>
+                            android:textColor="#F57F17"
+                            android:layout_marginTop="8dp"/>
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Notes / Transcriptions"
-                            android:textColor="#777777"/>
+                            android:text="Transcriptions"
+                            android:textColor="#777777"
+                            android:textSize="12sp"
+                            android:layout_marginTop="2dp"/>
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 
                 <!-- BLOCKED USERS -->
                 <androidx.cardview.widget.CardView
                     android:layout_width="0dp"
-                    android:layout_height="110dp"
-                    android:layout_columnWeight="1"
-                    app:cardCornerRadius="18dp"
-                    app:cardElevation="6dp">
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="6dp"
+                    app:cardBackgroundColor="#FFFFFF">
 
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="14dp">
+                        android:padding="18dp"
+                        android:gravity="center_horizontal">
+
+                        <LinearLayout
+                            android:layout_width="52dp"
+                            android:layout_height="52dp"
+                            android:background="#FFEBEE"
+                            android:gravity="center">
+
+                            <ImageView
+                                android:layout_width="26dp"
+                                android:layout_height="26dp"
+                                android:src="@drawable/ic_notification"/>
+                        </LinearLayout>
 
                         <TextView
                             android:id="@+id/tvBlockedUsers"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="5"
-                            android:textSize="24sp"
+                            android:text="0"
+                            android:textSize="28sp"
                             android:textStyle="bold"
-                            android:textColor="#E53935"/>
+                            android:textColor="#C62828"
+                            android:layout_marginTop="8dp"/>
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Blocked Users"
-                            android:textColor="#777777"/>
+                            android:textColor="#777777"
+                            android:textSize="12sp"
+                            android:layout_marginTop="2dp"/>
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 
-            </GridLayout>
+            </LinearLayout>
 
         </LinearLayout>
     </ScrollView>
 
-    <!-- ================= DRAWER ================= -->
+    <!-- DRAWER -->
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigationView"
         android:layout_width="280dp"

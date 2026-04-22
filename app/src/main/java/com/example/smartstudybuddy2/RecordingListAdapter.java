@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -46,8 +47,10 @@ public class RecordingListAdapter extends BaseAdapter {
 
         TextView recordingTitle = convertView.findViewById(R.id.tvRecordingName);
         TextView recordingDate = convertView.findViewById(R.id.tvRecordingDate);
+        ImageButton btnBookmark = convertView.findViewById(R.id.btnBookmark);
 
         Recording recording = recordings.get(position);
+        DatabaseHelper dbHelper = new DatabaseHelper(context);
 
         // Display title from database
         String title = recording.getTitle() != null ? recording.getTitle() : "Untitled";
@@ -59,6 +62,16 @@ public class RecordingListAdapter extends BaseAdapter {
 
         Log.d(TAG, "✅ [" + position + "] Item: " + title + " (" + date + ")");
 
+        // Update bookmark button visual state
+        updateBookmarkButtonState(btnBookmark, recording.getId(), dbHelper);
+
+        // Bookmark button click handler
+        btnBookmark.setOnClickListener(v -> {
+            boolean newBookmarkState = dbHelper.toggleBookmark(recording.getId());
+            updateBookmarkButtonState(btnBookmark, recording.getId(), dbHelper);
+            Log.d(TAG, "⭐ Bookmark toggled for " + title + ": " + newBookmarkState);
+        });
+
         // Entire item is clickable - opens detail screen with recording ID
         convertView.setOnClickListener(v -> {
             Log.d(TAG, "📋 [" + position + "] Item clicked: " + title);
@@ -69,6 +82,19 @@ public class RecordingListAdapter extends BaseAdapter {
         });
 
         return convertView;
+    }
+
+    /**
+     * Update bookmark button visual state (filled or empty star)
+     */
+    private void updateBookmarkButtonState(ImageButton button, int recordingId, DatabaseHelper dbHelper) {
+        if (dbHelper.isBookmarked(recordingId)) {
+            button.setImageResource(android.R.drawable.btn_star_big_on);
+            button.setColorFilter(context.getResources().getColor(android.R.color.holo_orange_dark), android.graphics.PorterDuff.Mode.SRC_IN);
+        } else {
+            button.setImageResource(android.R.drawable.btn_star_big_off);
+            button.setColorFilter(context.getResources().getColor(android.R.color.darker_gray), android.graphics.PorterDuff.Mode.SRC_IN);
+        }
     }
 }
 

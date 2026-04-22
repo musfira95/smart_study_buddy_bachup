@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ import java.util.Locale;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "SmartStudyBuddy.db";
-    private static final int DB_VERSION = 16; // ✅ Do NOT change - onCreate already creates all tables
+    private static final int DB_VERSION = 21; // ✅ v21: Added bookmarked column for bookmarks
 
     public DatabaseHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -65,7 +66,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     "timestamp INTEGER, " +
                     "transcription TEXT DEFAULT NULL, " +
                     "summary TEXT DEFAULT NULL, " +
-                    "quiz_json TEXT DEFAULT '[]')");
+                    "quiz_json TEXT DEFAULT '[]', " +
+                    "topic TEXT DEFAULT 'General', " +
+                    "bookmarked INTEGER DEFAULT 0)");
 
             // STUDY SESSION TABLE (only File 1 had it → added)
             // ✅ UPDATED: Using new enhanced schema with audio processing fields
@@ -137,6 +140,64 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 android.util.Log.d("DatabaseHelper", "ℹ️ Flashcard stats: " + e.getMessage());
             }
             
+            // ✅ Add missing columns to schedules table for reminders feature
+            try {
+                db.execSQL("ALTER TABLE " + TABLE_SCHEDULES + " ADD COLUMN feature_type TEXT");
+                android.util.Log.d("DatabaseHelper", "✅ Added feature_type column to schedules");
+            } catch (Exception e) {
+                android.util.Log.d("DatabaseHelper", "ℹ️ feature_type already exists: " + e.getMessage());
+            }
+            
+            try {
+                db.execSQL("ALTER TABLE " + TABLE_SCHEDULES + " ADD COLUMN feature_id INTEGER");
+                android.util.Log.d("DatabaseHelper", "✅ Added feature_id column to schedules");
+            } catch (Exception e) {
+                android.util.Log.d("DatabaseHelper", "ℹ️ feature_id already exists: " + e.getMessage());
+            }
+            
+            try {
+                db.execSQL("ALTER TABLE " + TABLE_SCHEDULES + " ADD COLUMN is_completed INTEGER DEFAULT 0");
+                android.util.Log.d("DatabaseHelper", "✅ Added is_completed column to schedules");
+            } catch (Exception e) {
+                android.util.Log.d("DatabaseHelper", "ℹ️ is_completed already exists: " + e.getMessage());
+            }
+
+            // ✅ Create notifications table if missing
+            try {
+                db.execSQL(CREATE_NOTIFICATIONS_TABLE);
+                android.util.Log.d("DatabaseHelper", "✅ Notifications table created or already exists");
+            } catch (Exception e) {
+                android.util.Log.d("DatabaseHelper", "ℹ️ Notifications table: " + e.getMessage());
+            }
+            
+            // ✅ v19: Remove old quiz results that were saved with generic 'General' category
+            try {
+                int deleted = db.delete("quiz_results", "category = ?", new String[]{"General"});
+                android.util.Log.d("DatabaseHelper", "✅ Deleted " + deleted + " old General quiz results");
+            } catch (Exception e) {
+                android.util.Log.d("DatabaseHelper", "ℹ️ quiz_results cleanup: " + e.getMessage());
+            }
+
+            // ✅ Ensure help_content and about_content tables exist for all versions
+            try {
+                db.execSQL(CREATE_HELP_TABLE);
+                android.util.Log.d("DatabaseHelper", "✅ help_content table created or already exists");
+            } catch (Exception e) {
+                android.util.Log.d("DatabaseHelper", "ℹ️ help_content: " + e.getMessage());
+            }
+            try {
+                db.execSQL(CREATE_ABOUT_TABLE);
+                // Insert default row if table is empty
+                Cursor ac = db.rawQuery("SELECT COUNT(*) FROM " + TABLE_ABOUT_CONTENT, null);
+                if (ac.moveToFirst() && ac.getInt(0) == 0) {
+                    insertDefaultAboutContent(db);
+                }
+                ac.close();
+                android.util.Log.d("DatabaseHelper", "✅ about_content table created or already exists");
+            } catch (Exception e) {
+                android.util.Log.d("DatabaseHelper", "ℹ️ about_content: " + e.getMessage());
+            }
+
             android.util.Log.d("DatabaseHelper", "✅✅✅ DATABASE UPGRADE COMPLETE - ALL USER DATA PRESERVED! ✅✅✅");
         } catch (Exception e) {
             android.util.Log.e("DatabaseHelper", "❌ ERROR in onUpgrade: " + e.getMessage());
@@ -202,6 +263,42 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     android.util.Log.d("DatabaseHelper", "✅ 'quiz_json' column added successfully");
                 } catch (Exception e) {
                     android.util.Log.w("DatabaseHelper", "⚠️ Column 'quiz_json' might already exist: " + e.getMessage());
+                }
+            }
+
+            if (!existingColumns.contains("user_email")) {
+                try {
+                    db.execSQL("ALTER TABLE audio_files ADD COLUMN user_email TEXT DEFAULT NULL");
+                    android.util.Log.d("DatabaseHelper", "✅ 'user_email' column added");
+                } catch (Exception e) {
+                    android.util.Log.w("DatabaseHelper", "user_email: " + e.getMessage());
+                }
+            }
+
+            if (!existingColumns.contains("source")) {
+                try {
+                    db.execSQL("ALTER TABLE audio_files ADD COLUMN source TEXT DEFAULT 'recorded'");
+                    android.util.Log.d("DatabaseHelper", "✅ 'source' column added");
+                } catch (Exception e) {
+                    android.util.Log.w("DatabaseHelper", "source: " + e.getMessage());
+                }
+            }
+            
+            if (!existingColumns.contains("topic")) {
+                try {
+                    db.execSQL("ALTER TABLE audio_files ADD COLUMN topic TEXT DEFAULT 'General'");
+                    android.util.Log.d("DatabaseHelper", "✅ 'topic' column added for topic detection");
+                } catch (Exception e) {
+                    android.util.Log.w("DatabaseHelper", "topic: " + e.getMessage());
+                }
+            }
+
+            if (!existingColumns.contains("bookmarked")) {
+                try {
+                    db.execSQL("ALTER TABLE audio_files ADD COLUMN bookmarked INTEGER DEFAULT 0");
+                    android.util.Log.d("DatabaseHelper", "✅ 'bookmarked' column added for bookmarks");
+                } catch (Exception e) {
+                    android.util.Log.w("DatabaseHelper", "bookmarked: " + e.getMessage());
                 }
             }
             
@@ -356,6 +453,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
     }
 
+    public boolean updateProfileName(String email, String newName) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put("name", newName);
+        int rows = db.update("profile", cv, "email = ?", new String[]{email});
+        if (rows == 0) {
+            // No row for this email yet — insert a minimal row
+            cv.put("email", email);
+            db.insert("profile", null, cv);
+        }
+        return true;
+    }
+
 
     public static final String TABLE_PROFILE = "profile";
 
@@ -369,7 +479,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     "course TEXT," +
                     "semester TEXT," +
                     "study_preference TEXT," +
-                    "daily_goal TEXT," +
                     "daily_goal TEXT," +
                     "language TEXT)";
 
@@ -402,7 +511,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     "title TEXT," +
                     "description TEXT," +
                     "time TEXT," +
-                    "date TEXT)";
+                    "date TEXT," +
+                    "feature_type TEXT," +
+                    "feature_id INTEGER," +
+                    "is_completed INTEGER DEFAULT 0)";
 
     // QUIZ QUESTIONS
     public static final String TABLE_QUIZ_QUESTIONS = "quiz_questions";
@@ -709,6 +821,279 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.rawQuery("SELECT * FROM " + TABLE_SCHEDULES + " WHERE date=?", new String[]{date});
     }
 
+    // ====================================================================
+    // ✅ TIMETABLE/REMINDERS - New Methods for Enhanced Scheduling
+    // ====================================================================
+
+    /**
+     * Insert reminder with feature linking (Recording/Flashcard/Quiz/PDF)
+     */
+    public long insertScheduleWithFeature(String title, String description, String date, 
+                                          String time, String featureType, int featureId) {
+        try {
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues cv = new ContentValues();
+            cv.put("title", title);
+            cv.put("description", description);
+            cv.put("date", date);
+            cv.put("time", time);
+            cv.put("feature_type", featureType != null ? featureType : "reminder");
+            cv.put("feature_id", featureId > 0 ? featureId : null);
+            cv.put("is_completed", 0);
+            
+            long result = db.insert(TABLE_SCHEDULES, null, cv);
+            if (result != -1) {
+                android.util.Log.d("DatabaseHelper", "✅ Reminder created: " + title + " (Type: " + featureType + ")");
+            }
+            return result;
+        } catch (Exception e) {
+            android.util.Log.e("DatabaseHelper", "❌ Error inserting schedule with feature: " + e.getMessage());
+            return -1;
+        }
+    }
+
+    /**
+     * Get all reminders as ArrayList
+     */
+    public ArrayList<ScheduleReminder> getAllScheduleReminders() {
+        ArrayList<ScheduleReminder> list = new ArrayList<>();
+        Cursor c = null;
+        try {
+            SQLiteDatabase db = this.getReadableDatabase();
+            if (db == null) {
+                android.util.Log.e("DatabaseHelper", "❌ Database is null");
+                return list;
+            }
+            
+            c = db.rawQuery("SELECT id, title, description, date, time, feature_type, feature_id, is_completed " +
+                                  "FROM " + TABLE_SCHEDULES + " ORDER BY date DESC, time ASC", null);
+            
+            if (c != null && c.moveToFirst()) {
+                do {
+                    try {
+                        ScheduleReminder reminder = new ScheduleReminder(
+                            c.getInt(c.getColumnIndexOrThrow("id")),
+                            c.getString(c.getColumnIndexOrThrow("title")),
+                            c.getString(c.getColumnIndexOrThrow("description")),
+                            c.getString(c.getColumnIndexOrThrow("date")),
+                            c.getString(c.getColumnIndexOrThrow("time")),
+                            c.getString(c.getColumnIndexOrThrow("feature_type")),
+                            c.getInt(c.getColumnIndexOrThrow("feature_id")),
+                            c.getInt(c.getColumnIndexOrThrow("is_completed")) == 1
+                        );
+                        list.add(reminder);
+                    } catch (Exception e) {
+                        android.util.Log.e("DatabaseHelper", "Error parsing reminder row: " + e.getMessage());
+                    }
+                } while (c.moveToNext());
+            }
+            android.util.Log.d("DatabaseHelper", "✅ Loaded " + list.size() + " reminders");
+        } catch (Exception e) {
+            android.util.Log.e("DatabaseHelper", "❌ Error loading reminders: " + e.getMessage(), e);
+        } finally {
+            if (c != null) {
+                c.close();
+            }
+        }
+        return list;
+    }
+
+    /**
+     * Get today's reminders
+     */
+    public ArrayList<ScheduleReminder> getTodaySchedules() {
+        ArrayList<ScheduleReminder> list = new ArrayList<>();
+        Cursor c = null;
+        try {
+            String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+            SQLiteDatabase db = this.getReadableDatabase();
+            if (db == null) {
+                android.util.Log.e("DatabaseHelper", "❌ Database is null");
+                return list;
+            }
+            
+            c = db.rawQuery("SELECT id, title, description, date, time, feature_type, feature_id, is_completed " +
+                                  "FROM " + TABLE_SCHEDULES + " WHERE date=? ORDER BY time ASC", 
+                                  new String[]{today});
+            
+            if (c != null && c.moveToFirst()) {
+                do {
+                    try {
+                        ScheduleReminder reminder = new ScheduleReminder(
+                            c.getInt(c.getColumnIndexOrThrow("id")),
+                            c.getString(c.getColumnIndexOrThrow("title")),
+                            c.getString(c.getColumnIndexOrThrow("description")),
+                            c.getString(c.getColumnIndexOrThrow("date")),
+                            c.getString(c.getColumnIndexOrThrow("time")),
+                            c.getString(c.getColumnIndexOrThrow("feature_type")),
+                            c.getInt(c.getColumnIndexOrThrow("feature_id")),
+                            c.getInt(c.getColumnIndexOrThrow("is_completed")) == 1
+                        );
+                        list.add(reminder);
+                    } catch (Exception e) {
+                        android.util.Log.e("DatabaseHelper", "Error parsing today's reminder: " + e.getMessage());
+                    }
+                } while (c.moveToNext());
+            }
+            android.util.Log.d("DatabaseHelper", "✅ Loaded " + list.size() + " today's reminders");
+        } catch (Exception e) {
+            android.util.Log.e("DatabaseHelper", "❌ Error loading today's reminders: " + e.getMessage(), e);
+        } finally {
+            if (c != null) {
+                c.close();
+            }
+        }
+        return list;
+    }
+
+    /**
+     * Get upcoming reminders (future dates only)
+     */
+    public ArrayList<ScheduleReminder> getUpcomingSchedules() {
+        ArrayList<ScheduleReminder> list = new ArrayList<>();
+        Cursor c = null;
+        try {
+            String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+            SQLiteDatabase db = this.getReadableDatabase();
+            if (db == null) {
+                android.util.Log.e("DatabaseHelper", "❌ Database is null");
+                return list;
+            }
+            
+            c = db.rawQuery("SELECT id, title, description, date, time, feature_type, feature_id, is_completed " +
+                                  "FROM " + TABLE_SCHEDULES + " WHERE date > ? ORDER BY date ASC, time ASC", 
+                                  new String[]{today});
+            
+            if (c != null && c.moveToFirst()) {
+                do {
+                    try {
+                        ScheduleReminder reminder = new ScheduleReminder(
+                            c.getInt(c.getColumnIndexOrThrow("id")),
+                            c.getString(c.getColumnIndexOrThrow("title")),
+                            c.getString(c.getColumnIndexOrThrow("description")),
+                            c.getString(c.getColumnIndexOrThrow("date")),
+                            c.getString(c.getColumnIndexOrThrow("time")),
+                            c.getString(c.getColumnIndexOrThrow("feature_type")),
+                            c.getInt(c.getColumnIndexOrThrow("feature_id")),
+                            c.getInt(c.getColumnIndexOrThrow("is_completed")) == 1
+                        );
+                        list.add(reminder);
+                    } catch (Exception e) {
+                        android.util.Log.e("DatabaseHelper", "Error parsing upcoming reminder: " + e.getMessage());
+                    }
+                } while (c.moveToNext());
+            }
+            android.util.Log.d("DatabaseHelper", "✅ Loaded " + list.size() + " upcoming reminders");
+        } catch (Exception e) {
+            android.util.Log.e("DatabaseHelper", "❌ Error loading upcoming reminders: " + e.getMessage(), e);
+        } finally {
+            if (c != null) {
+                c.close();
+            }
+        }
+        return list;
+    }
+
+    /**
+     * Mark reminder as completed
+     */
+    public boolean markReminderCompleted(int reminderId) {
+        try {
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues cv = new ContentValues();
+            cv.put("is_completed", 1);
+            
+            int updated = db.update(TABLE_SCHEDULES, cv, "id=?", new String[]{String.valueOf(reminderId)});
+            
+            if (updated > 0) {
+                android.util.Log.d("DatabaseHelper", "✅ Reminder marked completed: ID " + reminderId);
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            android.util.Log.e("DatabaseHelper", "❌ Error marking reminder completed: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Delete reminder by ID
+     */
+    public boolean deleteScheduleReminder(int reminderId) {
+        try {
+            SQLiteDatabase db = this.getWritableDatabase();
+            int deleted = db.delete(TABLE_SCHEDULES, "id=?", new String[]{String.valueOf(reminderId)});
+            
+            if (deleted > 0) {
+                android.util.Log.d("DatabaseHelper", "✅ Reminder deleted: ID " + reminderId);
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            android.util.Log.e("DatabaseHelper", "❌ Error deleting reminder: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Get reminder by ID
+     */
+    public ScheduleReminder getScheduleReminderById(int id) {
+        try {
+            SQLiteDatabase db = this.getReadableDatabase();
+            Cursor c = db.rawQuery("SELECT id, title, description, date, time, feature_type, feature_id, is_completed " +
+                                  "FROM " + TABLE_SCHEDULES + " WHERE id=?", 
+                                  new String[]{String.valueOf(id)});
+            
+            if (c.moveToFirst()) {
+                ScheduleReminder reminder = new ScheduleReminder(
+                    c.getInt(c.getColumnIndexOrThrow("id")),
+                    c.getString(c.getColumnIndexOrThrow("title")),
+                    c.getString(c.getColumnIndexOrThrow("description")),
+                    c.getString(c.getColumnIndexOrThrow("date")),
+                    c.getString(c.getColumnIndexOrThrow("time")),
+                    c.getString(c.getColumnIndexOrThrow("feature_type")),
+                    c.getInt(c.getColumnIndexOrThrow("feature_id")),
+                    c.getInt(c.getColumnIndexOrThrow("is_completed")) == 1
+                );
+                c.close();
+                return reminder;
+            }
+            c.close();
+        } catch (Exception e) {
+            android.util.Log.e("DatabaseHelper", "❌ Error getting reminder: " + e.getMessage());
+        }
+        return null;
+    }
+
+    /**
+     * Update reminder
+     */
+    public boolean updateScheduleReminder(int reminderId, String title, String description, 
+                                          String date, String time, String featureType, int featureId) {
+        try {
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues cv = new ContentValues();
+            cv.put("title", title);
+            cv.put("description", description);
+            cv.put("date", date);
+            cv.put("time", time);
+            cv.put("feature_type", featureType != null ? featureType : "reminder");
+            cv.put("feature_id", featureId > 0 ? featureId : null);
+            
+            int updated = db.update(TABLE_SCHEDULES, cv, "id=?", new String[]{String.valueOf(reminderId)});
+            
+            if (updated > 0) {
+                android.util.Log.d("DatabaseHelper", "✅ Reminder updated: ID " + reminderId);
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            android.util.Log.e("DatabaseHelper", "❌ Error updating reminder: " + e.getMessage());
+            return false;
+        }
+    }
+
     public boolean isLastAdmin(String email) {
         SQLiteDatabase db = this.getReadableDatabase();
 
@@ -966,6 +1351,155 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
+     * Update topic for a recording (from topic detection)
+     */
+    public boolean updateRecordingTopic(int recordingId, String topic) {
+        try {
+            ensureAudioFilesColumns();
+            
+            SQLiteDatabase db = this.getWritableDatabase();
+
+            android.util.Log.d("DatabaseHelper", "🎯 Updating topic for recording ID: " + recordingId);
+            android.util.Log.d("DatabaseHelper", "   Topic: " + (topic != null ? topic : "General"));
+
+            ContentValues cv = new ContentValues();
+            cv.put("topic", topic != null ? topic : "General");
+
+            int updated = db.update("audio_files", cv, "id=?", new String[]{String.valueOf(recordingId)});
+
+            if (updated > 0) {
+                android.util.Log.d("DatabaseHelper", "✅ Topic updated successfully for recording ID: " + recordingId);
+                return true;
+            } else {
+                android.util.Log.w("DatabaseHelper", "⚠️ No record found with ID: " + recordingId);
+                return false;
+            }
+        } catch (Exception e) {
+            android.util.Log.e("DatabaseHelper", "❌ Error in updateRecordingTopic: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Toggle bookmark status for a recording
+     */
+    public boolean toggleBookmark(int recordingId) {
+        try {
+            ensureAudioFilesColumns();
+            
+            SQLiteDatabase db = this.getWritableDatabase();
+            
+            // Get current bookmark status
+            Cursor cursor = db.rawQuery("SELECT bookmarked FROM audio_files WHERE id=?", new String[]{String.valueOf(recordingId)});
+            
+            if (cursor.moveToFirst()) {
+                int currentStatus = cursor.getInt(0);
+                int newStatus = currentStatus == 0 ? 1 : 0;
+                
+                ContentValues cv = new ContentValues();
+                cv.put("bookmarked", newStatus);
+                
+                int updated = db.update("audio_files", cv, "id=?", new String[]{String.valueOf(recordingId)});
+                cursor.close();
+                
+                if (updated > 0) {
+                    android.util.Log.d("DatabaseHelper", "⭐ Bookmark toggled for recording ID: " + recordingId + " (now: " + newStatus + ")");
+                    return true;
+                }
+            }
+            cursor.close();
+            return false;
+        } catch (Exception e) {
+            android.util.Log.e("DatabaseHelper", "❌ Error in toggleBookmark: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Check if a recording is bookmarked
+     */
+    public boolean isBookmarked(int recordingId) {
+        try {
+            ensureAudioFilesColumns();
+            
+            SQLiteDatabase db = this.getReadableDatabase();
+            Cursor cursor = db.rawQuery("SELECT bookmarked FROM audio_files WHERE id=?", new String[]{String.valueOf(recordingId)});
+            
+            if (cursor.moveToFirst()) {
+                int bookmarked = cursor.getInt(0);
+                cursor.close();
+                return bookmarked == 1;
+            }
+            cursor.close();
+            return false;
+        } catch (Exception e) {
+            android.util.Log.e("DatabaseHelper", "❌ Error in isBookmarked: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Get all bookmarked recordings
+     */
+    public ArrayList<Recording> getBookmarkedRecordings() {
+        ArrayList<Recording> bookmarkedRecordings = new ArrayList<>();
+        SQLiteDatabase db = null;
+        Cursor c = null;
+
+        try {
+            db = this.getReadableDatabase();
+            
+            android.util.Log.d("DatabaseHelper", "⭐ Fetching bookmarked recordings from database...");
+            c = db.rawQuery("SELECT * FROM audio_files WHERE bookmarked=1 ORDER BY timestamp DESC", null);
+            
+            if (c != null && c.moveToFirst()) {
+                do {
+                    try {
+                        String transcription = null;
+                        try {
+                            transcription = c.getString(c.getColumnIndexOrThrow("transcription"));
+                        } catch (Exception e) {
+                            transcription = null;
+                        }
+                        
+                        long timestamp = 0;
+                        try {
+                            timestamp = c.getLong(c.getColumnIndexOrThrow("timestamp"));
+                        } catch (Exception e) {
+                            timestamp = 0;
+                        }
+                        
+                        String dateFormatted = formatTimestamp(timestamp);
+                        int recordingId = c.getInt(c.getColumnIndexOrThrow("id"));
+                        String title = c.getString(c.getColumnIndexOrThrow("file_name"));
+                        String filePath = c.getString(c.getColumnIndexOrThrow("file_path"));
+                        
+                        Recording recording = new Recording(
+                                recordingId,
+                                title != null ? title : "Untitled",
+                                filePath != null ? filePath : "",
+                                dateFormatted,
+                                0,
+                                transcription != null ? transcription : ""
+                        );
+                        bookmarkedRecordings.add(recording);
+                        android.util.Log.d("DatabaseHelper", "  ⭐ Bookmarked Recording ID=" + recordingId + ", Title=" + title);
+                    } catch (Exception itemError) {
+                        android.util.Log.w("DatabaseHelper", "⚠️ Error processing bookmarked item: " + itemError.getMessage());
+                    }
+                } while (c.moveToNext());
+            }
+        } catch (Exception e) {
+            android.util.Log.e("DatabaseHelper", "❌ Error in getBookmarkedRecordings: " + e.getMessage());
+        } finally {
+            if (c != null) c.close();
+        }
+        return bookmarkedRecordings;
+    }
+
+    /**
      * Insert summary generated from transcription
      */
     public boolean insertSummary(String fileName, String summaryText, String originalTranscription) {
@@ -980,6 +1514,30 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             e.printStackTrace();
             return false;
         }
+    }
+
+    /**
+     * ✅ NEW: Get all summaries for backup
+     */
+    public ArrayList<String> getAllSummaries() {
+        ArrayList<String> summaries = new ArrayList<>();
+        try {
+            SQLiteDatabase db = this.getReadableDatabase();
+            Cursor cursor = db.rawQuery("SELECT summary FROM audio_files WHERE summary IS NOT NULL", null);
+            
+            if (cursor.moveToFirst()) {
+                do {
+                    String summary = cursor.getString(0);
+                    if (summary != null && !summary.isEmpty()) {
+                        summaries.add(summary);
+                    }
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+        } catch (Exception e) {
+            Log.e("DatabaseHelper", "Error fetching summaries: " + e.getMessage());
+        }
+        return summaries;
     }
 
     /**
@@ -1047,10 +1605,49 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cv.put("file_name", fileName);
         cv.put("file_path", filePath);
         cv.put("timestamp", currentTimeMillis);
-        cv.put("transcription", (String) null);  // Initialize as NULL, not "Processing..."
+        cv.put("transcription", (String) null);
         long recordingId = db.insert("audio_files", null, cv);
-        android.util.Log.d("DatabaseHelper", "✅ Recording inserted with ID: " + recordingId + ", fileName: " + fileName + ", timestamp: " + currentTimeMillis);
+        android.util.Log.d("DatabaseHelper", "✅ Recording inserted with ID: " + recordingId + ", fileName: " + fileName);
         return recordingId;
+    }
+
+    // Overload: save recording WITH user email and source (recorded/uploaded)
+    public long insertRecording(String fileName, String filePath, String userEmail, String source) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put("file_name", fileName);
+        cv.put("file_path", filePath);
+        cv.put("timestamp", System.currentTimeMillis());
+        cv.put("transcription", (String) null);
+        if (userEmail != null) cv.put("user_email", userEmail);
+        if (source != null) cv.put("source", source);
+        long recordingId = db.insert("audio_files", null, cv);
+        android.util.Log.d("DatabaseHelper", "✅ Recording inserted ID=" + recordingId + " user=" + userEmail + " source=" + source);
+        return recordingId;
+    }
+
+    // Returns int[]{total, recorded, uploaded} for a user
+    public int[] getAudioStatsForUser(String email) {
+        int[] stats = new int[]{0, 0, 0};
+        if (email == null) return stats;
+        try {
+            SQLiteDatabase db = this.getReadableDatabase();
+            Cursor c = db.rawQuery(
+                "SELECT COUNT(*), " +
+                "SUM(CASE WHEN source='recorded' OR source IS NULL THEN 1 ELSE 0 END), " +
+                "SUM(CASE WHEN source='uploaded' THEN 1 ELSE 0 END) " +
+                "FROM audio_files WHERE user_email=?",
+                new String[]{email});
+            if (c.moveToFirst()) {
+                stats[0] = c.getInt(0);
+                stats[1] = c.getInt(1);
+                stats[2] = c.getInt(2);
+            }
+            c.close();
+        } catch (Exception e) {
+            android.util.Log.e("DatabaseHelper", "getAudioStatsForUser: " + e.getMessage());
+        }
+        return stats;
     }
 
     public Recording getLastRecording() {
@@ -1800,6 +2397,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public boolean insertNotification(String title, String message, String type) {
         SQLiteDatabase db = this.getWritableDatabase();
+        // Ensure table exists (safety for existing installs)
+        try { db.execSQL(CREATE_NOTIFICATIONS_TABLE); } catch (Exception ignored) {}
+
+        // ✅ Prevent duplicate: skip if same type inserted within last 10 seconds
+        try {
+            String tenSecondsAgo = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+                .format(new Date(System.currentTimeMillis() - 10000));
+            Cursor check = db.rawQuery(
+                "SELECT COUNT(*) FROM " + TABLE_NOTIFICATIONS + " WHERE type=? AND timestamp>?",
+                new String[]{type, tenSecondsAgo});
+            if (check.moveToFirst() && check.getInt(0) > 0) {
+                check.close();
+                android.util.Log.d("DatabaseHelper", "⏭️ Duplicate notification skipped: " + type);
+                return false;
+            }
+            check.close();
+        } catch (Exception ignored) {}
+
         ContentValues cv = new ContentValues();
         cv.put("title", title);
         cv.put("message", message);
@@ -1811,14 +2426,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public ArrayList<String> getAllNotifications() {
         ArrayList<String> list = new ArrayList<>();
-        SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase db = this.getWritableDatabase();
+        // Ensure table exists (safety for existing installs)
+        try { db.execSQL(CREATE_NOTIFICATIONS_TABLE); } catch (Exception ignored) {}
         Cursor c = db.rawQuery("SELECT title, message FROM " + TABLE_NOTIFICATIONS + " ORDER BY id DESC LIMIT 20", null);
 
         if (c.moveToFirst()) {
             do {
                 String title = c.getString(c.getColumnIndexOrThrow("title"));
                 String message = c.getString(c.getColumnIndexOrThrow("message"));
-                list.add(title + ": " + message);
+                list.add(title + "\n" + message);
             } while (c.moveToNext());
         }
         c.close();
@@ -1834,6 +2451,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public void clearAllNotifications() {
         SQLiteDatabase db = this.getWritableDatabase();
+        // Ensure table exists (safety for existing installs)
+        try { db.execSQL(CREATE_NOTIFICATIONS_TABLE); } catch (Exception ignored) {}
         db.delete(TABLE_NOTIFICATIONS, null, null);
     }
 
@@ -1842,40 +2461,53 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // ====================================================================
 
     public String getHelpContent(String category) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT content FROM " + TABLE_HELP_CONTENT + " WHERE category=? LIMIT 1",
-                              new String[]{category});
-
-        String content = "";
-        if (c.moveToFirst()) {
-            content = c.getString(c.getColumnIndexOrThrow("content"));
+        try {
+            SQLiteDatabase db = this.getReadableDatabase();
+            db.execSQL(CREATE_HELP_TABLE);
+            Cursor c = db.rawQuery("SELECT content FROM " + TABLE_HELP_CONTENT + " WHERE category=? LIMIT 1",
+                                  new String[]{category});
+            String content = "";
+            if (c.moveToFirst()) {
+                int idx = c.getColumnIndex("content");
+                if (idx >= 0) content = c.getString(idx);
+            }
+            c.close();
+            return content;
+        } catch (Exception e) {
+            return "";
         }
-        c.close();
-        return content;
     }
 
     public String getHelpSupportEmail() {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT support_email FROM " + TABLE_ABOUT_CONTENT + " LIMIT 1", null);
-
-        String email = "support@smartstudybuddy.com";
-        if (c.moveToFirst()) {
-            email = c.getString(c.getColumnIndexOrThrow("support_email"));
+        try {
+            SQLiteDatabase db = this.getReadableDatabase();
+            Cursor c = db.rawQuery("SELECT support_email FROM " + TABLE_ABOUT_CONTENT + " LIMIT 1", null);
+            String email = "support@smartstudybuddy.com";
+            if (c.moveToFirst()) {
+                int idx = c.getColumnIndex("support_email");
+                if (idx >= 0) email = c.getString(idx);
+            }
+            c.close();
+            return email;
+        } catch (Exception e) {
+            return "support@smartstudybuddy.com";
         }
-        c.close();
-        return email;
     }
 
     public String getHelpSupportPhone() {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT support_phone FROM " + TABLE_ABOUT_CONTENT + " LIMIT 1", null);
-
-        String phone = "+1 234 567 890";
-        if (c.moveToFirst()) {
-            phone = c.getString(c.getColumnIndexOrThrow("support_phone"));
+        try {
+            SQLiteDatabase db = this.getReadableDatabase();
+            Cursor c = db.rawQuery("SELECT support_phone FROM " + TABLE_ABOUT_CONTENT + " LIMIT 1", null);
+            String phone = "+1 234 567 890";
+            if (c.moveToFirst()) {
+                int idx = c.getColumnIndex("support_phone");
+                if (idx >= 0) phone = c.getString(idx);
+            }
+            c.close();
+            return phone;
+        } catch (Exception e) {
+            return "+1 234 567 890";
         }
-        c.close();
-        return phone;
     }
 
     // ====================================================================
@@ -1883,38 +2515,58 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // ====================================================================
 
     public String getAboutAppDescription() {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT description FROM " + TABLE_ABOUT_CONTENT + " LIMIT 1", null);
-
-        String desc = "Smart Study Buddy helps you record audio, generate transcriptions, save notes, and stay organized.";
-        if (c.moveToFirst()) {
-            desc = c.getString(c.getColumnIndexOrThrow("description"));
+        try {
+            SQLiteDatabase db = this.getReadableDatabase();
+            Cursor c = db.rawQuery("SELECT description FROM " + TABLE_ABOUT_CONTENT + " LIMIT 1", null);
+            String desc = "Smart Study Buddy helps you record audio, generate transcriptions, save notes, and stay organized.";
+            if (c.moveToFirst()) {
+                int idx = c.getColumnIndex("description");
+                if (idx >= 0) desc = c.getString(idx);
+            }
+            c.close();
+            return desc;
+        } catch (Exception e) {
+            return "Smart Study Buddy helps you record audio, generate transcriptions, save notes, and stay organized.";
         }
-        c.close();
-        return desc;
     }
 
     public String getAboutAppVersion() {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT app_version FROM " + TABLE_ABOUT_CONTENT + " LIMIT 1", null);
-
-        String version = "1.0.0";
-        if (c.moveToFirst()) {
-            version = c.getString(c.getColumnIndexOrThrow("app_version"));
+        try {
+            SQLiteDatabase db = this.getReadableDatabase();
+            Cursor c = db.rawQuery("SELECT app_version FROM " + TABLE_ABOUT_CONTENT + " LIMIT 1", null);
+            String version = "1.0.0";
+            if (c.moveToFirst()) {
+                int idx = c.getColumnIndex("app_version");
+                if (idx >= 0) version = c.getString(idx);
+            }
+            c.close();
+            return version;
+        } catch (Exception e) {
+            return "1.0.0";
         }
-        c.close();
-        return version;
     }
 
     public boolean updateAboutContent(String appVersion, String description, String email, String phone) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues cv = new ContentValues();
-        cv.put("app_version", appVersion);
-        cv.put("description", description);
-        cv.put("support_email", email);
-        cv.put("support_phone", phone);
-        cv.put("last_updated", new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date()));
-        return db.update(TABLE_ABOUT_CONTENT, cv, null, null) > 0;
+        try {
+            SQLiteDatabase db = this.getWritableDatabase();
+            // Ensure table exists before updating
+            db.execSQL(CREATE_ABOUT_TABLE);
+            // Delete old row and insert fresh (upsert)
+            db.delete(TABLE_ABOUT_CONTENT, null, null);
+            ContentValues cv = new ContentValues();
+            cv.put("app_name", "Smart Study Buddy");
+            cv.put("app_version", appVersion);
+            cv.put("description", description);
+            cv.put("support_email", email);
+            cv.put("support_phone", phone);
+            cv.put("last_updated", new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date()));
+            long result = db.insert(TABLE_ABOUT_CONTENT, null, cv);
+            android.util.Log.d("DatabaseHelper", "updateAboutContent insert result: " + result);
+            return result != -1;
+        } catch (Exception e) {
+            android.util.Log.e("DatabaseHelper", "updateAboutContent error: " + e.getMessage());
+            return false;
+        }
     }
 
     public boolean updateHelpContent(String category, String title, String content) {

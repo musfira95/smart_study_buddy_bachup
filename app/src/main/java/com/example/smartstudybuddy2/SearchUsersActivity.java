@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -47,6 +48,9 @@ public class SearchUsersActivity extends AppCompatActivity {
         noResultsText = findViewById(R.id.noResultsText);
         recyclerView = findViewById(R.id.searchRecycler);
 
+        ImageView btnBack = findViewById(R.id.btnBack);
+        if (btnBack != null) btnBack.setOnClickListener(v -> finish());
+
         dbHelper = new DatabaseHelper(this);
 
         // 📥 Load users
@@ -54,11 +58,13 @@ public class SearchUsersActivity extends AppCompatActivity {
 
         // 📋 RecyclerView setup
         adapter = new SearchUserAdapter(this, filteredList);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(adapter);
+        if (recyclerView != null) {
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            recyclerView.setAdapter(adapter);
+        }
 
         // 🔍 SearchView listener (CORRECT WAY)
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        if (searchView != null) searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 filterUsers(query);

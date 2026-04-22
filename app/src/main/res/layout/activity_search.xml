@@ -1,49 +1,191 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:padding="20dp"
-    android:gravity="center_horizontal"
-    android:background="@drawable/login_bg"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="0dp"
+    android:fitsSystemWindows="true"
+    android:background="@drawable/login_bg">
 
-    <!-- Header -->
-    <TextView
-        android:id="@+id/tvTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Your Notes  Quizzes"
-        android:textColor="#4F6F64"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="20dp"
-        android:fontFamily="@font/poppins_medium"/>
+    <!-- TOOLBAR WITH BACK BUTTON -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="#4F6F64"
+        android:padding="10dp"
+        app:titleTextColor="@android:color/white"
+        app:title="Search Across All" />
 
-    <!-- Stylish Search Bar -->
+    <!-- CONTENT AREA -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="@drawable/search_background"
-        android:padding="5dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:layout_marginBottom="20dp">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <SearchView
-            android:id="@+id/searchView"
+        <!-- Stylish Search Bar with Elevation -->
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:queryHint="Search notes or quizzes"
-            android:iconifiedByDefault="false" />
-    </LinearLayout>
+            android:layout_height="56dp"
+            android:background="@drawable/search_view_bg"
+            android:padding="8dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:layout_marginBottom="20dp"
+            android:elevation="3dp"
+            android:translationZ="2dp">
 
-    <!-- Card-style ListView -->
-    <ListView
-        android:id="@+id/listView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:divider="@null"
-        android:dividerHeight="0dp"
-        android:padding="4dp"/>
+            <SearchView
+                android:id="@+id/searchView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:queryHint="Find anything..."
+                android:iconifiedByDefault="false" />
+        </LinearLayout>
+
+        <!-- Category Tabs -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="20dp"
+            android:spacing="12dp">
+
+            <TextView
+                android:id="@+id/tvCategory1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="🎙️ Recordings"
+                android:textSize="14sp"
+                android:textColor="#4F6F64"
+                android:textStyle="bold"
+                android:gravity="center" />
+
+            <TextView
+                android:id="@+id/tvCategory2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="📝 Notes"
+                android:textSize="14sp"
+                android:textColor="#4F6F64"
+                android:textStyle="bold"
+                android:gravity="center" />
+
+            <TextView
+                android:id="@+id/tvCategory3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="📕 Flashcards"
+                android:textSize="14sp"
+                android:textColor="#4F6F64"
+                android:textStyle="bold"
+                android:gravity="center" />
+        </LinearLayout>
+
+        <!-- Progress Indicator (Loading) -->
+        <ProgressBar
+            android:id="@+id/progressSearching"
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:indeterminate="true"
+            android:visibility="gone"
+            android:layout_marginBottom="12dp"
+            android:indeterminateTint="#9C27FF"/>
+
+        <!-- Results Count Info -->
+        <TextView
+            android:id="@+id/tvResultsInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Start typing to search..."
+            android:textColor="#999999"
+            android:textSize="12sp"
+            android:layout_marginBottom="12dp"
+            android:visibility="gone"/>
+
+        <!-- Results Container -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <!-- Card-style ListView -->
+            <ListView
+                android:id="@+id/listView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:divider="@null"
+                android:dividerHeight="0dp"
+                android:padding="2dp"
+                android:visibility="gone"/>
+
+            <!-- Empty State -->
+            <LinearLayout
+                android:id="@+id/emptyStateContainer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:paddingHorizontal="24dp"
+                android:visibility="visible">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🔍"
+                    android:textSize="56sp"
+                    android:layout_marginBottom="16dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="No Results Yet"
+                    android:textColor="#4F6F64"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Try searching for recordings, notes, or flashcards. Create new content to see results here."
+                    android:textColor="#999999"
+                    android:textSize="13sp"
+                    android:gravity="center"
+                    android:layout_marginBottom="20dp"/>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center">
+
+                    <View
+                        android:layout_width="8dp"
+                        android:layout_height="8dp"
+                        android:background="@drawable/circle_white"
+                        android:layout_marginEnd="8dp"/>
+
+                    <View
+                        android:layout_width="8dp"
+                        android:layout_height="8dp"
+                        android:background="@drawable/circle_white"
+                        android:layout_marginEnd="8dp"/>
+
+                    <View
+                        android:layout_width="8dp"
+                        android:layout_height="8dp"
+                        android:background="@drawable/circle_white"/>
+                </LinearLayout>
+            </LinearLayout>
+        </FrameLayout>
+
+    </LinearLayout>
 
 </LinearLayout>

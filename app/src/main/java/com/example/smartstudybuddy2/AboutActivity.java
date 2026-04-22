@@ -15,6 +15,9 @@ public class AboutActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
 
+        android.widget.ImageView btnBack = findViewById(R.id.btnBack);
+        if (btnBack != null) btnBack.setOnClickListener(v -> finish());
+
         dbHelper = new DatabaseHelper(this);
         tvAboutDescription = findViewById(R.id.tvAboutDescription);
         tvAppVersion = findViewById(R.id.tvAppVersion);
@@ -25,5 +28,11 @@ public class AboutActivity extends AppCompatActivity {
 
         tvAboutDescription.setText(description);
         tvAppVersion.setText("App Version: " + version);
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 }

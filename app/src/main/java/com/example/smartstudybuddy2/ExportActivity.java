@@ -34,6 +34,12 @@ public class ExportActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_export);
 
+        // Enable back button in toolbar
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
+
         Log.d(TAG, "🚀 ExportActivity opened");
 
         dbHelper = new DatabaseHelper(this);
@@ -210,5 +216,11 @@ public class ExportActivity extends AppCompatActivity {
             e.printStackTrace();
             Toast.makeText(this, "❌ Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 }

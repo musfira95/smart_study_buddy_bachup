@@ -161,7 +161,7 @@ public class EditUserActivity extends AppCompatActivity {
         // DELETE BUTTON
         deleteUserButton.setOnClickListener(v -> {
             // Confirmation dialog
-            new androidx.appcompat.app.AlertDialog.Builder(EditUserActivity.this)
+            new androidx.appcompat.app.AlertDialog.Builder(EditUserActivity.this, R.style.AppDialog)
                     .setTitle("Delete User")
                     .setMessage("Are you sure you want to delete this user?")
                     .setPositiveButton("Delete", (dialog, which) -> {

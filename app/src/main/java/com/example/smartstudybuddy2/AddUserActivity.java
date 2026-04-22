@@ -6,6 +6,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Toast;
 import android.util.Patterns;
 import android.content.SharedPreferences;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.google.android.material.textfield.TextInputEditText;
@@ -18,7 +19,8 @@ public class AddUserActivity extends AppCompatActivity {
     TextInputEditText emailEditText, usernameEditText, passwordEditText;
     TextInputLayout emailLayout, usernameLayout, passwordLayout, roleLayout;
     MaterialAutoCompleteTextView roleSpinner;
-    LinearLayout addUserButton;   // UPDATED ✔
+    LinearLayout addUserButton;
+    ImageView btnBack;
     DatabaseHelper dbHelper;
 
     @Override
@@ -48,28 +50,32 @@ public class AddUserActivity extends AppCompatActivity {
 
         // Role dropdown
         roleSpinner = findViewById(R.id.roleSpinner);
-        addUserButton = findViewById(R.id.addUserButton); // FIXED ✔
+        addUserButton = findViewById(R.id.addUserButton);
+        btnBack = findViewById(R.id.btnBack);
+        if (btnBack != null) btnBack.setOnClickListener(v -> finish());
 
         // Role options
         String[] roles = {"User", "Admin"};
         ArrayAdapter<String> adapter =
                 new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, roles);
-        roleSpinner.setAdapter(adapter);
-        roleSpinner.setThreshold(0);  // Show dropdown on first click
+        if (roleSpinner != null) {
+            roleSpinner.setAdapter(adapter);
+            roleSpinner.setThreshold(0);
+            roleSpinner.setOnClickListener(v -> roleSpinner.showDropDown());
+            roleSpinner.setOnFocusChangeListener((v, hasFocus) -> {
+                if (hasFocus) roleSpinner.showDropDown();
+            });
+            roleSpinner.setOnItemClickListener((parent, view, position, id) -> {
+                String selectedRole = roles[position];
+                roleSpinner.setText(selectedRole, false);
+                if (roleLayout != null) {
+                    roleLayout.setError(null);
+                    roleLayout.setErrorEnabled(false);
+                }
+            });
+        }
 
-        roleSpinner.setOnClickListener(v -> roleSpinner.showDropDown());
-        roleSpinner.setOnFocusChangeListener((v, hasFocus) -> {
-            if (hasFocus) roleSpinner.showDropDown();
-        });
-
-        roleSpinner.setOnItemClickListener((parent, view, position, id) -> {
-            String selectedRole = roles[position];
-            roleSpinner.setText(selectedRole, false);
-            roleLayout.setError(null);
-            roleLayout.setErrorEnabled(false);
-        });
-
-        addUserButton.setOnClickListener(v -> {
+        if (addUserButton != null) addUserButton.setOnClickListener(v -> {
 
             usernameLayout.setError(null);
             emailLayout.setError(null);
@@ -79,7 +85,7 @@ public class AddUserActivity extends AppCompatActivity {
             String email = emailEditText.getText() != null ? emailEditText.getText().toString().trim() : "";
             String username = usernameEditText.getText() != null ? usernameEditText.getText().toString().trim() : "";
             String password = passwordEditText.getText() != null ? passwordEditText.getText().toString().trim() : "";
-            String role = roleSpinner.getText() != null ? roleSpinner.getText().toString().trim() : "";
+            String role = (roleSpinner != null && roleSpinner.getText() != null) ? roleSpinner.getText().toString().trim() : "";
 
             boolean valid = true;
 

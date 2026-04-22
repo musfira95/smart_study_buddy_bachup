@@ -15,6 +15,7 @@ import java.util.ArrayList;
 public class NotificationActivity extends AppCompatActivity {
 
     ImageView btnClearNotifications;
+    ImageView btnBack;
     ListView listNotifications;
     TextView tvEmpty;
 
@@ -27,10 +28,23 @@ public class NotificationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notification);
 
+        // Enable back button in toolbar
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
+
         try {
             btnClearNotifications = findViewById(R.id.btnClearNotifications);
+            btnBack = findViewById(R.id.btnBack);
             listNotifications = findViewById(R.id.listNotifications);
             tvEmpty = findViewById(R.id.tvEmpty);
+
+            // Back arrow
+            if (btnBack != null) {
+                btnBack.setColorFilter(android.graphics.Color.parseColor("#4F6F64"));
+                btnBack.setOnClickListener(v -> finish());
+            }
 
             dbHelper = new DatabaseHelper(this);
 
@@ -87,4 +101,9 @@ public class NotificationActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
 }

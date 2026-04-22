@@ -95,63 +95,6 @@
                         android:textSize="16sp"/>
                 </LinearLayout>
 
-                <!-- OR -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="OR"
-                    android:textColor="#4F6F64"
-                    android:layout_gravity="center"
-                    android:layout_margin="16dp"/>
-
-                <!-- Social Login Squares -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:orientation="horizontal"
-                    android:gravity="center">
-
-                    <!-- GOOGLE -->
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="56dp"
-                        android:layout_height="56dp"
-                        android:layout_marginEnd="16dp"
-                        app:cardCornerRadius="8dp"
-                        app:cardElevation="4dp"
-                        app:cardBackgroundColor="#FFFFFF">
-
-                        <ImageView
-                            android:id="@+id/googleLoginButton"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:padding="14dp"
-                            android:src="@drawable/ic_google"
-                            android:scaleType="fitCenter"/>
-                    </androidx.cardview.widget.CardView>
-
-                    <!-- FACEBOOK -->
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="56dp"
-                        android:layout_height="56dp"
-                        android:layout_marginStart="16dp"
-                        app:cardCornerRadius="8dp"
-                        app:cardElevation="4dp"
-                        app:cardBackgroundColor="#FFFFFF">
-
-                        <ImageView
-                            android:id="@+id/facebookLoginButton"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:padding="14dp"
-                            android:src="@drawable/ic_facebook"
-                            android:scaleType="fitCenter"/>
-                    </androidx.cardview.widget.CardView>
-
-                </LinearLayout>
-
-
-
                 <!-- SIGN UP -->
                 <TextView
                     android:id="@+id/signupRedirect"
