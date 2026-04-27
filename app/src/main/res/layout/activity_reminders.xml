@@ -6,39 +6,72 @@
     android:layout_height="match_parent"
     android:background="@drawable/login_bg">
 
-    <!-- TOP BAR -->
+    <!-- HEADER WITH ROUNDED BOTTOM CORNERS -->
     <LinearLayout
         android:id="@+id/topBar"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:layout_marginTop="8dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:background="#4F6F64"
-        android:gravity="center_vertical"
-        android:paddingStart="12dp"
-        android:paddingEnd="16dp">
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="32dp"
+        android:elevation="8dp">
 
-        <!-- BACK ARROW -->
-        <ImageButton
-            android:id="@+id/btnBack"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_back"
-            android:scaleType="centerInside"
-            app:tint="@android:color/white"
-            android:contentDescription="Back" />
-
-        <!-- TITLE -->
-        <TextView
-            android:layout_width="0dp"
+        <!-- BACK BUTTON + TITLE ROW -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="📌 Reminders"
-            android:textColor="@android:color/white"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            android:paddingStart="16dp"
-            android:gravity="center_vertical"/>
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="12dp">
+
+            <!-- BACK BUTTON (CIRCULAR BACKGROUND) -->
+            <FrameLayout
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="@drawable/button_back_circle">
+
+                <ImageButton
+                    android:id="@+id/btnBack"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_back"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:layout_gravity="center"
+                    android:scaleType="centerInside"
+                    app:tint="@android:color/white"
+                    android:contentDescription="Back" />
+
+            </FrameLayout>
+
+            <!-- TITLE (CENTERED WITH OFFSET) -->
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Your Reminders"
+                android:textColor="@android:color/white"
+                android:textSize="32sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:letterSpacing="0.015"
+                android:paddingEnd="44dp" />
+
+        </LinearLayout>
+
+        <!-- SUBTITLE -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Manage and organize your reminders"
+            android:textSize="13sp"
+            android:textColor="#E0E8E6"
+            android:gravity="center"
+            android:alpha="0.9"
+            android:lineSpacingMultiplier="1.2" />
+
     </LinearLayout>
 
     <!-- EMPTY STATE -->
@@ -46,49 +79,69 @@
         android:id="@+id/emptystateLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="70dp"
+        android:layout_marginTop="160dp"
         android:gravity="center">
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:gravity="center">
+            android:gravity="center"
+            android:paddingStart="32dp"
+            android:paddingEnd="32dp">
 
-            <!-- 🔽 ONLY ICON UPDATED -->
             <ImageView
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:src="@drawable/ic_reminders"/>
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:src="@drawable/ic_reminders"
+                android:alpha="0.5"
+                android:tint="#4F6F64"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="No reminders yet"
                 android:textColor="#4F6F64"
-                android:textSize="18sp"
+                android:textSize="20sp"
                 android:textStyle="bold"
-                android:layout_marginTop="12dp"/>
+                android:layout_marginTop="20dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tap the + button to create a new reminder"
+                android:textColor="#999999"
+                android:textSize="13sp"
+                android:layout_marginTop="8dp"
+                android:gravity="center"/>
         </LinearLayout>
     </FrameLayout>
 
-    <!-- LIST -->
+    <!-- REMINDERS LIST -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/reminderRecycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="70dp"
-        android:padding="16dp"
-        android:visibility="gone"/>
+        android:layout_marginTop="160dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="100dp"
+        android:clipToPadding="false"
+        android:visibility="gone"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
 
-    <!-- ADD BUTTON -->
+    <!-- FLOATING ACTION BUTTON -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAdd"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="24dp"
         app:backgroundTint="#4F6F64"
-        app:srcCompat="@drawable/ic_add"/>
+        app:elevation="6dp"
+        app:srcCompat="@drawable/ic_add"
+        app:tint="@android:color/white"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

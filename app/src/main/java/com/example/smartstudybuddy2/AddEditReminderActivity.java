@@ -10,6 +10,10 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -72,7 +76,28 @@ public class AddEditReminderActivity extends AppCompatActivity {
                     getSupportActionBar().setDisplayShowHomeEnabled(true);
                 }
             }
+            etDate.setFocusable(false);
+            etDate.setClickable(true);
+            etDate.setOnClickListener(v -> {
+                Calendar calendar = Calendar.getInstance();
 
+                DatePickerDialog datePickerDialog = new DatePickerDialog(
+                        AddEditReminderActivity.this,
+                        (view, year, month, dayOfMonth) -> {
+
+                            String selectedDate = year + "-" +
+                                    String.format("%02d", (month + 1)) + "-" +
+                                    String.format("%02d", dayOfMonth);
+
+                            etDate.setText(selectedDate);
+                        },
+                        calendar.get(Calendar.YEAR),
+                        calendar.get(Calendar.MONTH),
+                        calendar.get(Calendar.DAY_OF_MONTH)
+                );
+
+                datePickerDialog.show();
+            });
             // Initialize database
             dbHelper = new DatabaseHelper(this);
             if (dbHelper == null) {
@@ -466,6 +491,7 @@ public class AddEditReminderActivity extends AppCompatActivity {
             if (reminderId > 0) {
                 // Update existing reminder
                 android.util.Log.d("AddEditReminder", "Updating reminder ID: " + reminderId);
+                android.util.Log.d("DEBUG_DATE", "[UPDATE] About to update - Title: " + title + " | Date from EditText: " + date + " | Time: " + time);
                 boolean updated = dbHelper.updateScheduleReminder(reminderId, title, description, date, time, selectedFeatureType, selectedFeatureId);
                 if (updated) {
                     Toast.makeText(this, "Reminder updated successfully!", Toast.LENGTH_SHORT).show();
@@ -478,8 +504,54 @@ public class AddEditReminderActivity extends AppCompatActivity {
             } else {
                 // Create new reminder
                 android.util.Log.d("AddEditReminder", "Creating new reminder: " + title + " at " + time + " on " + date);
+                android.util.Log.d("DEBUG_DATE", "[SAVE] About to insert - Title: " + title + " | Date from EditText: " + date + " | Time: " + time);
                 long result = dbHelper.insertScheduleWithFeature(title, description, date, time, selectedFeatureType, selectedFeatureId);
                 if (result > 0) {
+
+                    // 🔔 ALARM SET (FINAL WORKING)
+                    try {
+                        Calendar calendar = Calendar.getInstance();
+
+                        String dateTime = date + " " + time;
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+                        Date reminderDate = sdf.parse(dateTime);
+
+                        if (reminderDate == null) {
+                            Toast.makeText(this, "Invalid date/time", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        calendar.setTime(reminderDate);
+                        long selectedTimeInMillis = calendar.getTimeInMillis();
+
+                        // ❗ past time check
+                        if (selectedTimeInMillis < System.currentTimeMillis()) {
+                            Toast.makeText(this, "Please select future time", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+                        Intent intent = new Intent(this, ReminderReceiver.class);
+                        intent.putExtra("title", title);
+
+                        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                                this,
+                                (int) System.currentTimeMillis(),
+                                intent,
+                                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+                        );
+
+                        // 🔥 IMPORTANT FIX (ye hi main issue tha)
+                        alarmManager.setExactAndAllowWhileIdle(
+                                AlarmManager.RTC_WAKEUP,
+                                selectedTimeInMillis,
+                                pendingIntent
+                        );
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     Toast.makeText(this, "Reminder created successfully!", Toast.LENGTH_SHORT).show();
                     android.util.Log.d("AddEditReminder", "✅ Reminder saved with ID: " + result);
                     setResult(RESULT_OK);

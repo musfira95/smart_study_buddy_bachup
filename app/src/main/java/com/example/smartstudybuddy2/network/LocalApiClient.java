@@ -14,8 +14,8 @@ public class LocalApiClient {
 
     private static Retrofit retrofit;
     // ✅ LOCAL BACKEND - Change this IP to your local FastAPI server IP
-    public static final String BASE_URL = "http://10.127.255.53:8000/";
-    
+    public static final String BASE_URL = "http://10.152.62.53:8000/";
+
     public static Retrofit getClient() {
 
         OkHttpClient client = new OkHttpClient.Builder()

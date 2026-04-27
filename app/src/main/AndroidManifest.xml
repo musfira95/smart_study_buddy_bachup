@@ -68,7 +68,6 @@
         <activity android:name=".SelectSessionForFlashcardsActivity"
             android:label="Select Session"
             android:exported="true"/>
-        <activity android:name=".FlashcardDetailActivity" />
         <activity android:name=".AboutActivity" android:theme="@style/Theme.Smartstudybuddy2.NoActionBar"/>
         <activity android:name=".HelpActivity" android:theme="@style/Theme.Smartstudybuddy2.NoActionBar"/>
         <activity android:name=".AllTranscriptionsActivity" />
@@ -130,6 +129,7 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/provider_paths" />
         </provider>
+        <receiver android:name=".ReminderReceiver" />
 
     </application>
 

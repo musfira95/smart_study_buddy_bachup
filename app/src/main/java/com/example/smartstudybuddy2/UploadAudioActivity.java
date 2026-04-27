@@ -16,6 +16,7 @@ import android.content.res.AssetFileDescriptor;
 
 import java.io.IOException;
 import com.example.smartstudybuddy2.DatabaseHelper;
+import com.google.android.material.button.MaterialButton;
 
 public class UploadAudioActivity extends BaseActivity {
 
@@ -24,7 +25,7 @@ public class UploadAudioActivity extends BaseActivity {
 
     // Upload Audio UI
     private CardView uploadButton, recordButton;
-    private LinearLayout processButton;
+    private MaterialButton processButton;
     private TextView fileNameText;
 
     // Bottom Navigation

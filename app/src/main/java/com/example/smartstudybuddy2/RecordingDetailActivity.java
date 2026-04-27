@@ -15,6 +15,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.gson.Gson;
 import org.json.JSONArray;
 
+import com.example.smartstudybuddy2.network.LocalApiClient;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -25,7 +27,7 @@ public class RecordingDetailActivity extends AppCompatActivity {
 
     private static final String TAG = "RecordingDetailActivity";
 
-    private TextView tvTitle, tvDate, tvTranscription;
+    private TextView tvTitle, tvDate, tvDetectedTopic, tvTranscription;
     private View btnPlay, btnPause, btnDelete, btnShare, btnSummarize, btnExportPdf;
     private DatabaseHelper dbHelper;
     private MediaPlayer mediaPlayer;
@@ -51,6 +53,7 @@ public class RecordingDetailActivity extends AppCompatActivity {
 
         tvTitle = findViewById(R.id.tvRecordingTitle);
         tvDate = findViewById(R.id.tvRecordingDate);
+        tvDetectedTopic = findViewById(R.id.tvDetectedTopic);
         tvTranscription = findViewById(R.id.tvTranscription);
 
         // 🔹 Buttons are now Views / LinearLayouts
@@ -74,14 +77,24 @@ public class RecordingDetailActivity extends AppCompatActivity {
                 title = recording.getTitle();
                 String date = recording.getDate();
                 String transcription = recording.getTranscription();
+                String topic = recording.getTopic();
                 filePath = recording.getFilePath();
 
-                Log.d(TAG, "Recording found - Title: " + title + ", Date: " + date);
+                Log.d(TAG, "Recording found - Title: " + title + ", Date: " + date + ", Topic: " + topic);
                 Log.d(TAG, "File path: " + filePath);
                 Log.d(TAG, "Transcription length: " + (transcription != null ? transcription.length() : 0));
 
                 tvTitle.setText(title != null ? title : "No title");
                 tvDate.setText("Date: " + (date != null ? date : "Unknown"));
+                
+                if (topic != null && !topic.isEmpty() && !topic.equals("General")) {
+                    tvDetectedTopic.setText("Detected Topic: " + topic);
+                    tvDetectedTopic.setVisibility(View.VISIBLE);
+                } else {
+                    tvDetectedTopic.setText("Detected Topic: General");
+                    // Can optionally hide it or show General
+                    // tvDetectedTopic.setVisibility(View.GONE);
+                }
 
                 if (transcription != null && !transcription.isEmpty() && !transcription.equals("Processing...")) {
                     tvTranscription.setText(transcription);
@@ -399,8 +412,20 @@ public class RecordingDetailActivity extends AppCompatActivity {
                 String summary = recordingData.getSummary();
                 Log.d(TAG, "   📊 Summary from audio_files(ID=" + recordingId + "): " + 
                     (summary != null && !summary.isEmpty() ? "✅ Found (" + summary.length() + " chars)" : "⚠️ Empty or null"));
+                
+                // If summary is empty from audio_files, try to generate a quick summary from transcription for fallback
                 if (summary == null || summary.isEmpty()) {
-                    summary = "";
+                    String transcriptionText = tvTranscription.getText().toString();
+                    if (!transcriptionText.isEmpty() && !transcriptionText.contains("⏳")) {
+                        // Generate a basic summary from first 300 chars of transcription as fallback
+                        int summaryLength = Math.min(300, transcriptionText.length());
+                        summary = transcriptionText.substring(0, summaryLength) + "...";
+                        Log.d(TAG, "   📝 Generated fallback summary from transcription (" + summary.length() + " chars)");
+                    } else {
+                        summary = "";
+                    }
+                } else {
+                    Log.d(TAG, "   ✅ Using summary from database");
                 }
                 
                 // ✅ STEP 3: Extract quiz_json from audio_files table (NOT generated fresh)
@@ -463,14 +488,14 @@ public class RecordingDetailActivity extends AppCompatActivity {
                 Log.d(TAG, "   Summary length: " + safeSummary.length() + " chars (from audio_files table)");
                 Log.d(TAG, "   Quiz JSON length: " + (quizJson != null ? quizJson.length() : 0) + " chars (from audio_files table)");
                 Log.d(TAG, "   Flashcards count: " + flashcardsList.size());
-                Log.d(TAG, "   URL: http://10.237.2.53:8000/export-pdf/");
+                Log.d(TAG, "   URL: " + LocalApiClient.BASE_URL + "export-pdf/");
                 
                 okhttp3.MediaType JSON = okhttp3.MediaType.parse("application/json; charset=utf-8");
                 okhttp3.RequestBody body = okhttp3.RequestBody.create(json, JSON);
 
                 okhttp3.OkHttpClient client = new okhttp3.OkHttpClient();
                 okhttp3.Request request = new okhttp3.Request.Builder()
-                        .url("http://10.237.2.53:8000/export-pdf/")
+                        .url(LocalApiClient.BASE_URL + "export-pdf/")
                         .post(body)
                         .build();
 

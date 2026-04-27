@@ -1,48 +1,126 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="12dp"
-    android:background="?android:attr/selectableItemBackground"
-    android:paddingBottom="16dp">
+    android:layout_marginBottom="12dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="3dp"
+    app:cardBackgroundColor="@android:color/white">
 
-    <!-- Title -->
-    <TextView
-        android:id="@+id/tvTranscriptionTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Transcription Title"
-        android:textStyle="bold"
-        android:textSize="16sp"
-        android:textColor="#4F6F64" />
-
-    <!-- Date / Time -->
-    <TextView
-        android:id="@+id/tvTranscriptionDate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Date / Time"
-        android:textSize="14sp"
-        android:textColor="#555555"
-        android:paddingTop="4dp" />
-
-    <!-- Transcription Preview with ScrollView -->
-    <ScrollView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:maxHeight="300dp"
-        android:background="#F5F5F5"
-        android:layout_marginTop="6dp">
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <TextView
-            android:id="@+id/tvTranscriptionPreview"
+        <!-- TITLE AND DATE ROW -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="No transcription yet"
-            android:textSize="13sp"
-            android:textColor="#666666"
-            android:padding="8dp" />
-    </ScrollView>
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="12dp">
 
-</LinearLayout>
+            <!-- Icon -->
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_text"
+                android:tint="#4F6F64"
+                android:scaleType="centerInside"
+                android:layout_marginEnd="12dp" />
+
+            <!-- Title and Date Column -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvTranscriptionTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Transcription Title"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:textColor="#1A1A1A"
+                    android:maxLines="1"
+                    android:ellipsize="end" />
+
+                <TextView
+                    android:id="@+id/tvTranscriptionDate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Date / Time"
+                    android:textSize="12sp"
+                    android:textColor="#999999"
+                    android:layout_marginTop="4dp" />
+
+            </LinearLayout>
+
+            <!-- Delete Button -->
+            <ImageView
+                android:id="@+id/btnDeleteTranscription"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:padding="6dp"
+                android:src="@android:drawable/ic_menu_delete"
+                android:tint="#F44336"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Delete transcription" />
+
+        </LinearLayout>
+
+        <!-- DIVIDER -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#E8E8E8"
+            android:layout_marginBottom="12dp" />
+
+        <!-- TRANSCRIPTION PREVIEW CONTAINER -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Transcription"
+                android:textSize="11sp"
+                android:textColor="#999999"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Preview Text Container -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#F9F9F9"
+                app:strokeColor="#E0E0E0"
+                app:strokeWidth="1dp">
+
+                <TextView
+                    android:id="@+id/tvTranscriptionPreview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="No transcription yet"
+                    android:textSize="13sp"
+                    android:textColor="#666666"
+                    android:padding="12dp"
+                    android:minHeight="80dp"
+                    android:maxHeight="150dp"
+                    android:lineSpacingMultiplier="1.3" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

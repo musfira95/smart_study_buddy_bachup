@@ -2,13 +2,13 @@ package com.example.smartstudybuddy2;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
+import android.widget.ImageButton;
 import android.content.Intent;
 
-
 import androidx.appcompat.app.AppCompatActivity;
+import com.google.android.material.chip.Chip;
 
 import java.util.ArrayList;
 
@@ -21,42 +21,48 @@ public class RecordingListActivity extends AppCompatActivity {
     private DatabaseHelper dbHelper;
     private boolean showOnlyBookmarked = false;
     private RecordingListAdapter adapter;
+    private Chip chipAll, chipBookmarks;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recording_list);
 
-        // Setup Toolbar with back button
-        androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        // Hide default action bar to prevent duplicate headers
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
+            getSupportActionBar().hide();
         }
 
         listView = findViewById(R.id.recordingListView);
         dbHelper = new DatabaseHelper(this);
 
-        // Setup filter buttons
-        Button btnAllRecordings = findViewById(R.id.btnAllRecordings);
-        Button btnBookmarkedOnly = findViewById(R.id.btnBookmarkedOnly);
+        // Setup back button
+        ImageButton btnBack = findViewById(R.id.btnBack);
+        btnBack.setOnClickListener(v -> finish());
 
-        btnAllRecordings.setOnClickListener(v -> {
+        // Setup filter chips
+        chipAll = findViewById(R.id.chipAll);
+        chipBookmarks = findViewById(R.id.chipBookmarks);
+
+        chipAll.setOnClickListener(v -> {
             showOnlyBookmarked = false;
-            btnAllRecordings.setBackgroundResource(R.drawable.button_rounded);
-            btnBookmarkedOnly.setBackgroundResource(android.R.drawable.btn_default);
+            chipAll.setChecked(true);
+            chipBookmarks.setChecked(false);
             loadRecordings();
             Log.d(TAG, "✅ Filter: All recordings");
         });
 
-        btnBookmarkedOnly.setOnClickListener(v -> {
+        chipBookmarks.setOnClickListener(v -> {
             showOnlyBookmarked = true;
-            btnBookmarkedOnly.setBackgroundResource(R.drawable.button_rounded);
-            btnAllRecordings.setBackgroundResource(android.R.drawable.btn_default);
+            chipBookmarks.setChecked(true);
+            chipAll.setChecked(false);
             loadRecordings();
             Log.d(TAG, "⭐ Filter: Bookmarks only");
         });
+
+        // Set initial state
+        chipAll.setChecked(true);
+        chipBookmarks.setChecked(false);
 
         // ✅ COMPREHENSIVE cleanup of ALL dummy data
         Log.d(TAG, "🗑️ Cleaning up ALL dummy/test recordings...");

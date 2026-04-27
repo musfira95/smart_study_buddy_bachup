@@ -12,21 +12,33 @@
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="64dp"
         android:background="#4F6F64"
-        android:padding="10dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:elevation="4dp"
         app:titleTextColor="@android:color/white"
-        app:title="Select Session for Flashcards" />
+        app:title="Select Session for Flashcards"
+        app:titleTextAppearance="@style/TextAppearance.AppCompat.Headline" />
 
-    <!-- Sessions RecyclerView -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvSessions"
+    <!-- LIST CONTAINER -->
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:paddingLeft="12dp"
-        android:paddingRight="12dp" />
+        android:layout_height="match_parent"
+        android:layout_margin="16dp"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="6dp"
+        app:cardBackgroundColor="#FFFFFF">
+
+        <!-- Sessions RecyclerView -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvSessions"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            android:clipToPadding="false" />
+
+    </com.google.android.material.card.MaterialCardView>
 
 </LinearLayout>

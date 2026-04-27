@@ -1,233 +1,286 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
-    android:background="@drawable/login_bg">
+    android:background="@drawable/login_bg"
+    android:padding="16dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <!-- BACK BUTTON -->
+    <ImageView
+        android:id="@+id/btnBack"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:src="@drawable/ic_back_arrow"
+        android:padding="8dp"
+        app:tint="#4F6F64"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/tvTitle"
+        app:layout_constraintVertical_bias="0.5" />
+
+    <!-- TITLE (SAME ROW AS BACK BUTTON, CENTERED) -->
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="24dp">
+        android:text="Upload or Record Audio"
+        android:textSize="26sp"
+        android:textStyle="bold"
+        android:textColor="#4F6F64"
+        android:letterSpacing="0.01"
+        android:gravity="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="4dp" />
 
-        <!-- HEADER WITH BACK BUTTON -->
-        <FrameLayout
+    <!-- MAIN CONTENT CARD -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/mainContentCard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="24dp"
+        app:cardElevation="6dp"
+        app:cardBackgroundColor="#FFFFFF"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvTitle"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavCard"
+        app:layout_constraintVertical_bias="0.25"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="48dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp">
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp">
-            
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="24dp">
+
+            <!-- ICON -->
             <ImageView
-                android:id="@+id/btnBack"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:src="@drawable/ic_back_arrow"
-                android:layout_gravity="center_vertical|start"
-                app:tint="#4F6F64"
-                android:clickable="true"
-                android:focusable="true"/>
+                android:layout_width="90dp"
+                android:layout_height="90dp"
+                android:src="@drawable/upload_audio"
+                android:layout_marginBottom="28dp"
+                android:alpha="0.85"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Upload or Record Audio"
-                android:textSize="22sp"
-                android:textStyle="bold"
-                android:textColor="#4F6F64"
-                android:layout_gravity="center"/>
-        </FrameLayout>
-
-        <!-- MAIN CARD (COLOR ADDED) -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardCornerRadius="24dp"
-            app:cardElevation="8dp"
-            app:cardBackgroundColor="#FFFFFF"
-            android:padding="20dp">
-
+            <!-- TWO SQUARE CARDS IN ONE LINE -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center">
+                android:orientation="horizontal"
+                android:weightSum="2"
+                android:layout_marginBottom="28dp">
 
-                <!-- ICON -->
-                <ImageView
-                    android:layout_width="120dp"
-                    android:layout_height="120dp"
-                    android:src="@drawable/upload_audio"
-                    android:layout_marginBottom="24dp"/>
+                <!-- UPLOAD AUDIO CARD -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/btnSelectAudio"
+                    android:layout_width="0dp"
+                    android:layout_height="130dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="12dp"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="4dp">
 
-                <!-- TWO SQUARE CARDS IN ONE LINE (DASHBOARD STYLE) -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/bg_green_circle"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <ImageView
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:src="@drawable/ic_upload"
+                            android:layout_marginBottom="12dp"
+                            app:tint="#4F6F64"
+                            android:scaleType="centerInside"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Upload MP3"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            android:textColor="#1A1A1A"
+                            android:gravity="center"
+                            android:lines="2"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- RECORD AUDIO CARD -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/btnRecordAudio"
+                    android:layout_width="0dp"
+                    android:layout_height="130dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/bg_green_circle"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <ImageView
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:src="@drawable/ic_mic"
+                            android:layout_marginBottom="12dp"
+                            app:tint="#4F6F64"
+                            android:scaleType="centerInside"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Record Audio"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            android:textColor="#1A1A1A"
+                            android:gravity="center"
+                            android:lines="2"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
+
+            <!-- FILE STATUS -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="#F9F9F9"
+                android:layout_marginBottom="20dp">
+
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:orientation="horizontal"
-                    android:weightSum="2"
-                    android:layout_marginBottom="20dp">
+                    android:gravity="center_vertical"
+                    android:padding="16dp">
 
-                    <!-- UPLOAD AUDIO -->
-                    <androidx.cardview.widget.CardView
-                        android:id="@+id/btnSelectAudio"
-                        android:layout_width="0dp"
-                        android:layout_height="120dp"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="8dp"
-                        app:cardCornerRadius="18dp"
-                        app:cardElevation="6dp">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="@drawable/bg_green_circle"
-                            android:gravity="center"
-                            android:orientation="vertical">
-
-                            <ImageView
-                                android:layout_width="32dp"
-                                android:layout_height="32dp"
-                                android:src="@drawable/ic_upload"
-                                app:tint="#4F6F64"/>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Upload MP3"
-                                android:textStyle="bold"
-                                android:textColor="#4F6F64"
-                                android:layout_marginTop="8dp"/>
-                        </LinearLayout>
-                    </androidx.cardview.widget.CardView>
-
-                    <!-- RECORD AUDIO -->
-                    <androidx.cardview.widget.CardView
-                        android:id="@+id/btnRecordAudio"
-                        android:layout_width="0dp"
-                        android:layout_height="120dp"
-                        android:layout_weight="1"
-                        android:layout_marginStart="8dp"
-                        app:cardCornerRadius="18dp"
-                        app:cardElevation="6dp">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="@drawable/bg_green_circle"
-                            android:gravity="center"
-                            android:orientation="vertical">
-
-                            <ImageView
-                                android:layout_width="32dp"
-                                android:layout_height="32dp"
-                                android:src="@drawable/ic_mic"
-                                app:tint="#4F6F64"/>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Record Audio"
-                                android:textStyle="bold"
-                                android:textColor="#4F6F64"
-                                android:layout_marginTop="8dp"/>
-                        </LinearLayout>
-                    </androidx.cardview.widget.CardView>
-
-                </LinearLayout>
-
-
-
-                <!-- FILE STATUS -->
-                <TextView
-                    android:id="@+id/tvFileStatus"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:gravity="center"
-                    android:text="No file selected"
-                    android:textColor="#777777"
-                    android:background="@drawable/search_bg"
-                    android:layout_marginBottom="20dp"/>
-
-                <!-- PROCESS BUTTON -->
-                <LinearLayout
-                    android:id="@+id/btnProcessAudio"
-                    android:layout_width="match_parent"
-                    android:layout_height="54dp"
-                    android:gravity="center"
-                    android:background="#4F6F64">
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_file_details"
+                        app:tint="#4F6F64"
+                        android:layout_marginEnd="12dp"
+                        android:scaleType="centerInside"/>
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:id="@+id/tvFileStatus"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="Process Audio"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="@android:color/white"/>
+                        android:layout_weight="1"
+                        android:text="No file selected"
+                        android:textColor="#999999"
+                        android:textSize="14sp"
+                        android:gravity="start"/>
                 </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-        <!-- ================= QUICK NAV ICON CARD ================= -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:layout_marginTop="64dp"
-            android:layout_marginBottom="64dp"
-            app:cardCornerRadius="22dp"
-            app:cardElevation="8dp"
-            android:background="@drawable/bottom_nav_bg">
+            <!-- PROCESS BUTTON -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnProcessAudio"
+                android:layout_width="match_parent"
+                android:layout_height="54dp"
+                android:text="Process Audio"
+                android:textSize="16sp"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:letterSpacing="0.02"
+                app:backgroundTint="#4F6F64"
+                app:cornerRadius="24dp"
+                app:elevation="4dp"
+                android:fontFamily="sans-serif-medium"/>
 
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
 
-
+    <!-- BOTTOM NAVIGATION CARD -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/bottomNavCard"
+        android:layout_width="0dp"
+        android:layout_height="80dp"
+        app:cardCornerRadius="22dp"
+        app:cardElevation="6dp"
+        app:cardBackgroundColor="#2C2C2C"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp">
 
         <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:gravity="center"
-                android:weightSum="4">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:weightSum="4"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp">
 
-                <!-- Home -->
-                <ImageView
-                    android:id="@+id/navHome"
-                    android:layout_width="0dp"
-                    android:layout_height="32dp"
-                    android:layout_weight="1"
-                    android:src="@drawable/ic_home"
-                    app:tint="#4F6F64" />
+            <!-- Home -->
+            <ImageView
+                android:id="@+id/navHome"
+                android:layout_width="0dp"
+                android:layout_height="32dp"
+                android:layout_weight="1"
+                android:src="@drawable/ic_home"
+                app:tint="#7FD34F"
+                android:scaleType="centerInside"
+                android:padding="6dp"/>
 
-                <!-- Analytics -->
-                <ImageView
-                    android:id="@+id/navAnalytics"
-                    android:layout_width="0dp"
-                    android:layout_height="32dp"
-                    android:layout_weight="1"
-                    android:src="@drawable/ic_analytics"
-                    app:tint="#4CAF50" />
+            <!-- Analytics -->
+            <ImageView
+                android:id="@+id/navAnalytics"
+                android:layout_width="0dp"
+                android:layout_height="32dp"
+                android:layout_weight="1"
+                android:src="@drawable/ic_analytics"
+                app:tint="#7FD34F"
+                android:scaleType="centerInside"
+                android:padding="6dp"/>
 
-                <!-- Settings -->
-                <ImageView
-                    android:id="@+id/navSettings"
-                    android:layout_width="0dp"
-                    android:layout_height="32dp"
-                    android:layout_weight="1"
-                    android:src="@drawable/ic_settings"
-                    app:tint="#3F90B5" />
+            <!-- Settings -->
+            <ImageView
+                android:id="@+id/navSettings"
+                android:layout_width="0dp"
+                android:layout_height="32dp"
+                android:layout_weight="1"
+                android:src="@drawable/ic_settings"
+                app:tint="#42A5F5"
+                android:scaleType="centerInside"
+                android:padding="6dp"/>
 
-                <!-- Profile -->
-                <ImageView
-                    android:id="@+id/navProfile"
-                    android:layout_width="0dp"
-                    android:layout_height="32dp"
-                    android:layout_weight="1"
-                    android:src="@drawable/ic_user"
-                    app:tint="#4F6F64" />
+            <!-- Profile -->
+            <ImageView
+                android:id="@+id/navProfile"
+                android:layout_width="0dp"
+                android:layout_height="32dp"
+                android:layout_weight="1"
+                android:src="@drawable/ic_user"
+                app:tint="#A0A0A0"
+                android:scaleType="centerInside"
+                android:padding="6dp"/>
 
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
 
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
-
-    </LinearLayout>
-</ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

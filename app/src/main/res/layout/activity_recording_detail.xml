@@ -71,6 +71,21 @@
                     android:textSize="14sp"
                     android:textColor="#777777"
                     android:gravity="center"
+                    android:layout_marginBottom="10dp"/>
+
+                <!-- DETECTED TOPIC -->
+                <TextView
+                    android:id="@+id/tvDetectedTopic"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Topic: Loading..."
+                    android:textSize="14sp"
+                    android:textColor="#4F6F64"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:background="#E8F0ED"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="6dp"
                     android:layout_marginBottom="20dp"/>
 
                 <!-- ROW 1 -->

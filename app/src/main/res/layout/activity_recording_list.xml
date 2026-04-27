@@ -3,57 +3,136 @@
     android:orientation="vertical"
     android:padding="0dp"
     android:fitsSystemWindows="true"
-    android:background="@drawable/login_bg"
+    android:background="#F5F7FA"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- TOOLBAR WITH BACK BUTTON -->
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
+    <!-- PREMIUM HEADER WITH ROUNDED BOTTOM CORNERS -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:paddingBottom="24dp"
         android:background="#4F6F64"
-        android:padding="10dp"
-        app:titleTextColor="@android:color/white"
-        app:title="Your Recordings" />
+        android:elevation="4dp">
+
+        <!-- Top Row: Arrow + Title -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
+
+            <!-- Back Button in Circle -->
+            <FrameLayout
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/button_back_circle">
+
+                <ImageButton
+                    android:id="@+id/btnBack"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:src="@drawable/ic_back"
+                    android:contentDescription="Go back"
+                    android:scaleType="centerInside"
+                    android:background="@android:color/transparent"
+                    android:tint="@android:color/white" />
+
+            </FrameLayout>
+
+            <!-- Title -->
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Your Recordings"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                android:gravity="start" />
+
+        </LinearLayout>
+
+        <!-- Subtitle -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Manage and organize your audio files"
+            android:textSize="13sp"
+            android:textColor="#D4E5E1"
+            android:gravity="start"
+            android:layout_marginStart="60dp" />
+
+    </LinearLayout>
 
     <!-- CONTENT AREA -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="8dp"
-        android:background="@drawable/login_bg">
+        android:background="#F5F7FA">
 
-        <!-- FILTER BUTTONS -->
+        <!-- 29 DAYS NOTICE -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Recordings older than 29 days are automatically removed"
+            android:textSize="12sp"
+            android:textColor="#888888"
+            android:gravity="center"
+            android:layout_marginTop="12dp"
+            android:layout_marginHorizontal="16dp"
+            android:textStyle="italic" />
+
+        <!-- FILTER CHIPS -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_horizontal"
-            android:padding="8dp">
+            android:padding="20dp">
 
-            <Button
-                android:id="@+id/btnAllRecordings"
+            <!-- Chip Group Container -->
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="All"
-                android:background="@drawable/button_rounded"
-                android:textColor="@android:color/white"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp"
-                android:layout_marginEnd="8dp" />
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:spacing="12dp">
 
-            <Button
-                android:id="@+id/btnBookmarkedOnly"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="⭐ Bookmarks"
-                android:background="@drawable/button_rounded"
-                android:textColor="@android:color/white"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp"
-                android:layout_marginStart="8dp" />
+                <!-- All Recordings Chip -->
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipAll"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:text="All"
+                    android:textColor="@android:color/white"
+                    android:layout_marginEnd="8dp"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    app:chipBackgroundColor="#4F6F64"
+                    app:chipStrokeColor="#4F6F64"
+                    app:chipStrokeWidth="2dp"
+                    app:checkedIcon="@drawable/ic_check"
+                    app:checkedIconVisible="true" />
+
+                <!-- Bookmarks Chip -->
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipBookmarks"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:text="Bookmarks"
+                    android:textColor="#4F6F64"
+                    android:layout_marginStart="8dp"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    app:chipBackgroundColor="@android:color/white"
+                    app:chipStrokeColor="#4F6F64"
+                    app:chipStrokeWidth="2dp" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
@@ -62,8 +141,12 @@
             android:id="@+id/recordingListView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginHorizontal="12dp"
+            android:layout_marginBottom="12dp"
             android:divider="@android:color/transparent"
-            android:dividerHeight="0dp" />
+            android:dividerHeight="8dp"
+            android:scrollbars="vertical" />
+
     </LinearLayout>
 
 </LinearLayout>

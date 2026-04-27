@@ -40,4 +40,8 @@ public class Recording {
     // ✅ Setters for updating fields
     public void setSummary(String summary) { this.summary = summary; }
     public void setQuizJson(String quiz_json) { this.quiz_json = quiz_json; }
+    
+    private String topic; // ✅ Added
+    public String getTopic() { return topic != null ? topic : "General"; } // ✅ Added
+    public void setTopic(String topic) { this.topic = topic; } // ✅ Added
 }

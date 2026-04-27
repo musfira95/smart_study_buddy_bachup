@@ -22,7 +22,7 @@ import androidx.appcompat.app.AppCompatActivity;
 public class FlashcardDetailActivity extends AppCompatActivity {
     private static final String TAG = "FlashcardDetail";
     
-    private TextView tvProgress, tvQuestion, tvAnswer, tvReviewCount;
+    private TextView tvProgress, tvQuestion, tvAnswer;
     private Button btnAgain, btnMastered;
     private DatabaseHelper dbHelper;
     
@@ -61,7 +61,6 @@ public class FlashcardDetailActivity extends AppCompatActivity {
         tvProgress = findViewById(R.id.tvProgress);
         tvQuestion = findViewById(R.id.tvQuestion);
         tvAnswer = findViewById(R.id.tvAnswer);
-        tvReviewCount = findViewById(R.id.tvReviewCount);
         btnAgain = findViewById(R.id.btnAgain);
         btnMastered = findViewById(R.id.btnMastered);
 
@@ -77,7 +76,6 @@ public class FlashcardDetailActivity extends AppCompatActivity {
         
         // Update UI
         updateProgressDisplay();
-        updateReviewCountDisplay();
         
         // Setup buttons
         setupButtons();
@@ -98,16 +96,6 @@ public class FlashcardDetailActivity extends AppCompatActivity {
         Log.d(TAG, "📊 Progress: " + progressText);
     }
 
-    private void updateReviewCountDisplay() {
-        if (tvReviewCount == null) return;
-        
-        String text = "Reviews: " + reviewCount;
-        if (isMastered) {
-            text += " | ✅ Mastered";
-        }
-        tvReviewCount.setText(text);
-    }
-
     private void setupButtons() {
         if (btnAgain == null || btnMastered == null) {
             Log.e(TAG, "❌ Buttons not found in layout");
@@ -123,7 +111,7 @@ public class FlashcardDetailActivity extends AppCompatActivity {
             updateCardInDatabase();
             
             // Update UI
-            updateReviewCountDisplay();
+            updateProgressDisplay();
             
             Toast.makeText(this, "📝 Review count: " + reviewCount, Toast.LENGTH_SHORT).show();
         });
@@ -138,7 +126,6 @@ public class FlashcardDetailActivity extends AppCompatActivity {
             updateCardInDatabase();
             
             // Update UI
-            updateReviewCountDisplay();
             updateProgressDisplay();
             
             Toast.makeText(this, "🎉 Card mastered! (" + masteredCount + "/" + totalCards + ")", Toast.LENGTH_SHORT).show();

@@ -20,5 +20,9 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        // ✅ Auto-delete recordings older than 29 days
+        DatabaseHelper db = new DatabaseHelper(this);
+        db.deleteOldRecordings();
     }
 }

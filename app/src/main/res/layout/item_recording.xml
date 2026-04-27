@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
+<com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="12dp"
-    app:cardCornerRadius="14dp"
-    app:cardElevation="6dp"
-    app:cardBackgroundColor="@android:color/white">
+    android:layout_margin="8dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="@android:color/white"
+    app:strokeColor="#E8E8E8"
+    app:strokeWidth="0.5dp">
 
     <!-- Main Container -->
     <LinearLayout
@@ -18,15 +20,23 @@
         android:gravity="center_vertical"
         android:background="?attr/selectableItemBackground">
 
-        <!-- Microphone Icon -->
-        <ImageView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@drawable/ic_mic"
-            android:contentDescription="Recording icon"
-            android:scaleType="centerInside"
-            android:tint="#4F6F64"
-            android:layout_marginEnd="16dp" />
+        <!-- Microphone Icon in Circular Background -->
+        <FrameLayout
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/circle_bg_purple">
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_mic"
+                android:contentDescription="Recording icon"
+                android:scaleType="centerInside"
+                android:tint="@android:color/white"
+                android:layout_gravity="center" />
+
+        </FrameLayout>
 
         <!-- Recording Info Container -->
         <LinearLayout
@@ -44,36 +54,50 @@
                 android:text="recorded_1"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:textColor="#2C3E3C"
+                android:textColor="#1A1A1A"
                 android:layout_marginBottom="6dp"
-                android:maxLines="2"
+                android:maxLines="1"
                 android:ellipsize="end" />
 
-            <!-- Recording Date (Lighter, Smaller) -->
+            <!-- Recording Date (Grey, Smaller) -->
             <TextView
                 android:id="@+id/tvRecordingDate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="2025-10-20 14:30:45"
                 android:textSize="12sp"
-                android:textColor="#999999"
+                android:textColor="#A0A0A0"
                 android:maxLines="1"
                 android:ellipsize="end" />
 
         </LinearLayout>
 
-        <!-- Bookmark Button -->
+        <!-- Bookmark Button (Star) -->
         <ImageButton
             android:id="@+id/btnBookmark"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
             android:src="@drawable/ic_star"
             android:contentDescription="Bookmark recording"
             android:scaleType="centerInside"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:layout_marginStart="12dp"
-            android:padding="8dp" />
+            android:padding="8dp"
+            android:tint="#4F6F64" />
+
+        <!-- Delete Button -->
+        <ImageButton
+            android:id="@+id/btnDeleteRecording"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:src="@android:drawable/ic_menu_delete"
+            android:contentDescription="Delete recording"
+            android:scaleType="centerInside"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:layout_marginStart="4dp"
+            android:padding="8dp"
+            android:tint="#F44336" />
 
     </LinearLayout>
 
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>

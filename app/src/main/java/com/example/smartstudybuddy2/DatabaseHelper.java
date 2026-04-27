@@ -841,6 +841,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             cv.put("feature_id", featureId > 0 ? featureId : null);
             cv.put("is_completed", 0);
             
+            android.util.Log.d("DEBUG_DATE", "[DB INSERT] Title: " + title + " | Inserting date: " + date + " | Time: " + time);
+            
             long result = db.insert(TABLE_SCHEDULES, null, cv);
             if (result != -1) {
                 android.util.Log.d("DatabaseHelper", "✅ Reminder created: " + title + " (Type: " + featureType + ")");
@@ -865,22 +867,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 return list;
             }
             
+            android.util.Log.d("DEBUG_DATE", "[DB QUERY] Fetching all reminders");
+            
             c = db.rawQuery("SELECT id, title, description, date, time, feature_type, feature_id, is_completed " +
                                   "FROM " + TABLE_SCHEDULES + " ORDER BY date DESC, time ASC", null);
             
             if (c != null && c.moveToFirst()) {
                 do {
                     try {
+                        String dbDate = c.getString(c.getColumnIndexOrThrow("date"));
+                        String dbTitle = c.getString(c.getColumnIndexOrThrow("title"));
                         ScheduleReminder reminder = new ScheduleReminder(
                             c.getInt(c.getColumnIndexOrThrow("id")),
-                            c.getString(c.getColumnIndexOrThrow("title")),
+                            dbTitle,
                             c.getString(c.getColumnIndexOrThrow("description")),
-                            c.getString(c.getColumnIndexOrThrow("date")),
+                            dbDate,
                             c.getString(c.getColumnIndexOrThrow("time")),
                             c.getString(c.getColumnIndexOrThrow("feature_type")),
                             c.getInt(c.getColumnIndexOrThrow("feature_id")),
                             c.getInt(c.getColumnIndexOrThrow("is_completed")) == 1
                         );
+                        android.util.Log.d("DEBUG_DATE", "[DB RETRIEVE] All - Title: " + dbTitle + " | Retrieved date: " + dbDate);
                         list.add(reminder);
                     } catch (Exception e) {
                         android.util.Log.e("DatabaseHelper", "Error parsing reminder row: " + e.getMessage());
@@ -912,6 +919,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 return list;
             }
             
+            android.util.Log.d("DEBUG_DATE", "[DB QUERY] Fetching today's reminders for date: " + today);
+            
             c = db.rawQuery("SELECT id, title, description, date, time, feature_type, feature_id, is_completed " +
                                   "FROM " + TABLE_SCHEDULES + " WHERE date=? ORDER BY time ASC", 
                                   new String[]{today});
@@ -919,16 +928,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             if (c != null && c.moveToFirst()) {
                 do {
                     try {
+                        String dbDate = c.getString(c.getColumnIndexOrThrow("date"));
+                        String dbTitle = c.getString(c.getColumnIndexOrThrow("title"));
                         ScheduleReminder reminder = new ScheduleReminder(
                             c.getInt(c.getColumnIndexOrThrow("id")),
-                            c.getString(c.getColumnIndexOrThrow("title")),
+                            dbTitle,
                             c.getString(c.getColumnIndexOrThrow("description")),
-                            c.getString(c.getColumnIndexOrThrow("date")),
+                            dbDate,
                             c.getString(c.getColumnIndexOrThrow("time")),
                             c.getString(c.getColumnIndexOrThrow("feature_type")),
                             c.getInt(c.getColumnIndexOrThrow("feature_id")),
                             c.getInt(c.getColumnIndexOrThrow("is_completed")) == 1
                         );
+                        android.util.Log.d("DEBUG_DATE", "[DB RETRIEVE] Today - Title: " + dbTitle + " | Retrieved date: " + dbDate);
                         list.add(reminder);
                     } catch (Exception e) {
                         android.util.Log.e("DatabaseHelper", "Error parsing today's reminder: " + e.getMessage());
@@ -960,6 +972,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 return list;
             }
             
+            android.util.Log.d("DEBUG_DATE", "[DB QUERY] Fetching upcoming reminders after: " + today);
+            
             c = db.rawQuery("SELECT id, title, description, date, time, feature_type, feature_id, is_completed " +
                                   "FROM " + TABLE_SCHEDULES + " WHERE date > ? ORDER BY date ASC, time ASC", 
                                   new String[]{today});
@@ -967,16 +981,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             if (c != null && c.moveToFirst()) {
                 do {
                     try {
+                        String dbDate = c.getString(c.getColumnIndexOrThrow("date"));
+                        String dbTitle = c.getString(c.getColumnIndexOrThrow("title"));
                         ScheduleReminder reminder = new ScheduleReminder(
                             c.getInt(c.getColumnIndexOrThrow("id")),
-                            c.getString(c.getColumnIndexOrThrow("title")),
+                            dbTitle,
                             c.getString(c.getColumnIndexOrThrow("description")),
-                            c.getString(c.getColumnIndexOrThrow("date")),
+                            dbDate,
                             c.getString(c.getColumnIndexOrThrow("time")),
                             c.getString(c.getColumnIndexOrThrow("feature_type")),
                             c.getInt(c.getColumnIndexOrThrow("feature_id")),
                             c.getInt(c.getColumnIndexOrThrow("is_completed")) == 1
                         );
+                        android.util.Log.d("DEBUG_DATE", "[DB RETRIEVE] Upcoming - Title: " + dbTitle + " | Retrieved date: " + dbDate);
                         list.add(reminder);
                     } catch (Exception e) {
                         android.util.Log.e("DatabaseHelper", "Error parsing upcoming reminder: " + e.getMessage());
@@ -1080,6 +1097,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             cv.put("time", time);
             cv.put("feature_type", featureType != null ? featureType : "reminder");
             cv.put("feature_id", featureId > 0 ? featureId : null);
+            
+            android.util.Log.d("DEBUG_DATE", "[DB UPDATE] Reminder ID: " + reminderId + " | Updating date to: " + date + " | Time: " + time);
             
             int updated = db.update(TABLE_SCHEDULES, cv, "id=?", new String[]{String.valueOf(reminderId)});
             
@@ -1744,6 +1763,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 quizJson = "[]";
             }
             
+            String topic = "General";
+            try {
+                topic = c.getString(c.getColumnIndexOrThrow("topic"));
+            } catch (Exception e) {
+                android.util.Log.w("DatabaseHelper", "⚠️ Error getting topic for ID " + id + ": " + e.getMessage());
+                topic = "General";
+            }
+            
             long timestamp = 0;
             try {
                 timestamp = c.getLong(c.getColumnIndexOrThrow("timestamp"));
@@ -1763,6 +1790,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             // Set summary and quiz_json on the Recording object
             r.setSummary(summary != null ? summary : "");
             r.setQuizJson(quizJson != null && !quizJson.isEmpty() ? quizJson : "[]");
+            r.setTopic(topic != null && !topic.isEmpty() ? topic : "General");
             
             android.util.Log.d("DatabaseHelper", "✅ Recording fetched by ID " + id + ": Title=" + r.getTitle() + 
                     ", HasTranscription=" + (transcription != null && !transcription.isEmpty()) +
@@ -2715,5 +2743,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-
+    /**
+     * Delete recordings older than 29 days
+     */
+    public void deleteOldRecordings() {
+        try {
+            SQLiteDatabase db = this.getWritableDatabase();
+            long threshold = System.currentTimeMillis() - (29L * 24 * 60 * 60 * 1000);
+            int deleted = db.delete("audio_files", "timestamp < ?", new String[]{String.valueOf(threshold)});
+            android.util.Log.d("DatabaseHelper", "🗑️ Auto-deleted " + deleted + " recordings older than 29 days");
+        } catch (Exception e) {
+            android.util.Log.e("DatabaseHelper", "❌ Error deleting old recordings: " + e.getMessage());
+        }
+    }
 }

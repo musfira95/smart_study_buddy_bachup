@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="6dp"
+    android:layout_marginStart="12dp"
+    android:layout_marginEnd="12dp"
+    android:layout_marginTop="8dp"
+    android:layout_marginBottom="8dp"
+    app:cardCornerRadius="18dp"
+    app:cardElevation="3dp"
     app:cardBackgroundColor="@android:color/white">
 
     <LinearLayout
@@ -15,19 +18,21 @@
         android:padding="16dp"
         android:gravity="center_vertical">
 
-        <!-- Session Icon -->
-        <LinearLayout
+        <!-- Session Icon with Background -->
+        <FrameLayout
             android:layout_width="56dp"
             android:layout_height="56dp"
-            android:background="@drawable/rounded_background"
-            android:backgroundTint="#E8F5E9"
+            android:background="@drawable/circle_bg"
             android:gravity="center">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="📚"
-                android:textSize="32sp" />
-        </LinearLayout>
+            
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_content"
+                android:scaleType="centerInside"
+                android:contentDescription="Session Icon"
+                app:tint="#E74C3C" />
+        </FrameLayout>
 
         <!-- Session Info -->
         <LinearLayout
@@ -35,7 +40,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:layout_marginLeft="16dp">
+            android:layout_marginStart="16dp">
 
             <!-- Session Title -->
             <TextView
@@ -45,7 +50,9 @@
                 android:text="Audio Session"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:textColor="#1B5E20" />
+                android:textColor="#1A1A1A"
+                android:ellipsize="end"
+                android:maxLines="1" />
 
             <!-- Creation Date -->
             <TextView
@@ -53,31 +60,50 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="2025-01-15 14:30"
-                android:textSize="12sp"
+                android:textSize="13sp"
                 android:textColor="#666666"
-                android:layout_marginTop="4dp" />
+                android:layout_marginTop="6dp" />
 
             <!-- Metadata (Duration & Word Count) -->
-            <TextView
-                android:id="@+id/tvSessionMetadata"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="⏱ 300s | 📝 2500 words"
-                android:textSize="11sp"
-                android:textColor="#999999"
-                android:layout_marginTop="4dp" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="8dp">
+
+                <ImageView
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:src="@drawable/ic_time"
+                    android:contentDescription="Duration"
+                    android:scaleType="centerInside"
+                    android:tint="#999999"
+                    android:layout_marginEnd="4dp" />
+
+                <TextView
+                    android:id="@+id/tvSessionMetadata"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0s | 0 words"
+                    android:textSize="12sp"
+                    android:textColor="#999999" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
         <!-- Arrow Icon -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="→"
-            android:textSize="20sp"
-            android:textColor="#2E7D32"
-            android:layout_marginLeft="8dp" />
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_back_arrow"
+            android:scaleType="centerInside"
+            android:contentDescription="Open Session"
+            app:tint="#4F6F64"
+            android:layout_marginStart="12dp"
+            android:rotation="180" />
 
     </LinearLayout>
 
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>

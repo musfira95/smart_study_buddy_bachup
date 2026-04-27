@@ -48,6 +48,7 @@ public class RecordingListAdapter extends BaseAdapter {
         TextView recordingTitle = convertView.findViewById(R.id.tvRecordingName);
         TextView recordingDate = convertView.findViewById(R.id.tvRecordingDate);
         ImageButton btnBookmark = convertView.findViewById(R.id.btnBookmark);
+        ImageButton btnDeleteRecording = convertView.findViewById(R.id.btnDeleteRecording);
 
         Recording recording = recordings.get(position);
         DatabaseHelper dbHelper = new DatabaseHelper(context);
@@ -70,6 +71,24 @@ public class RecordingListAdapter extends BaseAdapter {
             boolean newBookmarkState = dbHelper.toggleBookmark(recording.getId());
             updateBookmarkButtonState(btnBookmark, recording.getId(), dbHelper);
             Log.d(TAG, "⭐ Bookmark toggled for " + title + ": " + newBookmarkState);
+        });
+
+        // Delete button click handler
+        btnDeleteRecording.setOnClickListener(v -> {
+            new android.app.AlertDialog.Builder(context)
+                .setTitle("Delete Recording")
+                .setMessage("Are you sure you want to delete this recording?")
+                .setPositiveButton("Delete", (dialog, which) -> {
+                    if (dbHelper.deleteRecordingById(recording.getId())) {
+                        recordings.remove(position);
+                        notifyDataSetChanged();
+                        android.widget.Toast.makeText(context, "Recording deleted", android.widget.Toast.LENGTH_SHORT).show();
+                    } else {
+                        android.widget.Toast.makeText(context, "Failed to delete", android.widget.Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
         });
 
         // Entire item is clickable - opens detail screen with recording ID

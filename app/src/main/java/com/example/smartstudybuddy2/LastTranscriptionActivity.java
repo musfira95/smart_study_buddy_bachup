@@ -5,11 +5,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 import android.widget.ImageView;
+import android.widget.ImageButton;
 
 import androidx.appcompat.app.AppCompatActivity;
+import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
 
@@ -17,40 +18,29 @@ public class LastTranscriptionActivity extends AppCompatActivity {
 
     private static final String TAG = "LastTranscriptionActivity";
 
+    private ImageButton btnBack;
     private EditText etTitle;
-    private TextView tvText, tvTime;
-    private LinearLayout btnAllTranscripts;
+    private TextView tvText, tvTime, tvFilePath;
+    private MaterialButton btnAllTranscripts;
     private DatabaseHelper dbHelper;
-
-    // ✅ Bottom Nav Icons
-    private ImageView navHome, navAnalytics, navSettings, navProfile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_last_transcription);
 
-        // Setup Toolbar with back button
-        androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
-        }
-
         Log.d(TAG, "LastTranscriptionActivity created");
+
+        // Setup back button
+        btnBack = findViewById(R.id.btnBack);
+        btnBack.setOnClickListener(v -> finish());
 
         // FIND VIEWS
         etTitle = findViewById(R.id.etLastTitle);
         tvText = findViewById(R.id.tvLastText);
         tvTime = findViewById(R.id.tvLastTime);
+        tvFilePath = findViewById(R.id.tvFilePath);
         btnAllTranscripts = findViewById(R.id.btnAllTranscripts);
-
-        // ✅ FIND BOTTOM NAV VIEWS
-        navHome = findViewById(R.id.navHome);
-        navAnalytics = findViewById(R.id.navAnalytics);
-        navSettings = findViewById(R.id.navSettings);
-        navProfile = findViewById(R.id.navProfile);
 
         // Initialize DatabaseHelper
         dbHelper = new DatabaseHelper(this);
@@ -92,6 +82,7 @@ public class LastTranscriptionActivity extends AppCompatActivity {
             etTitle.setText(title != null ? title : "Untitled");
             tvText.setText(text);
             tvTime.setText("Saved On: " + time);
+            tvFilePath.setText(latestRecording.getFilePath() != null ? latestRecording.getFilePath() : "N/A");
 
             Log.i(TAG, "✅ Latest transcription loaded successfully from database");
             Toast.makeText(this, "✅ Latest transcription loaded from database", Toast.LENGTH_SHORT).show();
@@ -101,6 +92,7 @@ public class LastTranscriptionActivity extends AppCompatActivity {
             etTitle.setText("Untitled");
             tvText.setText("❌ No transcriptions available yet. Create a new recording to get started.");
             tvTime.setText("Saved On: N/A");
+            tvFilePath.setText("N/A");
             Toast.makeText(this, "No recordings found", Toast.LENGTH_SHORT).show();
         }
 
@@ -119,24 +111,6 @@ public class LastTranscriptionActivity extends AppCompatActivity {
                 Toast.makeText(this, "Title updated", Toast.LENGTH_SHORT).show();
             }
         });
-
-        // ✅ BOTTOM NAV CLICK ACTIONS
-        navHome.setOnClickListener(v -> {
-            startActivity(new Intent(this, DashboardActivity.class));
-            finish();
-        });
-
-        navAnalytics.setOnClickListener(v ->
-                startActivity(new Intent(this, AnalyticsActivity.class))
-        );
-
-        navSettings.setOnClickListener(v ->
-                startActivity(new Intent(this, ThemeSettingsActivity.class))
-        );
-
-        navProfile.setOnClickListener(v ->
-                startActivity(new Intent(this, ProfileActivity.class))
-        );
     }
 
     @Override

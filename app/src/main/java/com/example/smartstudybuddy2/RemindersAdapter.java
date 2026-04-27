@@ -57,10 +57,10 @@ public class RemindersAdapter extends RecyclerView.Adapter<RemindersAdapter.Remi
         holder.tvTime.setText(reminder.getDisplayTime());
 
         // Set date
+        android.util.Log.d("DEBUG_DATE", "[ADAPTER] Reminder ID: " + reminder.getId() + " | Title: " + reminder.getTitle() + " | Displaying date: " + reminder.getDate() + " | Time: " + reminder.getTime());
         holder.tvDate.setText(reminder.getDate());
 
-        // Set feature type icon and name
-        holder.tvFeatureIcon.setText(reminder.getFeatureIcon());
+        // Set feature type name
         holder.tvFeatureType.setText(reminder.getFeatureType() != null ? reminder.getFeatureType() : "Reminder");
 
         // Set description if available
@@ -192,7 +192,6 @@ public class RemindersAdapter extends RecyclerView.Adapter<RemindersAdapter.Remi
         TextView tvTitle;
         TextView tvTime;
         TextView tvDate;
-        TextView tvFeatureIcon;
         TextView tvFeatureType;
         TextView tvDescription;
         CheckBox cbCompleted;
@@ -205,8 +204,7 @@ public class RemindersAdapter extends RecyclerView.Adapter<RemindersAdapter.Remi
             tvTitle = itemView.findViewById(R.id.tvReminderTitle);
             tvTime = itemView.findViewById(R.id.tvReminderTime);
             tvDate = itemView.findViewById(R.id.tvReminderDate);
-            tvFeatureIcon = itemView.findViewById(R.id.tvFeatureIcon);
-            tvFeatureType = itemView.findViewById(R.id.tvFeatureType);
+            tvFeatureType = itemView.findViewById(R.id .tvFeatureType);
             tvDescription = itemView.findViewById(R.id.tvReminderDescription);
             cbCompleted = itemView.findViewById(R.id.cbReminderCompleted);
             btnEdit = itemView.findViewById(R.id.btnEditReminder);

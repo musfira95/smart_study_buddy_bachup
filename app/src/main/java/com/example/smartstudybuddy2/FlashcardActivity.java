@@ -11,6 +11,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.smartstudybuddy2.network.LocalApiClient;
+
 import java.util.ArrayList;
 
 /**
@@ -30,7 +32,7 @@ public class FlashcardActivity extends AppCompatActivity {
     private FlashcardAdapter adapter;
     private DatabaseHelper dbHelper;
     private ArrayList<Flashcard> flashcards;
-    private TextView tvStatsBar;
+    private TextView tvEmptyState;
     
     // ✅ NEW: Session tracking
     private int sessionId = -1;
@@ -52,7 +54,7 @@ public class FlashcardActivity extends AppCompatActivity {
 
         dbHelper = new DatabaseHelper(this);
         rvFlashcards = findViewById(R.id.rvFlashcards);
-        tvStatsBar = findViewById(R.id.tvStatsBar);
+        tvEmptyState = findViewById(R.id.tvEmptyState);
 
         // ✅ NEW: Get session_id from Intent (passed from SelectSessionForFlashcardsActivity)
         sessionId = getIntent().getIntExtra("session_id", -1);
@@ -70,10 +72,8 @@ public class FlashcardActivity extends AppCompatActivity {
 
         // Load flashcards with mastery tracking
         loadFlashcards();
-        updateMasteryStats();
 
-
-        Log.d(TAG, "✅ FlashcardActivity initialized with mastery tracking");
+        Log.d(TAG, "✅ FlashcardActivity initialized");
     }
 
     private void loadFlashcards() {
@@ -81,10 +81,18 @@ public class FlashcardActivity extends AppCompatActivity {
             flashcards = new ArrayList<>();
             
             if (sessionId <= 0) {
-                Log.e(TAG, "❌ Invalid session ID: " + sessionId);
-                Toast.makeText(this, "Invalid session", Toast.LENGTH_SHORT).show();
-                finish();
-                return;
+                Log.w(TAG, "⚠️ Invalid session ID: " + sessionId + ". Trying to load latest recording fallback...");
+                Recording latestRecording = dbHelper.getLastRecording();
+                if (latestRecording != null) {
+                    sessionId = latestRecording.getId();
+                    sessionTitle = latestRecording.getTitle();
+                    if (getSupportActionBar() != null) {
+                        getSupportActionBar().setTitle(sessionTitle != null ? sessionTitle : "Flashcards");
+                    }
+                } else {
+                    showEmptyState("No flashcards available");
+                    return;
+                }
             }
             
             Log.d(TAG, "📚 Loading flashcards from session_id=" + sessionId);
@@ -98,8 +106,7 @@ public class FlashcardActivity extends AppCompatActivity {
                 
                 if (recording == null) {
                     Log.e(TAG, "❌ Session/Recording not found with ID: " + sessionId);
-                    Toast.makeText(this, "Session not found", Toast.LENGTH_SHORT).show();
-                    finish();
+                    showEmptyState("Session not found");
                     return;
                 }
                 
@@ -120,8 +127,7 @@ public class FlashcardActivity extends AppCompatActivity {
             }
             
             if (currentSession == null) {
-                Toast.makeText(this, "Could not load session data", Toast.LENGTH_SHORT).show();
-                finish();
+                showEmptyState("Could not load session data");
                 return;
             }
             
@@ -135,11 +141,9 @@ public class FlashcardActivity extends AppCompatActivity {
                 summaryText = currentSession.getTranscription();
             }
             
-            // ✅ Only abort if both summary AND transcription are missing
             if (summaryText == null || summaryText.trim().isEmpty()) {
                 Log.e(TAG, "❌ No summary or transcription available for session_id=" + sessionId);
-                Toast.makeText(this, "No content available for flashcards", Toast.LENGTH_SHORT).show();
-                finish();
+                showEmptyState("No content available for flashcards");
                 return;
             }
             
@@ -148,8 +152,7 @@ public class FlashcardActivity extends AppCompatActivity {
             
             if (flashcards == null || flashcards.isEmpty()) {
                 Log.e(TAG, "❌ No flashcards generated from summary");
-                Toast.makeText(this, "Could not generate flashcards", Toast.LENGTH_SHORT).show();
-                finish();
+                showEmptyState("Could not generate flashcards");
                 return;
             }
             
@@ -180,10 +183,24 @@ public class FlashcardActivity extends AppCompatActivity {
             
             Log.d(TAG, "✅ Flashcards displayed: " + flashcards.size() + " cards");
             
+            // Ensure lists are visible
+            if (tvEmptyState != null) tvEmptyState.setVisibility(android.view.View.GONE);
+            if (rvFlashcards != null) rvFlashcards.setVisibility(android.view.View.VISIBLE);
+
         } catch (Exception e) {
             Log.e(TAG, "❌ Error loading flashcards: " + e.getMessage());
             e.printStackTrace();
-            Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            showEmptyState("Error loading flashcards");
+        }
+    }
+
+    private void showEmptyState(String message) {
+        if (tvEmptyState != null) {
+            tvEmptyState.setText(message);
+            tvEmptyState.setVisibility(android.view.View.VISIBLE);
+        }
+        if (rvFlashcards != null) {
+            rvFlashcards.setVisibility(android.view.View.GONE);
         }
     }
     
@@ -281,7 +298,7 @@ public class FlashcardActivity extends AppCompatActivity {
                         .readTimeout(600, java.util.concurrent.TimeUnit.SECONDS)
                         .build();
                 okhttp3.Request request = new okhttp3.Request.Builder()
-                        .url("http://192.168.100.96:8000/save-flashcards/")
+                        .url(LocalApiClient.BASE_URL + "save-flashcards/")
                         .post(body)
                         .build();
                 
@@ -456,83 +473,8 @@ public class FlashcardActivity extends AppCompatActivity {
     }
 
     private void onFlashcardItemClick(Flashcard flashcard) {
-        Log.d(TAG, "🎯 Flashcard review started: " + flashcard.getQuestion());
-        
-        // ✅ Calculate progress stats
-        int totalCards = flashcards.size();
-        int masteredCount = 0;
-        for (Flashcard card : flashcards) {
-            if (card.isMastered()) {
-                masteredCount++;
-            }
-        }
-        
-        // Open flashcard detail for review with mastery tracking
-        Intent intent = new Intent(this, FlashcardDetailActivity.class);
-        intent.putExtra("flashcard_id", flashcard.getId());
-        intent.putExtra("question", flashcard.getQuestion());
-        intent.putExtra("answer", flashcard.getAnswer());
-        intent.putExtra("topic", flashcard.getTopic());
-        
-        // ✅ NEW: Pass progress tracking data
-        intent.putExtra("total_cards", totalCards);
-        intent.putExtra("review_count", flashcard.getReviewCount());
-        intent.putExtra("is_mastered", flashcard.isMastered());
-        intent.putExtra("mastered_count", masteredCount);
-        
-        startActivity(intent);
-    }
-
-    private void updateMasteryStats() {
-        try {
-            if (flashcards == null || flashcards.isEmpty()) {
-                if (tvStatsBar != null) {
-                    tvStatsBar.setText("🟥 Learning • 0/0 Mastered");
-                }
-                return;
-            }
-            
-            // ✅ Use Flashcard model fields instead of database stats
-            int masteredCount = 0;
-            int totalCards = flashcards.size();
-            int reviewedCount = 0;
-            
-            for (Flashcard card : flashcards) {
-                if (card.getReviewCount() > 0) {
-                    reviewedCount++;
-                    if (card.isMastered()) {
-                        masteredCount++;
-                    }
-                }
-            }
-            
-            // ✅ Calculate mastery percentage
-            String masteryLevel = "🟥 Learning";
-            if (reviewedCount > 0) {
-                double masteredPercent = (masteredCount * 100.0) / reviewedCount;
-                if (masteredPercent >= 80) {
-                    masteryLevel = "🟢 Mastered!";
-                } else if (masteredPercent >= 60) {
-                    masteryLevel = "🟩 Confident";
-                } else if (masteredPercent >= 40) {
-                    masteryLevel = "🟨 Familiar";
-                } else {
-                    masteryLevel = "🟥 Learning";
-                }
-            }
-            
-            // ✅ Display stats with total card count
-            String statsText = String.format("%s • %d/%d Mastered", masteryLevel, masteredCount, totalCards);
-            
-            if (tvStatsBar != null) {
-                tvStatsBar.setText(statsText);
-            }
-            
-            Log.d(TAG, "📊 Mastery Progress: " + statsText + " (reviewed: " + reviewedCount + ")");
-            
-        } catch (Exception e) {
-            Log.e(TAG, "❌ Error updating mastery stats: " + e.getMessage());
-        }
+        // ❌ Detail screen disabled - click does nothing
+        // This allows users to view the flashcard list without opening detail screens
     }
 
     @Override
@@ -540,7 +482,6 @@ public class FlashcardActivity extends AppCompatActivity {
         super.onResume();
         // Refresh flashcard list whenever returning to this activity
         loadFlashcards();
-        updateMasteryStats();
     }
 
     @Override

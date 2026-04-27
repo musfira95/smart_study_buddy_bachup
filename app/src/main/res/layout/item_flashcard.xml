@@ -1,43 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="12dp"
-    android:layout_margin="8dp"
-    android:background="@drawable/bg_card"
-    android:elevation="4dp">
+    android:layout_marginStart="12dp"
+    android:layout_marginEnd="12dp"
+    android:layout_marginTop="8dp"
+    android:layout_marginBottom="8dp"
+    app:cardCornerRadius="18dp"
+    app:cardElevation="3dp"
+    app:cardBackgroundColor="@android:color/white">
 
-    <!-- Question Preview -->
-    <TextView
-        android:id="@+id/tvQuestion"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Flashcard Question"
-        android:textSize="14sp"
-        android:textColor="#1B5E20"
-        android:textStyle="bold"
-        android:paddingBottom="8dp"
-        android:lineSpacingMultiplier="1.3" />
+        android:orientation="vertical"
+        android:padding="16dp">
 
-    <!-- Topic -->
-    <TextView
-        android:id="@+id/tvTopic"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="📚 Biology"
-        android:textSize="12sp"
-        android:textColor="#558B2F"
-        android:paddingBottom="6dp" />
+        <!-- Question -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="12dp">
 
-    <!-- Mastery Status -->
-    <TextView
-        android:id="@+id/tvMastery"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="🟥 Learning (2x)"
-        android:textSize="12sp"
-        android:textColor="#F57F17"
-        android:textStyle="bold" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Q:"
+                android:textSize="14sp"
+                android:textColor="#4F6F64"
+                android:textStyle="bold"
+                android:layout_marginEnd="8dp" />
 
-</LinearLayout>
+            <TextView
+                android:id="@+id/tvQuestion"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Flashcard Question"
+                android:textSize="15sp"
+                android:textColor="#1A1A1A"
+                android:textStyle="bold"
+                android:lineSpacingMultiplier="1.2"
+                android:ellipsize="end"
+                android:maxLines="3" />
+
+        </LinearLayout>
+
+        <!-- Answer -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="A:"
+                android:textSize="14sp"
+                android:textColor="#4F6F64"
+                android:textStyle="bold"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:id="@+id/tvTopic"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Answer text here"
+                android:textSize="14sp"
+                android:textColor="#666666"
+                android:lineSpacingMultiplier="1.2"
+                android:ellipsize="end"
+                android:maxLines="2" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

@@ -7,178 +7,295 @@
     android:fitsSystemWindows="true"
     android:background="@drawable/login_bg">
 
-    <!-- TOOLBAR WITH BACK BUTTON -->
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
+    <!-- HEADER WITH ROUNDED BOTTOM CORNERS (24dp) -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:layout_marginTop="32dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:background="#4F6F64"
-        android:padding="10dp"
-        app:titleTextColor="@android:color/white"
-        app:title="Last Transcription" />
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="32dp"
+        android:elevation="6dp">
 
-    <!-- SCROLLABLE CONTENT -->
+        <!-- Back Button + Centered Title -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="12dp">
+
+            <!-- Back Button (Circular Background) -->
+            <FrameLayout
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="@drawable/button_back_circle">
+
+                <ImageButton
+                    android:id="@+id/btnBack"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_back"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:layout_gravity="center"
+                    android:scaleType="centerInside"
+                    android:contentDescription="Back"
+                    android:tint="@android:color/white" />
+
+            </FrameLayout>
+
+            <!-- Title (Centered with offset) -->
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Last Transcription"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                android:gravity="center"
+                android:letterSpacing="0.02"
+                android:paddingEnd="44dp" />
+
+        </LinearLayout>
+
+        <!-- Subtitle -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="View your most recent transcription"
+            android:textSize="12sp"
+            android:textColor="#E0E8E6"
+            android:gravity="center"
+            android:alpha="0.85" />
+
+    </LinearLayout>
+
+    <!-- SCROLLABLE CONTENT AREA -->
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:fillViewport="true"
         android:background="@drawable/login_bg">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
             android:orientation="vertical"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="24dp">
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="120dp">
 
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="0dp"
-            android:layout_marginBottom="24dp"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="6dp"
-            app:cardBackgroundColor="@android:color/white"
-            app:useCompatPadding="true">
-
-
-        <LinearLayout
+            <!-- MAIN CONTENT CARD (20dp radius, single card) -->
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="24dp"
-                android:gravity="center_horizontal">
+                android:layout_marginStart="0dp"
+                android:layout_marginEnd="0dp"
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="3dp"
+                app:cardBackgroundColor="@android:color/white">
 
-                <!-- TITLE (REMOVED - Using Toolbar instead) -->
-
-                <!-- TITLE INPUT -->
-                <EditText
-                    android:id="@+id/etLastTitle"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:background="@drawable/edittext_bg_rounded"
-                    android:hint="Title"
-                    android:padding="12dp"
-                    android:textSize="16sp"
-                    android:textColor="#000000"
-                    android:textColorHint="#777777"/>
-
-                <!-- DATE TIME -->
-                <TextView
-                    android:id="@+id/tvLastTime"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Date  Time"
-                    android:textSize="13sp"
-                    android:textColor="#777777"
-                    android:gravity="end"
-                    android:layout_marginTop="6dp"
-                    android:layout_marginBottom="14dp"/>
-
-                <!-- TRANSCRIPTION CARD -->
-                <androidx.cardview.widget.CardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:cardCornerRadius="14dp"
-                    app:cardElevation="4dp"
-                    app:cardBackgroundColor="@android:color/white"
-                    android:background="@android:color/white"
-                    android:layout_marginBottom="24dp">
-
-                    <TextView
-                        android:id="@+id/tvLastText"
-                        android:layout_width="match_parent"
-                        android:layout_height="120dp"
-                        android:text="Transcription content will appear here"
-                        android:textSize="16sp"
-                        android:textColor="#333333"
-                        android:padding="14dp"/>
-                </androidx.cardview.widget.CardView>
-
-                <!-- VIEW ALL BUTTON -->
                 <LinearLayout
-                    android:id="@+id/btnAllTranscripts"
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:gravity="center"
-                    android:background="@drawable/button_rounded"
-                    android:clickable="true"
-                    android:focusable="true">
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <!-- FILENAME SECTION WITH ICON -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="20dp">
+
+                        <!-- Audio Icon -->
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@drawable/ic_mic"
+                            android:tint="#4F6F64"
+                            android:scaleType="centerInside"
+                            android:layout_marginEnd="12dp" />
+
+                        <!-- Title Input -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Filename"
+                                android:textSize="12sp"
+                                android:textColor="#999999"
+                                android:textStyle="bold"
+                                android:layout_marginBottom="6dp" />
+
+                            <EditText
+                                android:id="@+id/etLastTitle"
+                                android:layout_width="match_parent"
+                                android:layout_height="40dp"
+                                android:background="@drawable/edittext_rounded_light"
+                                android:hint="Recording name"
+                                android:padding="12dp"
+                                android:textSize="14sp"
+                                android:textColor="#1A1A1A"
+                                android:textColorHint="#AAAAAA"
+                                android:maxLines="1"
+                                android:ellipsize="end" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <!-- DATE & TIME -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginBottom="20dp"
+                        android:paddingStart="44dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Date &amp; Time"
+                            android:textSize="12sp"
+                            android:textColor="#999999"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="4dp" />
+
+                        <TextView
+                            android:id="@+id/tvLastTime"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="22 Apr 2026 13:27:49"
+                            android:textSize="14sp"
+                            android:textColor="#666666" />
+
+                    </LinearLayout>
+
+                    <!-- DIVIDER -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#E8E8E8"
+                        android:layout_marginBottom="20dp" />
+
+                    <!-- TRANSCRIPTION SECTION -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginBottom="20dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Transcription"
+                            android:textSize="12sp"
+                            android:textColor="#999999"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="8dp" />
+
+                        <!-- Transcription Container (Soft rounded) -->
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="0dp"
+                            android:layout_marginEnd="0dp"
+                            app:cardCornerRadius="12dp"
+                            app:cardElevation="0dp"
+                            app:cardBackgroundColor="#F9F9F9"
+                            app:strokeColor="#E0E0E0"
+                            app:strokeWidth="1dp">
+
+                            <TextView
+                                android:id="@+id/tvLastText"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Your transcription will appear here..."
+                                android:textSize="14sp"
+                                android:textColor="#333333"
+                                android:padding="16dp"
+                                android:minHeight="120dp"
+                                android:lineSpacingMultiplier="1.4" />
+
+                        </com.google.android.material.card.MaterialCardView>
+
+                    </LinearLayout>
+
+                    <!-- FILE PATH SECTION -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginBottom="20dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="File Path"
+                            android:textSize="12sp"
+                            android:textColor="#999999"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="8dp" />
+
+                        <!-- File Path Container (Light green) -->
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="0dp"
+                            android:layout_marginEnd="0dp"
+                            app:cardCornerRadius="12dp"
+                            app:cardElevation="0dp"
+                            app:cardBackgroundColor="#F0F5F3"
+                            app:strokeColor="#D4E5E1"
+                            app:strokeWidth="0.5dp">
+
+                            <TextView
+                                android:id="@+id/tvFilePath"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="/storage/emulated/0/Audio/recording.wav"
+                                android:textSize="12sp"
+                                android:textColor="#666666"
+                                android:padding="12dp"
+                                android:maxLines="2"
+                                android:ellipsize="middle" />
+
+                        </com.google.android.material.card.MaterialCardView>
+
+                    </LinearLayout>
+
+                    <!-- VIEW ALL TRANSCRIPTIONS BUTTON (Full width, rounded, green) -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnAllTranscripts"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
                         android:text="View All Transcriptions"
                         android:textSize="16sp"
                         android:textStyle="bold"
-                        android:textColor="@android:color/white"/>
+                        android:textColor="@android:color/white"
+                        app:cornerRadius="24dp"
+                        app:backgroundTint="#4F6F64"
+                        app:elevation="3dp" />
+
                 </LinearLayout>
 
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-        <!-- ================= BOTTOM NAV BAR (SAME AS UPLOAD AUDIO) ================= -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:layout_marginTop="24dp"
-            app:cardCornerRadius="22dp"
-            app:cardElevation="6dp"
-            android:background="@drawable/bottom_nav_bg">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:gravity="center"
-                android:weightSum="4">
-
-                <!-- Home -->
-                <ImageView
-                    android:id="@+id/navHome"
-                    android:layout_width="0dp"
-                    android:layout_height="32dp"
-                    android:layout_weight="1"
-                    android:src="@drawable/ic_home"
-                    app:tint="#4F6F64" />
-
-                <!-- Analytics -->
-                <ImageView
-                    android:id="@+id/navAnalytics"
-                    android:layout_width="0dp"
-                    android:layout_height="32dp"
-                    android:layout_weight="1"
-                    android:src="@drawable/ic_analytics"
-                    app:tint="#4CAF50" />
-
-                <!-- Settings -->
-                <ImageView
-                    android:id="@+id/navSettings"
-                    android:layout_width="0dp"
-                    android:layout_height="32dp"
-                    android:layout_weight="1"
-                    android:src="@drawable/ic_settings"
-                    app:tint="#3F90B5" />
-
-                <!-- Profile -->
-                <ImageView
-                    android:id="@+id/navProfile"
-                    android:layout_width="0dp"
-                    android:layout_height="32dp"
-                    android:layout_weight="1"
-                    android:src="@drawable/ic_user"
-                    app:tint="#4F6F64" />
-
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
+            </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
+
     </ScrollView>
 
 </LinearLayout>

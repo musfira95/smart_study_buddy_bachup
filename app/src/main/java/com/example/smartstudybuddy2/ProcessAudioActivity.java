@@ -13,7 +13,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.smartstudybuddy2.network.ApiClient;
+import com.example.smartstudybuddy2.network.LocalApiClient;
 import com.example.smartstudybuddy2.network.ApiService;
 import com.example.smartstudybuddy2.network.TranscriptionResponse;
 import com.example.smartstudybuddy2.network.SummaryResponse;
@@ -235,7 +235,7 @@ public class ProcessAudioActivity extends BaseActivity {
             );
             // Create API service and upload
             Log.d("ProcessAudioActivity", "🔵 Creating ApiClient...");
-            ApiService apiService = ApiClient.getClient().create(ApiService.class);
+            ApiService apiService = LocalApiClient.getClient().create(ApiService.class);
             Call<TranscriptionResponse> call = apiService.uploadAudio(filePart);
 
             Log.d("ProcessAudioActivity", "🔵 Request URL: https://devotee-portly-flock.ngrok-free.dev/transcribe/");
@@ -341,7 +341,7 @@ public class ProcessAudioActivity extends BaseActivity {
 
                     String errorMsg = t.getMessage();
                     if (t.getMessage().contains("Failed to connect")) {
-                        errorMsg = "❌ Cannot reach server at 192.168.100.96:8000\n\nCheck:\n1. Is FastAPI running?\n2. Are phone & laptop on same WiFi?\n3. Is Firewall blocking port 8000?";
+                        errorMsg = "❌ Cannot reach server at " + LocalApiClient.BASE_URL + "\n\nCheck:\n1. Is FastAPI running?\n2. Are phone & laptop on same WiFi?\n3. Is Firewall blocking port 8000?";
                     } else if (t.getMessage().contains("timeout")) {
                         errorMsg = "⏱️ Connection timeout - Server is slow or unreachable";
                     }
@@ -524,7 +524,7 @@ public class ProcessAudioActivity extends BaseActivity {
         Log.d("ProcessAudioActivity", "🎯 GENERATING QUIZ START - recordingId=" + recordingId + ", text=" + transcribedText.length());
 
         try {
-            ApiService apiService = ApiClient.getClient().create(ApiService.class);
+            ApiService apiService = LocalApiClient.getClient().create(ApiService.class);
             // ✅ NEW: Pass recording_id for database persistence
             QuizRequest request = new QuizRequest(transcribedText, 3, (int)recordingId);
             Log.d("ProcessAudioActivity", "📤 PASSING TO API - /quiz/ endpoint with recording_id=" + recordingId);

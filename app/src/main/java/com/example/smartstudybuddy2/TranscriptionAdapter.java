@@ -78,6 +78,25 @@ public class TranscriptionAdapter extends RecyclerView.Adapter<TranscriptionAdap
                 listener.onItemClick(recording);
             }
         });
+
+        holder.btnDeleteTranscription.setOnClickListener(v -> {
+            new android.app.AlertDialog.Builder(context)
+                .setTitle("Delete Transcription")
+                .setMessage("Are you sure you want to delete this transcription?")
+                .setPositiveButton("Delete", (dialog, which) -> {
+                    DatabaseHelper dbHelper = new DatabaseHelper(context);
+                    if (dbHelper.deleteRecordingById(recording.getId())) {
+                        transcriptions.remove(position);
+                        notifyItemRemoved(position);
+                        notifyItemRangeChanged(position, transcriptions.size());
+                        android.widget.Toast.makeText(context, "Transcription deleted", android.widget.Toast.LENGTH_SHORT).show();
+                    } else {
+                        android.widget.Toast.makeText(context, "Failed to delete", android.widget.Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+        });
     }
 
     @Override
@@ -87,11 +106,13 @@ public class TranscriptionAdapter extends RecyclerView.Adapter<TranscriptionAdap
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvTitle, tvDate, tvTranscriptionPreview;
+        android.widget.ImageView btnDeleteTranscription;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             tvTitle = itemView.findViewById(R.id.tvTranscriptionTitle);
             tvDate = itemView.findViewById(R.id.tvTranscriptionDate);
             tvTranscriptionPreview = itemView.findViewById(R.id.tvTranscriptionPreview);
+            btnDeleteTranscription = itemView.findViewById(R.id.btnDeleteTranscription);
         }
     }
 }

@@ -49,18 +49,13 @@ public class FlashcardAdapter extends RecyclerView.Adapter<FlashcardAdapter.Flas
                 return;
             }
             
-            // Show full question (Q/A). Do not truncate - ensure full text is visible in the list.
+            // Show full question
             String question = card.getQuestion() != null ? card.getQuestion() : "No question";
             holder.tvQuestion.setText(question);
             
-            // Show topic
-            String topic = card.getTopic() != null ? card.getTopic() : "General";
-            holder.tvTopic.setText("📚 " + topic);
-            
-            // ✅ NEW: Display mastery using card's reviewCount and isMastered fields
-            String masteryLabel = card.isMastered() ? "🟢 Mastered!" : "🟥 Learning";
-            int reviewCount = card.getReviewCount();
-            holder.tvMastery.setText(masteryLabel + " (" + reviewCount + "x)");
+            // Show answer preview in place of topic
+            String answer = card.getAnswer() != null ? card.getAnswer() : "No answer";
+            holder.tvTopic.setText(answer);
             
             // Open detail on click
             holder.itemView.setOnClickListener(v -> {
@@ -81,14 +76,13 @@ public class FlashcardAdapter extends RecyclerView.Adapter<FlashcardAdapter.Flas
 
 
     public static class FlashcardViewHolder extends RecyclerView.ViewHolder {
-        TextView tvQuestion, tvTopic, tvMastery;
+        TextView tvQuestion, tvTopic;
         DatabaseHelper dbHelper;
 
         public FlashcardViewHolder(@NonNull View itemView) {
             super(itemView);
             tvQuestion = itemView.findViewById(R.id.tvQuestion);
             tvTopic = itemView.findViewById(R.id.tvTopic);
-            tvMastery = itemView.findViewById(R.id.tvMastery);
         }
     }
 }

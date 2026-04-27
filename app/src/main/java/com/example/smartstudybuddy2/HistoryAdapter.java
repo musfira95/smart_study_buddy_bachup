@@ -66,12 +66,6 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
             // Date: Show created date
             holder.tvDate.setText(session.getCreatedDate());
             
-            // Metadata: Duration and Quiz Score
-            String metadata = String.format("⏱ %ds | 🎯 %.1f%%",
-                    session.getDuration(),
-                    session.getQuizScore());
-            holder.tvMetadata.setText(metadata);
-            
             // Icon for Study Session
             holder.ivIcon.setImageResource(R.drawable.ic_study);
             
@@ -90,7 +84,6 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
             Recording r = (Recording) item;
             holder.tvTitle.setText(r.getTitle());
             holder.tvDate.setText(r.getDate());
-            holder.tvMetadata.setText("📁 Recording");
             holder.ivIcon.setImageResource(R.drawable.ic_recording);
             
             // Non-clickable, but delete button VISIBLE
@@ -139,7 +132,6 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
                     q.getCategory(), q.getScorePercentage());
             holder.tvTitle.setText(scoreText);
             holder.tvDate.setText(q.getCreatedDate());
-            holder.tvMetadata.setText(String.format("%d/%d correct", q.getCorrectCount(), q.getTotalQuestions()));
             holder.ivIcon.setImageResource(R.drawable.ic_quiz);
             
             // Non-clickable, but show delete button for Quiz
@@ -178,7 +170,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
 
     static class HistoryViewHolder extends RecyclerView.ViewHolder {
         ImageView ivIcon;
-        TextView tvTitle, tvDate, tvMetadata;
+        TextView tvTitle, tvDate;
         ImageView btnDelete;
 
         public HistoryViewHolder(@NonNull View itemView) {
@@ -186,7 +178,6 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
             ivIcon = itemView.findViewById(R.id.ivIcon);
             tvTitle = itemView.findViewById(R.id.tvTitle);
             tvDate = itemView.findViewById(R.id.tvDate);
-            tvMetadata = itemView.findViewById(R.id.tvMetadata);
             btnDelete = itemView.findViewById(R.id.btnDelete);
         }
     }
